@@ -10,6 +10,10 @@ pub fn decode_any(Bytes) -> Any raise DecodeError
 
 pub fn encode_any(Any) -> Bytes
 
+pub fn from_hex(String) -> Bytes raise DecodeError
+
+pub fn to_hex(BytesView) -> String
+
 pub fn utf8_encode(String) -> Bytes
 
 // Errors

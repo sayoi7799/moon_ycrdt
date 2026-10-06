@@ -13,6 +13,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as encoding from 'lib0/encoding'
+import * as Y from 'yjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const YJS_VERSION = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts/node_modules/yjs/package.json'), 'utf8')).version
@@ -127,4 +128,164 @@ const describe = (v) => {
   return v
 }
 
+// ---------------------------------------------------------------------------
+// Update format v1
+
+const newDoc = (clientID, opts = {}) => {
+  const doc = new Y.Doc(opts)
+  doc.clientID = clientID
+  return doc
+}
+
+const idStr = (id) => id === null ? '-' : `${id.client}:${id.clock}`
+
+// Canonical one-line description of a decoded struct; the MoonBit test builds
+// the same string from its own decoder (update/update_test.mbt `describe`).
+const describeStruct = (s) => {
+  if (s instanceof Y.GC) return `GC ${idStr(s.id)} len=${s.length}`
+  if (s instanceof Y.Skip) return `Skip ${idStr(s.id)} len=${s.length}`
+  let parent = '-'
+  if (typeof s.parent === 'string') parent = `root:${s.parent}`
+  else if (s.parent instanceof Y.ID) parent = `item:${idStr(s.parent)}`
+  return `Item ${idStr(s.id)} len=${s.length} o=${idStr(s.origin)} ro=${idStr(s.rightOrigin)} p=${parent} ps=${s.parentSub ?? '-'} ref=${s.content.getRef()}`
+}
+
+const describeDs = (ds) => [...ds.clients.entries()].map(([client, items]) =>
+  `${client}:` + items.map(r => `[${r.clock},${r.len}]`).join('')).join(' ')
+
+const updateScenarios = () => {
+  const out = []
+  const add = (name, update) => out.push({ name, update })
+
+  {
+    const d = newDoc(1)
+    const t = d.getText('t')
+    t.insert(0, 'ab'); t.insert(2, 'c'); t.delete(0, 1)
+    add('text_basic_gc', Y.encodeStateAsUpdate(d))
+  }
+  {
+    const d = newDoc(1, { gc: false })
+    const t = d.getText('t')
+    t.insert(0, 'ab'); t.insert(2, 'c'); t.delete(0, 1)
+    add('text_basic_nogc', Y.encodeStateAsUpdate(d))
+  }
+  {
+    const d = newDoc(7, { gc: false })
+    const t = d.getText('text')
+    t.insert(0, '你好😀世界'); t.insert(3, '🎉'); t.delete(3, 1) // splits a surrogate pair
+    t.insert(0, 'é')
+    add('text_unicode', Y.encodeStateAsUpdate(d))
+  }
+  {
+    const d = newDoc(3000000000) // client id above 2^31
+    const m = d.getMap('m')
+    m.set('int', 42); m.set('neg', -7); m.set('float', 1.5); m.set('double', 0.1)
+    m.set('big', 2n ** 40n); m.set('str', '中文'); m.set('t', true); m.set('f', false); m.set('nil', null)
+    m.set('arr', [1, 'two', [3]]); m.set('obj', { a: 1, b: { c: [null] } }); m.set('bin', new Uint8Array([1, 2, 3]))
+    m.set('int', 43) // overwrite: origin present, parentSub bit set but key omitted
+    m.delete('neg')
+    add('map_values', Y.encodeStateAsUpdate(d))
+  }
+  {
+    const d = newDoc(5)
+    const t = d.getText('rich')
+    t.insert(0, 'hello world')
+    t.format(0, 5, { bold: true })
+    t.insertEmbed(5, { image: 'x.png' })
+    t.insert(11, '!', { italic: true })
+    add('text_format_embed', Y.encodeStateAsUpdate(d))
+  }
+  {
+    const d = newDoc(9)
+    const arr = d.getArray('arr')
+    const inner = new Y.Map()
+    arr.insert(0, [inner, 'plain', 3])
+    inner.set('k', 'v')
+    const frag = d.getXmlFragment('xml')
+    const el = new Y.XmlElement('p')
+    el.setAttribute('class', 'c1')
+    const txt = new Y.XmlText()
+    frag.insert(0, [el, new Y.XmlHook('hook-name')])
+    el.insert(0, [txt])
+    txt.insert(0, 'xml text')
+    const sub = new Y.Doc({ guid: 'sub-guid' })
+    d.getMap('docs').set('sub', sub)
+    add('nested_types', Y.encodeStateAsUpdate(d))
+  }
+  {
+    const d = newDoc(11) // gc: true turns children of deleted types into GC structs
+    const arr = d.getArray('arr')
+    const inner = new Y.Map()
+    arr.insert(0, [inner, 'keep'])
+    inner.set('a', 1); inner.set('b', 'two')
+    arr.delete(0, 1)
+    add('gc_structs', Y.encodeStateAsUpdate(d))
+  }
+  {
+    const a = newDoc(1); const b = newDoc(2); const c = newDoc(3)
+    a.getText('t').insert(0, 'base')
+    Y.applyUpdate(b, Y.encodeStateAsUpdate(a)); Y.applyUpdate(c, Y.encodeStateAsUpdate(a))
+    a.getText('t').insert(2, 'A'); b.getText('t').insert(2, 'B'); c.getText('t').insert(2, 'C')
+    b.getText('t').delete(0, 1); c.getMap('m').set('x', 'y')
+    Y.applyUpdate(a, Y.encodeStateAsUpdate(b)); Y.applyUpdate(a, Y.encodeStateAsUpdate(c))
+    add('multi_client', Y.encodeStateAsUpdate(a))
+  }
+  {
+    const d = newDoc(4)
+    const t = d.getText('t')
+    t.insert(0, 'hello')
+    const sv = Y.encodeStateVector(d)
+    t.insert(5, ' world')
+    add('diff_from_sv', Y.encodeStateAsUpdate(d, sv))
+    // A state vector that points into the middle of an item: written with an offset.
+    const e = encoding.createEncoder()
+    encoding.writeVarUint(e, 1); encoding.writeVarUint(e, 4); encoding.writeVarUint(e, 2)
+    add('diff_mid_item', Y.encodeStateAsUpdate(d, encoding.toUint8Array(e)))
+  }
+  {
+    const d = newDoc(6)
+    const updates = []
+    d.on('update', u => updates.push(u))
+    const t = d.getText('t')
+    t.insert(0, 'one'); t.insert(3, 'two'); t.insert(6, 'three')
+    add('merged_with_skip', Y.mergeUpdates([updates[0], updates[2]]))
+  }
+  {
+    // Legacy ContentJSON is never created by current Yjs, so craft it with lib0
+    // and let Yjs normalise it: the fixture is what Yjs itself writes back.
+    const e = encoding.createEncoder()
+    encoding.writeVarUint(e, 1) // clients
+    encoding.writeVarUint(e, 1); encoding.writeVarUint(e, 8); encoding.writeVarUint(e, 0)
+    encoding.writeUint8(e, 2) // info: ContentJSON, no origins
+    encoding.writeVarUint(e, 1); encoding.writeVarString(e, 'legacy')
+    encoding.writeVarUint(e, 3)
+    encoding.writeVarString(e, '{"a":1}'); encoding.writeVarString(e, '"s"'); encoding.writeVarString(e, 'undefined')
+    encoding.writeVarUint(e, 0) // empty delete set
+    const d = newDoc(100)
+    Y.applyUpdate(d, encoding.toUint8Array(e))
+    add('content_json', Y.encodeStateAsUpdate(d))
+  }
+  return out
+}
+
+const genUpdates = () => {
+  const cases = updateScenarios().map(({ name, update }) => {
+    const decoded = Y.decodeUpdate(update)
+    return {
+      name,
+      update: hex(update),
+      stateVector: hex(Y.encodeStateVectorFromUpdate(update)),
+      structs: decoded.structs.map(describeStruct),
+      deleteSet: describeDs(decoded.ds)
+    }
+  })
+  let mbt = '\n///|\nlet update_cases : Array[(String, String, String, Array[String], String)] = [\n'
+  for (const c of cases) {
+    mbt += `  (\n    "${c.name}",\n    "${c.update}",\n    "${c.stateVector}",\n    [\n${c.structs.map(s => `      ${mbtString(s)},`).join('\n')}\n    ],\n    ${mbtString(c.deleteSet)},\n  ),\n`
+  }
+  mbt += ']\n'
+  writeFixture('updates', 'update', cases, mbt)
+}
+
 genLib0()
+genUpdates()

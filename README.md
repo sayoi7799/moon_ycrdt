@@ -10,7 +10,8 @@ editors, y-websocket servers and Yrs backends.
 
 | package | contents |
 |---|---|
-| `lib0` | lib0-compatible binary encoding: varUint, varInt, varString, byte arrays, float32/64, bigint, `Any` |
+| `lib0` | lib0-compatible binary encoding: varUint, varInt, varString, byte arrays, float32/64, bigint, `Any`, hex helpers |
+| `update` | Yjs update format v1 as plain data: `ID`, all 9 content kinds, Item / GC / Skip structs, `DeleteSet`, state vectors; byte-exact decode/encode |
 
 ## Test fixtures
 

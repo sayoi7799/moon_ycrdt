@@ -1,0 +1,6 @@
+import {
+  "sayoi7799/moon_ycrdt/lib0",
+  "moonbitlang/core/cmp",
+}
+
+warnings = "-implicit_impl_as_method"

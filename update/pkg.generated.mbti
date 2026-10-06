@@ -1,0 +1,149 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sayoi7799/moon_ycrdt/update"
+
+import {
+  "moonbitlang/core/debug",
+  "sayoi7799/moon_ycrdt/lib0",
+}
+
+// Values
+pub const BITS_CONTENT_REF : Int = 0x1F
+
+pub const BIT_ORIGIN : Int = 0x80
+
+pub const BIT_PARENT_SUB : Int = 0x20
+
+pub const BIT_RIGHT_ORIGIN : Int = 0x40
+
+pub const TYPE_REF_ARRAY : Int = 0
+
+pub const TYPE_REF_MAP : Int = 1
+
+pub const TYPE_REF_TEXT : Int = 2
+
+pub const TYPE_REF_XML_ELEMENT : Int = 3
+
+pub const TYPE_REF_XML_FRAGMENT : Int = 4
+
+pub const TYPE_REF_XML_HOOK : Int = 5
+
+pub const TYPE_REF_XML_TEXT : Int = 6
+
+pub fn decode_state_vector(Bytes) -> Map[UInt, Int] raise @lib0.DecodeError
+
+pub fn decode_update(Bytes) -> Update raise @lib0.DecodeError
+
+pub fn encode_state_vector(Map[UInt, Int]) -> Bytes
+
+pub fn read_content(@lib0.Decoder, Int) -> Content raise @lib0.DecodeError
+
+pub fn read_delete_set(@lib0.Decoder) -> DeleteSet raise @lib0.DecodeError
+
+pub fn read_id(@lib0.Decoder) -> ID raise @lib0.DecodeError
+
+pub fn read_struct(@lib0.Decoder, ID) -> StructRef raise @lib0.DecodeError
+
+pub fn write_id(@lib0.Encoder, ID) -> Unit
+
+// Errors
+
+// Types and methods
+pub(all) struct ClientStructs {
+  client : UInt
+  structs : Array[StructRef]
+} derive(Eq, @debug.Debug)
+pub fn ClientStructs::equal(Self, Self) -> Bool
+pub fn ClientStructs::not_equal(Self, Self) -> Bool
+
+pub(all) enum Content {
+  Deleted(Int)
+  JSON(Array[String])
+  Binary(Bytes)
+  String(String)
+  Embed(String)
+  Format(String, String)
+  Type(Int, String?)
+  Any(Array[@lib0.Any])
+  Doc(String, @lib0.Any)
+} derive(Eq, @debug.Debug)
+pub fn Content::equal(Self, Self) -> Bool
+pub fn Content::is_countable(Self) -> Bool
+pub fn Content::length(Self) -> Int
+pub fn Content::not_equal(Self, Self) -> Bool
+pub fn Content::ref_number(Self) -> Int
+pub fn Content::split(Self, Int) -> (Self, Self)
+pub fn Content::write(Self, @lib0.Encoder, Int) -> Unit
+
+pub(all) struct DeleteRange {
+  clock : Int
+  len : Int
+} derive(Eq, @debug.Debug)
+pub fn DeleteRange::equal(Self, Self) -> Bool
+pub fn DeleteRange::not_equal(Self, Self) -> Bool
+
+pub struct DeleteSet {
+  clients : Map[UInt, Array[DeleteRange]]
+} derive(Eq, @debug.Debug)
+pub fn DeleteSet::add(Self, UInt, Int, Int) -> Unit
+pub fn DeleteSet::contains(Self, ID) -> Bool
+pub fn DeleteSet::equal(Self, Self) -> Bool
+pub fn DeleteSet::is_empty(Self) -> Bool
+pub fn DeleteSet::new() -> Self
+pub fn DeleteSet::not_equal(Self, Self) -> Bool
+pub fn DeleteSet::sort_and_merge(Self) -> Unit
+pub fn DeleteSet::write(Self, @lib0.Encoder) -> Unit
+
+pub(all) struct ID {
+  client : UInt
+  clock : Int
+} derive(Eq, Hash, @debug.Debug)
+pub fn ID::equal(Self, Self) -> Bool
+pub fn ID::new(UInt, Int) -> Self
+pub fn ID::not_equal(Self, Self) -> Bool
+pub fn ID::output(Self, &Logger) -> Unit
+pub fn ID::to_string(Self) -> String
+pub impl Show for ID
+
+pub(all) struct ItemRef {
+  id : ID
+  origin : ID?
+  right_origin : ID?
+  parent : ParentRef?
+  has_parent_sub : Bool
+  parent_sub : String?
+  content : Content
+} derive(Eq, @debug.Debug)
+pub fn ItemRef::equal(Self, Self) -> Bool
+pub fn ItemRef::not_equal(Self, Self) -> Bool
+
+pub(all) enum ParentRef {
+  Root(String)
+  Item(ID)
+} derive(Eq, @debug.Debug)
+pub fn ParentRef::equal(Self, Self) -> Bool
+pub fn ParentRef::not_equal(Self, Self) -> Bool
+
+pub(all) enum StructRef {
+  GC(ID, Int)
+  Skip(ID, Int)
+  Item(ItemRef)
+} derive(Eq, @debug.Debug)
+pub fn StructRef::equal(Self, Self) -> Bool
+pub fn StructRef::id(Self) -> ID
+pub fn StructRef::length(Self) -> Int
+pub fn StructRef::not_equal(Self, Self) -> Bool
+pub fn StructRef::write(Self, @lib0.Encoder, Int) -> Unit
+
+pub struct Update {
+  clients : Array[ClientStructs]
+  delete_set : DeleteSet
+} derive(Eq, @debug.Debug)
+pub fn Update::encode(Self) -> Bytes
+pub fn Update::equal(Self, Self) -> Bool
+pub fn Update::new(Array[ClientStructs], DeleteSet) -> Self
+pub fn Update::not_equal(Self, Self) -> Bool
+pub fn Update::state_vector(Self) -> Map[UInt, Int]
+
+// Type aliases
+
+// Traits
