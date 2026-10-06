@@ -203,3 +203,57 @@ pub extend Any with Eq::{not_equal, equal}
 
 ///|
 pub extend Any with @debug.Debug::{to_repr}
+
+///|
+/// JSON-like rendering; `undefined`, bigints (`12n`) and byte arrays
+/// (`Uint8Array[1,2]`) use JavaScript notation.
+pub impl Show for Any with fn output(self, logger) {
+  match self {
+    Undefined => logger.write_string("undefined")
+    Null => logger.write_string("null")
+    Bool(b) => logger.write_string(b.to_string())
+    Number(d) =>
+      if is_js_integer(d) && d.abs() < 9007199254740992.0 {
+        logger.write_string(d.to_int64().to_string())
+      } else {
+        logger.write_string(d.to_string())
+      }
+    BigInt(n) => logger.write_string("\{n}n")
+    String(s) => logger.write_string(s.escape())
+    Array(items) => {
+      logger.write_string("[")
+      for i, item in items {
+        if i > 0 {
+          logger.write_string(",")
+        }
+        item.output(logger)
+      }
+      logger.write_string("]")
+    }
+    Object(entries) => {
+      logger.write_string("{")
+      for i, entry in entries {
+        if i > 0 {
+          logger.write_string(",")
+        }
+        logger.write_string(entry.0.escape())
+        logger.write_string(":")
+        entry.1.output(logger)
+      }
+      logger.write_string("}")
+    }
+    Bytes(b) => {
+      logger.write_string("Uint8Array[")
+      for i, byte in b {
+        if i > 0 {
+          logger.write_string(",")
+        }
+        logger.write_string(byte.to_int().to_string())
+      }
+      logger.write_string("]")
+    }
+  }
+}
+
+///|
+pub extend Any with Show::{to_string, output}

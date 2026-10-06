@@ -1,0 +1,7 @@
+import {
+  "sayoi7799/moon_ycrdt/lib0",
+  "sayoi7799/moon_ycrdt/update",
+  "moonbitlang/core/hashset",
+}
+
+warnings = "-implicit_impl_as_method"

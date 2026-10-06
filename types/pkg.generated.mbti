@@ -1,0 +1,40 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sayoi7799/moon_ycrdt/types"
+
+import {
+  "sayoi7799/moon_ycrdt/doc",
+  "sayoi7799/moon_ycrdt/lib0",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Text {
+  doc : @doc.Doc
+  ty : @doc.YType
+}
+pub fn Text::delete(Self, Int, Int) -> Unit
+pub fn Text::insert(Self, Int, String) -> Unit
+pub fn Text::length(Self) -> Int
+pub fn Text::new(@doc.Doc, String) -> Self
+pub fn Text::to_string(Self) -> String
+pub impl Show for Text
+
+pub struct YMap {
+  doc : @doc.Doc
+  ty : @doc.YType
+}
+pub fn YMap::delete(Self, String) -> Unit
+pub fn YMap::entries(Self) -> Array[(String, @lib0.Any)]
+pub fn YMap::get(Self, String) -> @lib0.Any?
+pub fn YMap::has(Self, String) -> Bool
+pub fn YMap::keys(Self) -> Array[String]
+pub fn YMap::new(@doc.Doc, String) -> Self
+pub fn YMap::set(Self, String, @lib0.Any) -> Unit
+pub fn YMap::size(Self) -> Int
+
+// Type aliases
+
+// Traits

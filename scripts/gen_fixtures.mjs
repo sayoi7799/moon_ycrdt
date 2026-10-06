@@ -287,5 +287,202 @@ const genUpdates = () => {
   writeFixture('updates', 'update', cases, mbt)
 }
 
+// ---------------------------------------------------------------------------
+// Yjs -> MoonBit interop: updates to apply in order, and what Yjs itself ends
+// up with after applying them to a fresh (gc: false) document.
+
+// Small deterministic PRNG so that fixtures are reproducible.
+export const rng = (seed) => () => {
+  seed |= 0; seed = seed + 0x6D2B79F5 | 0
+  let t = Math.imul(seed ^ seed >>> 15, 1 | seed)
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t
+  return ((t ^ t >>> 14) >>> 0) / 4294967296
+}
+
+export const RECEIVER_CLIENT = 999999
+
+const recordUpdates = (doc) => {
+  const updates = []
+  doc.on('update', u => updates.push(u))
+  return updates
+}
+
+const interopScenarios = () => {
+  const out = []
+  const add = (name, updates, texts = [], maps = []) => out.push({ name, updates, texts, maps })
+
+  for (const { name, update } of updateScenarios()) {
+    const texts = { text_basic_gc: ['t'], text_basic_nogc: ['t'], text_unicode: ['text'], text_format_embed: ['rich'], multi_client: ['t'], merged_with_skip: ['t'] }[name] ?? []
+    const maps = { map_values: ['m'], multi_client: ['m'] }[name] ?? []
+    add(`single_${name}`, [update], texts, maps)
+  }
+  {
+    const d = newDoc(21, { gc: false })
+    const ups = recordUpdates(d)
+    const t = d.getText('t')
+    t.insert(0, 'Hello, world')
+    t.insert(5, ' there')
+    t.delete(0, 1)
+    t.insert(0, 'h')
+    t.insert(t.length, ' 😀👍')
+    t.delete(t.length - 3, 1) // inside the emoji pair -> U+FFFD halves
+    t.insert(3, '中文')
+    t.delete(2, 4)
+    t.insert(2, 'XYZ')
+    add('incremental_text', ups, ['t'])
+  }
+  {
+    const d = newDoc(22)
+    const ups = recordUpdates(d)
+    const m = d.getMap('settings')
+    m.set('theme', 'dark'); m.set('size', 12); m.set('ratio', 0.75)
+    m.set('size', 14); m.delete('theme'); m.set('list', [1, 2, { x: null }])
+    m.set('theme', 'light'); m.set('raw', new Uint8Array([9, 8, 7]))
+    add('incremental_map', ups, [], ['settings'])
+  }
+  {
+    // Three replicas, concurrent edits at the same positions, delivered to the
+    // receiver shuffled and with duplicates (exercises the pending queue).
+    const rand = rng(7)
+    const docs = [newDoc(101), newDoc(202), newDoc(303)]
+    const all = []
+    docs.forEach(d => d.on('update', u => all.push(u)))
+    docs[0].getText('t').insert(0, 'shared base')
+    for (const d of docs.slice(1)) Y.applyUpdate(d, Y.encodeStateAsUpdate(docs[0]))
+    docs[0].getText('t').insert(6, 'A1'); docs[1].getText('t').insert(6, 'B1'); docs[2].getText('t').insert(6, 'C1')
+    docs[1].getText('t').delete(0, 3); docs[2].getText('t').delete(2, 5)
+    docs[0].getMap('m').set('k', 'from0'); docs[2].getMap('m').set('k', 'from2'); docs[1].getMap('m').set('j', 1)
+    Y.applyUpdate(docs[1], Y.encodeStateAsUpdate(docs[2]))
+    docs[1].getText('t').insert(4, 'after-sync')
+    docs[0].getText('t').insert(0, '>')
+    const order = all.map((u, i) => [rand(), u]).sort((a, b) => a[0] - b[0]).map(x => x[1])
+    order.splice(3, 0, order[0]); order.push(order[5])
+    add('concurrent_shuffled', order, ['t'], ['m'])
+  }
+  return out
+}
+
+const genInterop = () => {
+  const cases = interopScenarios().map(({ name, updates, texts, maps }) => {
+    const r = newDoc(RECEIVER_CLIENT, { gc: false })
+    for (const u of updates) Y.applyUpdate(r, u)
+    return {
+      name,
+      updates: updates.map(hex),
+      texts: texts.map(n => [n, r.getText(n).toString()]),
+      maps: maps.map(n => {
+        const m = r.getMap(n)
+        return [n, [...m.keys()].sort().map(k => [k, m.get(k)])]
+      }),
+      stateVector: hex(Y.encodeStateVector(r)),
+      state: hex(Y.encodeStateAsUpdate(r))
+    }
+  })
+  let mbt = `\n///|\nlet receiver_client : UInt = ${RECEIVER_CLIENT}\n`
+  mbt += '\n///|\nlet interop_cases : Array[InteropCase] = [\n'
+  for (const c of cases) {
+    mbt += '  {\n'
+    mbt += `    name: "${c.name}",\n`
+    mbt += `    updates: [\n${c.updates.map(u => `      "${u}",`).join('\n')}\n    ],\n`
+    mbt += `    texts: [${c.texts.map(([n, s]) => `(${mbtString(n)}, ${mbtString(s)})`).join(', ')}],\n`
+    mbt += `    maps: [${c.maps.map(([n, es]) => `(${mbtString(n)}, [${es.map(([k, v]) => `(${mbtString(k)}, ${mbtAny(v)})`).join(', ')}])`).join(', ')}],\n`
+    mbt += `    state_vector: "${c.stateVector}",\n`
+    mbt += `    state: "${c.state}",\n`
+    mbt += '  },\n'
+  }
+  mbt += ']\n'
+  const json = cases.map(c => ({ ...c, maps: c.maps.map(([n, es]) => [n, es.map(([k, v]) => [k, describe(v)])]) }))
+  writeFixture('interop', 'tests', json, mbt)
+}
+
+// ---------------------------------------------------------------------------
+// Concurrent convergence: random edits on 2-3 replicas at nearby positions,
+// exchanged in random order with duplicates. Every step records the text Yjs
+// has on the affected replica and the bytes of every local update.
+
+const CHUNKS = ['a', 'b', 'xy', 'Z', '中', '文字', '😀', 'e😀', '👍z', ' ']
+
+export const convergenceScenario = (seed) => {
+  const rand = rng(seed * 7919 + 13)
+  const pick = (arr) => arr[Math.floor(rand() * arr.length)]
+  const n = 2 + Math.floor(rand() * 2)
+  const ids = []
+  while (ids.length < n) {
+    const id = rand() < 0.5 ? 1 + Math.floor(rand() * 5) : Math.floor(rand() * 4294967295)
+    if (!ids.includes(id)) ids.push(id)
+  }
+  const docs = ids.map(id => newDoc(id))
+  const logs = docs.map(() => [])
+  docs.forEach((d, i) => d.on('update', (u, _origin, _doc, tr) => { if (tr.local) logs[i].push(u) }))
+  const ops = []
+  const deliver = (from, to, indices) => {
+    for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+    ops.push({ op: 'sync', from, to, indices, text: docs[to].getText('t').toString() })
+  }
+  const steps = 15 + Math.floor(rand() * 25)
+  for (let s = 0; s < steps; s++) {
+    const r = Math.floor(rand() * n)
+    const t = docs[r].getText('t')
+    const len = t.length
+    const choice = rand()
+    if (choice < 0.45 || len === 0) {
+      const bias = rand()
+      const pos = bias < 0.15 ? 0 : bias < 0.3 ? len : bias < 0.4 ? Math.floor(len / 2) : Math.floor(rand() * (len + 1))
+      const text = pick(CHUNKS)
+      const before = logs[r].length
+      t.insert(pos, text)
+      ops.push({ op: 'insert', replica: r, pos, str: text, update: logs[r].slice(before).map(hex), text: t.toString() })
+    } else if (choice < 0.7) {
+      const pos = Math.floor(rand() * len)
+      const dl = 1 + Math.floor(rand() * Math.min(3, len - pos))
+      const before = logs[r].length
+      t.delete(pos, dl)
+      ops.push({ op: 'delete', replica: r, pos, len: dl, update: logs[r].slice(before).map(hex), text: t.toString() })
+    } else {
+      const from = Math.floor(rand() * n)
+      const to = (from + 1 + Math.floor(rand() * (n - 1))) % n
+      if (logs[from].length === 0) continue
+      const k = 1 + Math.floor(rand() * (logs[from].length + 1))
+      const indices = Array.from({ length: k }, () => Math.floor(rand() * logs[from].length))
+      deliver(from, to, indices)
+    }
+  }
+  // final full exchange, in order
+  for (let to = 0; to < n; to++) {
+    for (let from = 0; from < n; from++) {
+      if (from !== to && logs[from].length > 0) deliver(from, to, logs[from].map((_, i) => i))
+    }
+  }
+  const finalText = docs[0].getText('t').toString()
+  for (const d of docs) {
+    if (d.getText('t').toString() !== finalText) throw new Error(`seed ${seed}: Yjs replicas did not converge`)
+  }
+  return { seed, clients: ids, ops, finalText }
+}
+
+const CONVERGENCE_CASES = 200
+
+const genConvergence = () => {
+  const cases = Array.from({ length: CONVERGENCE_CASES }, (_, i) => convergenceScenario(i + 1))
+  const mbtOp = (o) => {
+    switch (o.op) {
+      case 'insert': return `Ins(${o.replica}, ${o.pos}, ${mbtString(o.str)}, [${o.update.map(u => `"${u}"`).join(', ')}], ${mbtString(o.text)})`
+      case 'delete': return `Del(${o.replica}, ${o.pos}, ${o.len}, [${o.update.map(u => `"${u}"`).join(', ')}], ${mbtString(o.text)})`
+      default: return `Sync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${mbtString(o.text)})`
+    }
+  }
+  // One top-level definition per scenario keeps each text segment small.
+  let mbt = ''
+  for (const c of cases) {
+    mbt += `\n///|\nlet convergence_case_${c.seed} : ConvergenceCase = {\n  seed: ${c.seed},\n  clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n  ops: [\n`
+    mbt += c.ops.map(o => `    ${mbtOp(o)},`).join('\n')
+    mbt += `\n  ],\n  final_text: ${mbtString(c.finalText)},\n}\n`
+  }
+  mbt += `\n///|\nlet convergence_cases : Array[ConvergenceCase] = [\n${cases.map(c => `  convergence_case_${c.seed},`).join('\n')}\n]\n`
+  writeFixture('convergence', 'tests', cases, mbt)
+}
+
 genLib0()
 genUpdates()
+genInterop()
+genConvergence()

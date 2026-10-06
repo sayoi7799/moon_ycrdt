@@ -1,0 +1,82 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sayoi7799/moon_ycrdt/doc"
+
+import {
+  "sayoi7799/moon_ycrdt/lib0",
+  "sayoi7799/moon_ycrdt/update",
+}
+
+// Values
+pub const TYPE_REF_UNKNOWN : Int = -1
+
+pub fn apply_update(Doc, Bytes) -> Unit raise @lib0.DecodeError
+
+pub fn encode_state_as_update(Doc, target_state_vector? : Bytes) -> Bytes raise @lib0.DecodeError
+
+pub fn encode_state_vector(Doc) -> Bytes
+
+// Errors
+
+// Types and methods
+pub struct Doc {
+  client_id : UInt
+  // private fields
+}
+pub fn Doc::apply_update(Self, Bytes) -> Unit raise @lib0.DecodeError
+pub fn Doc::commit(Self) -> Unit
+pub fn Doc::delete_item(Self, Item) -> Unit
+pub fn Doc::encode_state_as_update(Self, sv? : Map[UInt, Int]) -> Bytes
+pub fn Doc::encode_state_vector(Self) -> Bytes
+pub fn Doc::get_root(Self, String, Int) -> YType
+pub fn Doc::get_state(Self, UInt) -> Int
+pub fn Doc::get_struct(Self, @update.ID) -> Struct
+pub fn Doc::has_pending(Self) -> Bool
+pub fn Doc::insert(Self, YType, Item?, Item?, String?, @update.Content) -> Item
+pub fn Doc::new(UInt) -> Self
+pub fn Doc::on_update(Self, (Bytes, Bool) -> Unit) -> Unit
+pub fn Doc::root_names(Self) -> Array[String]
+pub fn Doc::split(Self, Item, Int) -> Item
+pub fn Doc::state_vector(Self) -> Map[UInt, Int]
+
+pub struct GCRange {
+  id : @update.ID
+  mut length : Int
+}
+
+pub struct Item {
+  id : @update.ID
+  mut length : Int
+  origin : @update.ID?
+  right_origin : @update.ID?
+  mut left : Item?
+  mut right : Item?
+  parent : YType
+  parent_sub : String?
+  mut content : @update.Content
+  mut deleted : Bool
+  mut nested : YType?
+}
+pub fn Item::is_countable(Self) -> Bool
+pub fn Item::last_id(Self) -> @update.ID
+
+pub enum Struct {
+  GC(GCRange)
+  Item(Item)
+}
+pub fn Struct::deleted(Self) -> Bool
+pub fn Struct::id(Self) -> @update.ID
+pub fn Struct::length(Self) -> Int
+
+pub struct YType {
+  mut type_ref : Int
+  name : String?
+  root_name : String?
+  item : Item?
+  mut start : Item?
+  map : Map[String, Item]
+  mut length : Int
+}
+
+// Type aliases
+
+// Traits

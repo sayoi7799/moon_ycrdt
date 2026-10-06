@@ -1,0 +1,13 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sayoi7799/moon_ycrdt/tests"
+
+// Values
+pub fn hex_bytes(String) -> Bytes
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

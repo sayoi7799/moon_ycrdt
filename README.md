@@ -12,6 +12,9 @@ editors, y-websocket servers and Yrs backends.
 |---|---|
 | `lib0` | lib0-compatible binary encoding: varUint, varInt, varString, byte arrays, float32/64, bigint, `Any`, hex helpers |
 | `update` | Yjs update format v1 as plain data: `ID`, all 9 content kinds, Item / GC / Skip structs, `DeleteSet`, state vectors; byte-exact decode/encode |
+| `doc` | `Doc` with client id, per-client struct store, YATA integration, pending queue for updates with missing dependencies, `apply_update`, `encode_state_as_update` (optionally against a state vector), `encode_state_vector`, per-transaction update events |
+| `types` | `Text` (insert / delete / to_string, UTF-16 positions) and `YMap` (set / get / delete with `Any` values) |
+| `tests` | interop tests against Yjs fixtures, 200 random convergence scenarios, quickcheck properties |
 
 ## Test fixtures
 

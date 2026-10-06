@@ -186,3 +186,22 @@ pub fn read_struct(
     }
   }
 }
+
+///|
+/// The struct without its first `offset` clocks. For items the origin
+/// becomes the preceding clock of the same item and the content is split
+/// like `Content::split` (which yields the same bytes as Yjs' offset write).
+pub fn StructRef::slice(self : StructRef, offset : Int) -> StructRef {
+  guard offset > 0 else { return self }
+  match self {
+    GC(id, len) => GC(ID::new(id.client, id.clock + offset), len - offset)
+    Skip(id, len) => Skip(ID::new(id.client, id.clock + offset), len - offset)
+    Item(r) =>
+      Item({
+        ..r,
+        id: ID::new(r.id.client, r.id.clock + offset),
+        origin: Some(ID::new(r.id.client, r.id.clock + offset - 1)),
+        content: r.content.split(offset).1,
+      })
+  }
+}

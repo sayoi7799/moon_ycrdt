@@ -132,6 +132,7 @@ pub fn StructRef::equal(Self, Self) -> Bool
 pub fn StructRef::id(Self) -> ID
 pub fn StructRef::length(Self) -> Int
 pub fn StructRef::not_equal(Self, Self) -> Bool
+pub fn StructRef::slice(Self, Int) -> Self
 pub fn StructRef::write(Self, @lib0.Encoder, Int) -> Unit
 
 pub struct Update {
