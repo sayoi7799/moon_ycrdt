@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  moonbit:
+    name: moon check / test (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [wasm-gc, js, native]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Toolchain version
+        run: moon version --all
+
+      - name: Format
+        if: matrix.target == 'wasm-gc'
+        run: moon fmt --check
+
+      - name: Check
+        run: moon check --deny-warn --target ${{ matrix.target }}
+
+      - name: Test
+        run: moon test --target ${{ matrix.target }}
+
+  interop:
+    name: Yjs interop (fixtures + MoonBit -> Yjs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pinned Yjs
+        working-directory: scripts
+        run: npm ci
+
+      - name: Fixtures are reproducible from Yjs
+        run: |
+          cd scripts && node gen_fixtures.mjs && cd ..
+          moon fmt
+          git diff --exit-code -- fixtures lib0 update tests cmd
+
+      - name: Export MoonBit edits
+        run: moon run cmd/export --target native > fixtures/moonbit_out.json
+
+      - name: Verify MoonBit updates with Yjs
+        run: node scripts/verify_moonbit.mjs fixtures/moonbit_out.json
+
+      - name: Exported fixture is up to date
+        run: git diff --exit-code -- fixtures/moonbit_out.json
+
+      - name: Example converges and is readable by Yjs
+        run: |
+          moon run examples/concurrent --target native | tee example.txt
+          node scripts/read_update.mjs "$(tail -1 example.txt | cut -d' ' -f3)" doc
