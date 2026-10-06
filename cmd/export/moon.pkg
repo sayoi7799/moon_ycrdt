@@ -1,0 +1,10 @@
+import {
+  "sayoi7799/moon_ycrdt/lib0",
+  "sayoi7799/moon_ycrdt/doc",
+  "sayoi7799/moon_ycrdt/types",
+  "moonbitlang/core/encoding/base64",
+}
+
+pkgtype(kind: "executable")
+
+warnings = "-implicit_impl_as_method"

@@ -72,12 +72,44 @@ fn Pos::forward(self : Pos) -> Unit {
 ///|
 /// Walks to `index` (`findPosition` / `findNextPosition`), splitting the item
 /// that contains the position.
+///
+/// Yjs starts the walk at a "search marker" for every index > 0 and then only
+/// knows the formatting attributes seen after the marker. Markers are a cache
+/// whose contents depend on the history of the Yjs object; this emulates the
+/// marker a freshly loaded Yjs document creates (`findMarker`): the item
+/// containing `index`, moved left over items of the same client with
+/// consecutive clocks. For text without formatting the result is the same as
+/// walking from the start.
 fn Text::find_position(self : Text, index : Int) -> Pos {
   guard index >= 0 && index <= self.ty.length else {
     abort("index \{index} out of range (length \{self.ty.length})")
   }
-  let pos = { left: None, right: self.ty.start, attrs: {}, }
+  let pos = { left: None, right: self.ty.start, attrs: Map([]), }
   let mut count = index
+  if index > 0 && self.ty.start is Some(first) {
+    let mut p = first
+    let mut pindex = 0
+    while p.right is Some(next) && pindex < index {
+      if !p.deleted && p.is_countable() {
+        if index < pindex + p.length {
+          break
+        }
+        pindex += p.length
+      }
+      p = next
+    }
+    while p.left is Some(l) &&
+          l.id.client == p.id.client &&
+          l.id.clock + l.length == p.id.clock {
+      p = l
+      if !p.deleted && p.is_countable() {
+        pindex -= p.length
+      }
+    }
+    pos.left = p.left
+    pos.right = Some(p)
+    count = index - pindex
+  }
   while pos.right is Some(r) && count > 0 {
     if !r.deleted && !(r.content is Format(_, _)) {
       if count < r.length {
@@ -126,6 +158,8 @@ pub fn Text::delete(self : Text, index : Int, len : Int) -> Unit {
     abort("delete range \{index}+\{len} out of range")
   }
   let pos = self.find_position(index)
+  let start = pos.right
+  let start_attrs = pos.attrs.copy()
   let mut remaining = len
   while remaining > 0 && pos.right is Some(r) {
     if !r.deleted {
@@ -142,5 +176,48 @@ pub fn Text::delete(self : Text, index : Int, len : Int) -> Unit {
     }
     pos.forward()
   }
+  if start is Some(s) {
+    self.cleanup_formatting_gap(s, start_attrs)
+  }
   self.doc.commit()
+}
+
+///|
+/// JavaScript `===` on two JSON-encoded attribute values: only primitive
+/// values can be identical, objects and arrays never are.
+fn js_identical(a : String, b : String) -> Bool {
+  a == b && !a.has_prefix("{") && !a.has_prefix("[")
+}
+
+///|
+/// After a deletion, removes formatting items that became redundant between
+/// the deleted range and the next visible character (`cleanupFormattingGap`),
+/// so that deleting inside formatted text gives the same result as Yjs.
+fn Text::cleanup_formatting_gap(
+  self : Text,
+  start : @doc.Item,
+  start_attrs : Map[String, String],
+) -> Unit {
+  // the formats that are in effect right before the next visible content
+  let end_formats : Map[String, @doc.Item] = Map([])
+  let mut end : @doc.Item? = Some(start)
+  while end is Some(e) && (!e.is_countable() || e.deleted) {
+    if !e.deleted && e.content is Format(key, _) {
+      end_formats[key] = e
+    }
+    end = e.right
+  }
+  let mut cur : @doc.Item? = Some(start)
+  while cur is Some(item) && !(end is Some(e) && physical_equal(e, item)) {
+    if !item.deleted && item.content is Format(key, value) {
+      let start_value = start_attrs.get(key).unwrap_or("null")
+      let is_end_format = end_formats.get(key) is Some(f) &&
+        physical_equal(f, item)
+      // overwritten later, or the attribute was already in effect
+      if !is_end_format || js_identical(start_value, value) {
+        self.doc.delete_item(item)
+      }
+    }
+    cur = item.right
+  }
 }

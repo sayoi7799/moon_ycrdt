@@ -1,0 +1,723 @@
+{
+  "generator": "moon_ycrdt cmd/export",
+  "cases": [
+    {
+      "name": "text_editing",
+      "clients": [
+        12345
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 0,
+          "text": "Hello world"
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 5,
+          "text": ","
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 12,
+          "text": "!"
+        },
+        {
+          "op": "delete",
+          "doc": 0,
+          "name": "t",
+          "pos": 0,
+          "len": 1
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 0,
+          "text": "h"
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 6,
+          "text": " 中文 "
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 17,
+          "text": "😀👍"
+        },
+        {
+          "op": "delete",
+          "doc": 0,
+          "name": "t",
+          "pos": 18,
+          "len": 1
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 3,
+          "text": "🎉"
+        },
+        {
+          "op": "delete",
+          "doc": 0,
+          "name": "t",
+          "pos": 2,
+          "len": 5
+        }
+      ],
+      "docs": [
+        {
+          "client": 12345,
+          "state": "AQ25YAAEAQF0AUiEuWAAAWWEuWABAWyEuWACAmxvhLlgBAYgd29ybGTEuWAEuWAFASyEuWAKASHEuWAAuWABAWjEuWALuWAFCCDkuK3mlocghLlgDAPvv72EuWASA++/vYS5YBME8J+RjcS5YAK5YAME8J+OiQG5YAQAAQIDEwEWAg==",
+          "stateVector": "AblgGA==",
+          "localUpdates": [
+            "AQG5YAAEAQF0C0hlbGxvIHdvcmxkAA==",
+            "AQG5YAvEuWAEuWAFASwA",
+            "AQG5YAyEuWAKASEA",
+            "AAG5YAEAAQ==",
+            "AQG5YA3EuWAAuWABAWgA",
+            "AQG5YA7EuWALuWAFCCDkuK3mlocgAA==",
+            "AQG5YBKEuWAMCPCfmIDwn5GNAA==",
+            "AAG5YAETAQ==",
+            "AQG5YBbEuWACuWADBPCfjokA",
+            "AAG5YAICAxYC"
+          ],
+          "texts": {
+            "t": "he, 中文  world!�👍"
+          },
+          "maps": {}
+        }
+      ]
+    },
+    {
+      "name": "map_values",
+      "clients": [
+        3000000001
+      ],
+      "ops": [
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "int",
+          "value": 42
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "negative",
+          "value": -7
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "float",
+          "value": 1.5
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "double",
+          "value": 0.1
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "big",
+          "value": {
+            "$bigint": "1099511627776"
+          }
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "text",
+          "value": "中文 😀"
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "flags",
+          "value": [
+            true,
+            false,
+            null,
+            {
+              "$undefined": true
+            }
+          ]
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "object",
+          "value": {
+            "a": 1,
+            "nested": {
+              "b": []
+            }
+          }
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "bytes",
+          "value": {
+            "$bytes": "AQL/"
+          }
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "int",
+          "value": 43
+        },
+        {
+          "op": "mapDelete",
+          "doc": 0,
+          "name": "m",
+          "key": "negative"
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "negative",
+          "value": -8
+        },
+        {
+          "op": "mapDelete",
+          "doc": 0,
+          "name": "m",
+          "key": "double"
+        }
+      ],
+      "docs": [
+        {
+          "client": 3000000001,
+          "state": "AQuBvMGWCwAoAQFtA2ludAF9KigBAW0IbmVnYXRpdmUBfUcoAQFtBWZsb2F0AXw/wAAAKAEBbQZkb3VibGUBez+5mZmZmZmaKAEBbQNiaWcBegAAAQAAAAAAKAEBbQR0ZXh0AXcL5Lit5paHIPCfmIAoAQFtBWZsYWdzAXUEeHl+fygBAW0Gb2JqZWN0AXYCAWF9AQZuZXN0ZWR2AQFidQAjAQFtBWJ5dGVzAwEC/6iBvMGWCwABfSuogbzBlgsBAX1IAYG8wZYLAgACAwE=",
+          "stateVector": "AYG8wZYLCw==",
+          "localUpdates": [
+            "AQGBvMGWCwAoAQFtA2ludAF9KgA=",
+            "AQGBvMGWCwEoAQFtCG5lZ2F0aXZlAX1HAA==",
+            "AQGBvMGWCwIoAQFtBWZsb2F0AXw/wAAAAA==",
+            "AQGBvMGWCwMoAQFtBmRvdWJsZQF7P7mZmZmZmZoA",
+            "AQGBvMGWCwQoAQFtA2JpZwF6AAABAAAAAAAA",
+            "AQGBvMGWCwUoAQFtBHRleHQBdwvkuK3mlocg8J+YgAA=",
+            "AQGBvMGWCwYoAQFtBWZsYWdzAXUEeHl+fwA=",
+            "AQGBvMGWCwcoAQFtBm9iamVjdAF2AgFhfQEGbmVzdGVkdgEBYnUAAA==",
+            "AQGBvMGWCwgjAQFtBWJ5dGVzAwEC/wA=",
+            "AQGBvMGWCwmogbzBlgsAAX0rAYG8wZYLAQAB",
+            "AAGBvMGWCwEBAQ==",
+            "AQGBvMGWCwqogbzBlgsBAX1IAA==",
+            "AAGBvMGWCwEDAQ=="
+          ],
+          "texts": {},
+          "maps": {
+            "m": {
+              "big": {
+                "$bigint": "1099511627776"
+              },
+              "bytes": {
+                "$bytes": "AQL/"
+              },
+              "flags": [
+                true,
+                false,
+                null,
+                {
+                  "$undefined": true
+                }
+              ],
+              "float": 1.5,
+              "int": 43,
+              "negative": -8,
+              "object": {
+                "a": 1,
+                "nested": {
+                  "b": []
+                }
+              },
+              "text": "中文 😀"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "concurrent_two",
+      "clients": [
+        1,
+        2
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 0,
+          "text": "base text"
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 4,
+          "text": "[A]"
+        },
+        {
+          "op": "insert",
+          "doc": 1,
+          "name": "t",
+          "pos": 4,
+          "text": "[B]"
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 0,
+          "text": "a0"
+        },
+        {
+          "op": "insert",
+          "doc": 1,
+          "name": "t",
+          "pos": 0,
+          "text": "b0"
+        },
+        {
+          "op": "delete",
+          "doc": 1,
+          "name": "t",
+          "pos": 6,
+          "len": 3
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "who",
+          "value": "first"
+        },
+        {
+          "op": "set",
+          "doc": 1,
+          "name": "m",
+          "key": "who",
+          "value": "second"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 2,
+          "text": "<after-sync>"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        }
+      ],
+      "docs": [
+        {
+          "client": 1,
+          "state": "AgMCAMQBAwEEA1tCXUQBAAJiMCgBAW0Dd2hvAXcGc2Vjb25kBgEABAEBdARiYXNlhAEDBSB0ZXh0xAEDAQQDW0FdRAEAAmEwKAEBbQN3aG8BdwVmaXJzdMQBDQIDDDxhZnRlci1zeW5jPgICAQADAQEOAQ==",
+          "stateVector": "AgIGARs=",
+          "localUpdates": [
+            "AQEBAAQBAXQJYmFzZSB0ZXh0AA==",
+            "AQEBCcQBAwEEA1tBXQA=",
+            "AQEBDEQBAAJhMAA=",
+            "AQEBDigBAW0Dd2hvAXcFZmlyc3QA",
+            "AQEBD8QBDQIDDDxhZnRlci1zeW5jPgA="
+          ],
+          "texts": {
+            "t": "a0<after-sync>b0base[A] text"
+          },
+          "maps": {
+            "m": {
+              "who": "second"
+            }
+          }
+        },
+        {
+          "client": 2,
+          "state": "AgMCAMQBAwEEA1tCXUQBAAJiMCgBAW0Dd2hvAXcGc2Vjb25kBgEABAEBdARiYXNlhAEDBSB0ZXh0xAEDAQQDW0FdRAEAAmEwKAEBbQN3aG8BdwVmaXJzdMQBDQIDDDxhZnRlci1zeW5jPgICAQADAQEOAQ==",
+          "stateVector": "AgIGARs=",
+          "localUpdates": [
+            "AQECAMQBAwEEA1tCXQA=",
+            "AQECA0QBAAJiMAA=",
+            "AAECAQAD",
+            "AQECBSgBAW0Dd2hvAXcGc2Vjb25kAA=="
+          ],
+          "texts": {
+            "t": "a0<after-sync>b0base[A] text"
+          },
+          "maps": {
+            "m": {
+              "who": "second"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "concurrent_three",
+      "clients": [
+        7,
+        4000000000,
+        3
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 0,
+          "text": "abc"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 2,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "sync",
+          "from": 2,
+          "to": 1
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 2
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 2
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 1,
+          "text": "X"
+        },
+        {
+          "op": "insert",
+          "doc": 1,
+          "name": "t",
+          "pos": 1,
+          "text": "Y"
+        },
+        {
+          "op": "insert",
+          "doc": 2,
+          "name": "t",
+          "pos": 1,
+          "text": "Z"
+        },
+        {
+          "op": "delete",
+          "doc": 2,
+          "name": "t",
+          "pos": 0,
+          "len": 2
+        },
+        {
+          "op": "sync",
+          "from": 2,
+          "to": 1
+        },
+        {
+          "op": "insert",
+          "doc": 1,
+          "name": "t",
+          "pos": 2,
+          "text": "😀"
+        },
+        {
+          "op": "delete",
+          "doc": 0,
+          "name": "t",
+          "pos": 3,
+          "len": 1
+        },
+        {
+          "op": "set",
+          "doc": 2,
+          "name": "m",
+          "key": "k",
+          "value": 3
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "k",
+          "value": 1
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "t",
+          "pos": 0,
+          "text": ">"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 2,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "sync",
+          "from": 2,
+          "to": 1
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 2
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 2
+        },
+        {
+          "op": "insert",
+          "doc": 1,
+          "name": "t",
+          "pos": 3,
+          "text": "after"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 2,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "sync",
+          "from": 2,
+          "to": 1
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 2
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 2
+        }
+      ],
+      "docs": [
+        {
+          "client": 7,
+          "state": "AwOA0KzzDgDEBwAHAQFZxAcBBwIE8J+YgMSA0KzzDgAHAQVhZnRlcgYHAAQBAXQBYYQHAAFihAcBAWPEBwAHAQFYKAEBbQFrAX0BxAMABwMBPgIDAMQHAAcBAVooAQFtAWsBfQMCBwIAAQIBAwEAAg==",
+          "stateVector": "A4DQrPMOCAcGAwI=",
+          "localUpdates": [
+            "AQEHAAQBAXQDYWJjAA==",
+            "AQEHA8QHAAcBAVgA",
+            "AAEHAQIB",
+            "AQEHBCgBAW0BawF9AQA=",
+            "AQEHBcQDAAcDAT4A"
+          ],
+          "texts": {
+            "t": ">XYafterb😀"
+          },
+          "maps": {
+            "m": {
+              "k": 1
+            }
+          }
+        },
+        {
+          "client": 4000000000,
+          "state": "AwOA0KzzDgDEBwAHAQFZxAcBBwIE8J+YgMSA0KzzDgAHAQVhZnRlcgYHAAQBAXQBYYQHAAFihAcBAWPEBwAHAQFYKAEBbQFrAX0BxAMABwMBPgIDAMQHAAcBAVooAQFtAWsBfQMCBwIAAQIBAwEAAg==",
+          "stateVector": "A4DQrPMOCAcGAwI=",
+          "localUpdates": [
+            "AQGA0KzzDgDEBwAHAQFZAA==",
+            "AQGA0KzzDgHEBwEHAgTwn5iAAA==",
+            "AQGA0KzzDgPEgNCs8w4ABwEFYWZ0ZXIA"
+          ],
+          "texts": {
+            "t": ">XYafterb😀"
+          },
+          "maps": {
+            "m": {
+              "k": 1
+            }
+          }
+        },
+        {
+          "client": 3,
+          "state": "AwOA0KzzDgDEBwAHAQFZxAcBBwIE8J+YgMSA0KzzDgAHAQVhZnRlcgYHAAQBAXQBYYQHAAFihAcBAWPEBwAHAQFYKAEBbQFrAX0BxAMABwMBPgIDAMQHAAcBAVooAQFtAWsBfQMCBwIAAQIBAwEAAg==",
+          "stateVector": "A4DQrPMOCAcGAwI=",
+          "localUpdates": [
+            "AQEDAMQHAAcBAVoA",
+            "AAIHAQABAwEAAQ==",
+            "AQEDASgBAW0BawF9AwA="
+          ],
+          "texts": {
+            "t": ">XYafterb😀"
+          },
+          "maps": {
+            "m": {
+              "k": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "preserve_unknown",
+      "clients": [
+        55
+      ],
+      "ops": [
+        {
+          "op": "apply",
+          "doc": 0,
+          "update": "AQkFAAQBBHJpY2gFaGVsbG+EBQQFIHdvcmyEBQkBZEYFAARib2xkBHRydWXGBQQFBQRib2xkBG51bGzFBQwFBRF7ImltYWdlIjoieC5wbmcifcYFCQUKBml0YWxpYwR0cnVlxAUOBQoBIcYFDwUKBml0YWxpYwRudWxsAA=="
+        },
+        {
+          "op": "apply",
+          "doc": 0,
+          "update": "AQkJAAcBA2FycgGICQACdwVwbGFpbn0DKAAJAAFrAXcBdgcBA3htbAMBcCgACQQFY2xhc3MBdwJjMYcJBAUJaG9vay1uYW1lBwAJBAYEAAkHCHhtbCB0ZXh0KQEEZG9jcwNzdWIIc3ViLWd1aWR2AAA="
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "rich",
+          "pos": 2,
+          "text": "-in-bold-"
+        },
+        {
+          "op": "delete",
+          "doc": 0,
+          "name": "rich",
+          "pos": 12,
+          "len": 2
+        },
+        {
+          "op": "delete",
+          "doc": 0,
+          "name": "rich",
+          "pos": 4,
+          "len": 3
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "rich",
+          "pos": 17,
+          "text": " end"
+        },
+        {
+          "op": "set",
+          "doc": 0,
+          "name": "m",
+          "key": "plain",
+          "value": "value"
+        }
+      ],
+      "docs": [
+        {
+          "client": 55,
+          "state": "AwU3AMQFAQUCAi1pxDcBBQIDbi1ixDcEBQIEb2xkLYQFCgQgZW5kKAEBbQVwbGFpbgF3BXZhbHVlCQkABwEDYXJyAYgJAAJ3BXBsYWlufQMoAAkAAWsBdwF2BwEDeG1sAwFwKAAJBAVjbGFzcwF3AmMxhwkEBQlob29rLW5hbWUHAAkEBgQACQcIeG1sIHRleHQpAQRkb2NzA3N1YghzdWItZ3VpZHYACwUABAEEcmljaAJoZYQFAQFshAUCAmxvhAUEBSB3b3JshAUJAWRGBQAEYm9sZAR0cnVlxgUEBQUEYm9sZARudWxsxQUMBQUReyJpbWFnZSI6IngucG5nIn3GBQkFCgZpdGFsaWMEdHJ1ZcQFDgUKASHGBQ8FCgZpdGFsaWMEbnVsbAI3AQIDBQIDAgwB",
+          "stateVector": "AzcOCREFEQ==",
+          "localUpdates": [
+            "AQE3AMQFAQUCCS1pbi1ib2xkLQA=",
+            "AAEFAgMCDAE=",
+            "AAE3AQID",
+            "AQE3CYQFCgQgZW5kAA==",
+            "AQE3DSgBAW0FcGxhaW4BdwV2YWx1ZQA="
+          ],
+          "texts": {
+            "rich": "he-iold-l worl!d end"
+          },
+          "maps": {
+            "m": {
+              "plain": "value"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

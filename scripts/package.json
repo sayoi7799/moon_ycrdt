@@ -4,7 +4,9 @@
   "type": "module",
   "description": "Fixture generation and interop verification for moon_ycrdt, using the official Yjs implementation.",
   "scripts": {
-    "gen": "node gen_fixtures.mjs"
+    "gen": "node gen_fixtures.mjs && cd .. && moon fmt",
+    "export": "cd .. && moon run cmd/export --target native > fixtures/moonbit_out.json",
+    "verify": "node verify_moonbit.mjs ../fixtures/moonbit_out.json"
   },
   "dependencies": {
     "lib0": "0.2.119",

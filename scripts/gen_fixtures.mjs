@@ -482,7 +482,22 @@ const genConvergence = () => {
   writeFixture('convergence', 'tests', cases, mbt)
 }
 
+// ---------------------------------------------------------------------------
+// Yjs documents with content moon_ycrdt does not model (formats, embeds, XML,
+// sub-documents), used by cmd/export to check that they survive MoonBit edits.
+
+const genExportBase = () => {
+  const byName = Object.fromEntries(updateScenarios().map(s => [s.name, hex(s.update)]))
+  const json = { rich_text: byName.text_format_embed, nested_types: byName.nested_types }
+  const mbt = `\n///|\nlet yjs_rich_text_update : String = "${json.rich_text}"\n\n///|\nlet yjs_nested_types_update : String = "${json.nested_types}"\n`
+  fs.mkdirSync(path.join(ROOT, 'fixtures'), { recursive: true })
+  fs.writeFileSync(path.join(ROOT, 'fixtures', 'export_base.json'), JSON.stringify(json, null, 2) + '\n')
+  fs.writeFileSync(path.join(ROOT, 'cmd/export', 'yjs_base_gen.mbt'), HEADER + mbt)
+  console.log('wrote fixtures/export_base.json and cmd/export/yjs_base_gen.mbt')
+}
+
 genLib0()
 genUpdates()
 genInterop()
 genConvergence()
+genExportBase()
