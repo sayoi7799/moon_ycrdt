@@ -1,0 +1,13 @@
+{
+  "name": "moon-ycrdt-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Fixture generation and interop verification for moon_ycrdt, using the official Yjs implementation.",
+  "scripts": {
+    "gen": "node gen_fixtures.mjs"
+  },
+  "dependencies": {
+    "lib0": "0.2.119",
+    "yjs": "13.6.33"
+  }
+}
