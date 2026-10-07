@@ -783,6 +783,119 @@ const genPreserve = () => {
 }
 
 // ---------------------------------------------------------------------------
+// Y.Array: random concurrent insert / push / delete on 2-3 replicas, exchanged
+// in a random order with duplicates (seeded). Every step records the array
+// content (rendered like MoonBit's `Show` for `Any`) and the local updates.
+
+export const ARRAY_CASES = 100
+
+// Same rendering as `impl Show for Any` in lib0/any.mbt (for the values used).
+export const showAny = (v) => {
+  if (v === null) return 'null'
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v)
+  if (typeof v === 'string') return JSON.stringify(v)
+  if (v instanceof Uint8Array) return `Uint8Array[${[...v].join(',')}]`
+  if (Array.isArray(v)) return `[${v.map(showAny).join(',')}]`
+  return `{${Object.keys(v).map(k => `${JSON.stringify(k)}:${showAny(v[k])}`).join(',')}}`
+}
+
+export const arrayScenario = (seed) => {
+  const rand = rng(seed * 104729 + 7)
+  const n = 2 + Math.floor(rand() * 2)
+  const ids = []
+  while (ids.length < n) {
+    const id = rand() < 0.5 ? 1 + Math.floor(rand() * 5) : Math.floor(rand() * 4294967295)
+    if (!ids.includes(id)) ids.push(id)
+  }
+  const value = () => {
+    const k = Math.floor(rand() * 7)
+    switch (k) {
+      case 0: return Math.floor(rand() * 1000)
+      case 1: return 'abcxyz'.slice(0, 1 + Math.floor(rand() * 3))
+      case 2: return rand() < 0.5
+      case 3: return null
+      case 4: return new Uint8Array([Math.floor(rand() * 256), 7])
+      case 5: return { k: Math.floor(rand() * 10) }
+      default: return [Math.floor(rand() * 10), 'x']
+    }
+  }
+  const values = () => Array.from({ length: 1 + Math.floor(rand() * 3) }, value)
+  const docs = ids.map(id => newDoc(id))
+  const logs = docs.map(() => [])
+  docs.forEach((d, i) => d.on('update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
+  const arr = (r) => docs[r].getArray('a')
+  const state = (r) => showAny(arr(r).toArray())
+  const ops = []
+  const local = (r, op, f) => {
+    const before = logs[r].length
+    f()
+    ops.push({ ...op, replica: r, update: logs[r].slice(before).map(hex), state: state(r) })
+  }
+  const deliver = (from, to, indices) => {
+    for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+    ops.push({ op: 'sync', from, to, indices, state: state(to) })
+  }
+  const steps = 10 + Math.floor(rand() * 25)
+  for (let s = 0; s < steps; s++) {
+    const r = Math.floor(rand() * n)
+    const len = arr(r).length
+    const choice = rand()
+    if (choice < 0.35 || len === 0) {
+      const bias = rand()
+      const pos = bias < 0.2 ? 0 : bias < 0.35 ? len : Math.floor(rand() * (len + 1))
+      const vs = values()
+      local(r, { op: 'insert', pos, values: vs }, () => arr(r).insert(pos, vs))
+    } else if (choice < 0.5) {
+      const vs = values()
+      local(r, { op: 'push', values: vs }, () => arr(r).push(vs))
+    } else if (choice < 0.7) {
+      const pos = Math.floor(rand() * len)
+      const dl = 1 + Math.floor(rand() * Math.min(3, len - pos))
+      local(r, { op: 'delete', pos, len: dl }, () => arr(r).delete(pos, dl))
+    } else {
+      const from = Math.floor(rand() * n)
+      const to = (from + 1 + Math.floor(rand() * (n - 1))) % n
+      if (logs[from].length === 0) continue
+      const k = 1 + Math.floor(rand() * (logs[from].length + 1))
+      deliver(from, to, Array.from({ length: k }, () => Math.floor(rand() * logs[from].length)))
+    }
+  }
+  for (let to = 0; to < n; to++) {
+    for (let from = 0; from < n; from++) {
+      if (from !== to && logs[from].length > 0) deliver(from, to, logs[from].map((_, i) => i))
+    }
+  }
+  const finalState = state(0)
+  for (let r = 0; r < n; r++) {
+    if (state(r) !== finalState) throw new Error(`array seed ${seed}: Yjs replicas did not converge`)
+  }
+  return { seed, clients: ids, ops, finalState }
+}
+
+const genArrays = () => {
+  const cases = Array.from({ length: ARRAY_CASES }, (_, i) => arrayScenario(i + 1))
+  const mbtArrOp = (o) => {
+    const ups = `[${(o.update ?? []).map(u => `"${u}"`).join(', ')}]`
+    const vs = `[${(o.values ?? []).map(mbtAny).join(', ')}]`
+    switch (o.op) {
+      case 'insert': return `AIns(${o.replica}, ${o.pos}, ${vs}, ${ups}, ${mbtString(o.state)})`
+      case 'push': return `APush(${o.replica}, ${vs}, ${ups}, ${mbtString(o.state)})`
+      case 'delete': return `ADel(${o.replica}, ${o.pos}, ${o.len}, ${ups}, ${mbtString(o.state)})`
+      default: return `ASync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${mbtString(o.state)})`
+    }
+  }
+  let mbt = ''
+  cases.forEach((c, i) => {
+    mbt += `\n///|\nfn array_case_${i + 1}() -> ArrayCase {\n  {\n    seed: ${c.seed},\n    clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n    ops: [\n`
+    mbt += c.ops.map(o => `      ${mbtArrOp(o)},`).join('\n')
+    mbt += `\n    ],\n    final_state: ${mbtString(c.finalState)},\n  }\n}\n`
+  })
+  mbt += `\n///|\nfn array_cases() -> Array[ArrayCase] {\n  [\n${cases.map((_, i) => `    array_case_${i + 1}(),`).join('\n')}\n  ]\n}\n`
+  const json = cases.map(c => ({ ...c, ops: c.ops.map(o => o.values ? { ...o, values: o.values.map(describe) } : o) }))
+  writeFixture('arrays', 'tests', json, mbt)
+}
+
+// ---------------------------------------------------------------------------
 // y-protocols sync messages. Replica A is plain Yjs; replica B is a Yjs
 // document whose state MoonBit loads and then mirrors (same client id), so
 // every message MoonBit produces must equal the one y-protocols produces.
@@ -865,5 +978,6 @@ genInterop()
 genConvergence()
 genEdge()
 genPreserve()
+genArrays()
 genProtocol()
 genExportBase()

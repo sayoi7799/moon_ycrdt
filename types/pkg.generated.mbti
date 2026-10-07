@@ -22,6 +22,18 @@ pub fn Text::new(@doc.Doc, String) -> Self
 pub fn Text::to_string(Self) -> String
 pub impl Show for Text
 
+pub struct YArray {
+  doc : @doc.Doc
+  ty : @doc.YType
+}
+pub fn YArray::delete(Self, Int, Int) -> Unit
+pub fn YArray::get(Self, Int) -> @lib0.Any?
+pub fn YArray::insert(Self, Int, Array[@lib0.Any]) -> Unit
+pub fn YArray::length(Self) -> Int
+pub fn YArray::new(@doc.Doc, String) -> Self
+pub fn YArray::push(Self, Array[@lib0.Any]) -> Unit
+pub fn YArray::to_array(Self) -> Array[@lib0.Any]
+
 pub struct YMap {
   doc : @doc.Doc
   ty : @doc.YType

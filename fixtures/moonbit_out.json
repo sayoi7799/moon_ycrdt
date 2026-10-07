@@ -80,6 +80,7 @@
       ],
       "docs": [
         {
+          "arrays": {},
           "client": 12345,
           "state": "AQ25YAAEAQF0AUiEuWAAAWWEuWABAWyEuWACAmxvhLlgBAYgd29ybGTEuWAEuWAFASyEuWAKASHEuWAAuWABAWjEuWALuWAFCCDkuK3mlocghLlgDAPvv72EuWASA++/vYS5YBME8J+RjcS5YAK5YAME8J+OiQG5YAQAAQIDEwEWAg==",
           "stateVector": "AblgGA==",
@@ -216,6 +217,7 @@
       ],
       "docs": [
         {
+          "arrays": {},
           "client": 3000000001,
           "state": "AQuBvMGWCwAoAQFtA2ludAF9KigBAW0IbmVnYXRpdmUBfUcoAQFtBWZsb2F0AXw/wAAAKAEBbQZkb3VibGUBez+5mZmZmZmaKAEBbQNiaWcBegAAAQAAAAAAKAEBbQR0ZXh0AXcL5Lit5paHIPCfmIAoAQFtBWZsYWdzAXUEeHl+fygBAW0Gb2JqZWN0AXYCAWF9AQZuZXN0ZWR2AQFidQAjAQFtBWJ5dGVzAwEC/6iBvMGWCwABfSuogbzBlgsBAX1IAYG8wZYLAgACAwE=",
           "stateVector": "AYG8wZYLCw==",
@@ -359,6 +361,7 @@
       ],
       "docs": [
         {
+          "arrays": {},
           "client": 1,
           "state": "AgMCAMQBAwEEA1tCXUQBAAJiMCgBAW0Dd2hvAXcGc2Vjb25kBgEABAEBdARiYXNlhAEDBSB0ZXh0xAEDAQQDW0FdRAEAAmEwKAEBbQN3aG8BdwVmaXJzdMQBDQIDDDxhZnRlci1zeW5jPgICAQADAQEOAQ==",
           "stateVector": "AgIGARs=",
@@ -379,6 +382,7 @@
           }
         },
         {
+          "arrays": {},
           "client": 2,
           "state": "AgMCAMQBAwEEA1tCXUQBAAJiMCgBAW0Dd2hvAXcGc2Vjb25kBgEABAEBdARiYXNlhAEDBSB0ZXh0xAEDAQQDW0FdRAEAAmEwKAEBbQN3aG8BdwVmaXJzdMQBDQIDDDxhZnRlci1zeW5jPgICAQADAQEOAQ==",
           "stateVector": "AgIGARs=",
@@ -587,6 +591,7 @@
       ],
       "docs": [
         {
+          "arrays": {},
           "client": 7,
           "state": "AwOA0KzzDgDEBwAHAQFZxAcBBwIE8J+YgMSA0KzzDgAHAQVhZnRlcgYHAAQBAXQBYYQHAAFihAcBAWPEBwAHAQFYKAEBbQFrAX0BxAMABwMBPgIDAMQHAAcBAVooAQFtAWsBfQMCBwIAAQIBAwEAAg==",
           "stateVector": "A4DQrPMOCAcGAwI=",
@@ -607,6 +612,7 @@
           }
         },
         {
+          "arrays": {},
           "client": 4000000000,
           "state": "AwOA0KzzDgDEBwAHAQFZxAcBBwIE8J+YgMSA0KzzDgAHAQVhZnRlcgYHAAQBAXQBYYQHAAFihAcBAWPEBwAHAQFYKAEBbQFrAX0BxAMABwMBPgIDAMQHAAcBAVooAQFtAWsBfQMCBwIAAQIBAwEAAg==",
           "stateVector": "A4DQrPMOCAcGAwI=",
@@ -625,6 +631,7 @@
           }
         },
         {
+          "arrays": {},
           "client": 3,
           "state": "AwOA0KzzDgDEBwAHAQFZxAcBBwIE8J+YgMSA0KzzDgAHAQVhZnRlcgYHAAQBAXQBYYQHAAFihAcBAWPEBwAHAQFYKAEBbQFrAX0BxAMABwMBPgIDAMQHAAcBAVooAQFtAWsBfQMCBwIAAQIBAwEAAg==",
           "stateVector": "A4DQrPMOCAcGAwI=",
@@ -698,6 +705,7 @@
       ],
       "docs": [
         {
+          "arrays": {},
           "client": 55,
           "state": "AwU3AMQFAQUCAi1pxDcBBQIDbi1ixDcEBQIEb2xkLYQFCgQgZW5kKAEBbQVwbGFpbgF3BXZhbHVlCQkABwEDYXJyAYgJAAJ3BXBsYWlufQMoAAkAAWsBdwF2BwEDeG1sAwFwKAAJBAVjbGFzcwF3AmMxhwkEBQlob29rLW5hbWUHAAkEBgQACQcIeG1sIHRleHQpAQRkb2NzA3N1YghzdWItZ3VpZHYACwUABAEEcmljaAJoZYQFAQFshAUCAmxvhAUEBSB3b3JshAUJAWRGBQAEYm9sZAR0cnVlxgUEBQUEYm9sZARudWxsxQUMBQUReyJpbWFnZSI6IngucG5nIn3GBQkFCgZpdGFsaWMEdHJ1ZcQFDgUKASHGBQ8FCgZpdGFsaWMEbnVsbAI3AQIDBQIDAgwB",
           "stateVector": "AzcOCREFEQ==",
@@ -716,6 +724,186 @@
               "plain": "value"
             }
           }
+        }
+      ]
+    },
+    {
+      "name": "arrays",
+      "clients": [
+        21,
+        3000000002
+      ],
+      "ops": [
+        {
+          "op": "arrayPush",
+          "doc": 0,
+          "name": "a",
+          "values": [
+            1,
+            "two",
+            {
+              "$bytes": "Aw=="
+            },
+            null
+          ]
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "arrayInsert",
+          "doc": 0,
+          "name": "a",
+          "pos": 1,
+          "values": [
+            "A",
+            {
+              "k": true
+            }
+          ]
+        },
+        {
+          "op": "arrayInsert",
+          "doc": 1,
+          "name": "a",
+          "pos": 1,
+          "values": [
+            "B"
+          ]
+        },
+        {
+          "op": "arrayDelete",
+          "doc": 1,
+          "name": "a",
+          "pos": 2,
+          "len": 1
+        },
+        {
+          "op": "arrayPush",
+          "doc": 0,
+          "name": "a",
+          "values": [
+            [
+              5
+            ]
+          ]
+        },
+        {
+          "op": "arrayPush",
+          "doc": 1,
+          "name": "a",
+          "values": [
+            "end"
+          ]
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "arrayDelete",
+          "doc": 0,
+          "name": "a",
+          "pos": 0,
+          "len": 2
+        },
+        {
+          "op": "arrayInsert",
+          "doc": 0,
+          "name": "a",
+          "pos": 0,
+          "values": [
+            {
+              "$bytes": "w78A"
+            },
+            -3
+          ]
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        }
+      ],
+      "docs": [
+        {
+          "arrays": {
+            "a": [
+              {
+                "$bytes": "w78A"
+              },
+              -3,
+              {
+                "k": true
+              },
+              "B",
+              {
+                "$bytes": "Aw=="
+              },
+              null,
+              [
+                5
+              ],
+              "end"
+            ]
+          },
+          "client": 21,
+          "state": "AgKCvMGWCwDIFQAVAQF3AUKIFQMBdwNlbmQJFQAIAQFhAX0BiBUAAXcDdHdvgxUBAQOIFQIBfsgVABUBAXcBQcgVBBUBAXYBAWt4iBUDAXUBfQVDFQADw78AyBUHFQABfUMBFQIAAgQB",
+          "stateVector": "AoK8wZYLAhUJ",
+          "localUpdates": [
+            "AQMVAAgBAWECfQF3A3R3b4MVAQEDiBUCAX4A",
+            "AQEVBMgVABUBAncBQXYBAWt4AA==",
+            "AQEVBogVAwF1AX0FAA==",
+            "AAEVAgABBAE=",
+            "AQIVB0MVAAPDvwDIFQcVAAF9QwA="
+          ],
+          "texts": {},
+          "maps": {}
+        },
+        {
+          "arrays": {
+            "a": [
+              {
+                "$bytes": "w78A"
+              },
+              -3,
+              {
+                "k": true
+              },
+              "B",
+              {
+                "$bytes": "Aw=="
+              },
+              null,
+              [
+                5
+              ],
+              "end"
+            ]
+          },
+          "client": 3000000002,
+          "state": "AgKCvMGWCwDIFQAVAQF3AUKIFQMBdwNlbmQJFQAIAQFhAX0BiBUAAXcDdHdvgxUBAQOIFQIBfsgVABUBAXcBQcgVBBUBAXYBAWt4iBUDAXUBfQVDFQADw78AyBUHFQABfUMBFQIAAgQB",
+          "stateVector": "AoK8wZYLAhUJ",
+          "localUpdates": [
+            "AQGCvMGWCwDIFQAVAQF3AUIA",
+            "AAEVAQEB",
+            "AQGCvMGWCwGIFQMBdwNlbmQA"
+          ],
+          "texts": {},
+          "maps": {}
         }
       ]
     }

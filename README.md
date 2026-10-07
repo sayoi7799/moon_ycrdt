@@ -91,7 +91,7 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | `lib0` | 与 lib0 一致的二进制编码：varUint、varInt（符号位在第一个字节的 0x40，不是 zigzag）、varString、字节数组、float32/64、bigint、`Any` |
 | `update` | update v1 的纯数据层：`ID`、9 种 content、Item / GC / Skip、info 字节、`DeleteSet`、状态向量；解码再编码逐字节还原 |
 | `doc` | `Doc`、按 client 存储的 struct store、YATA integrate、pending 队列、`apply_update`、`encode_state_as_update`、`encode_state_vector`、事务级 `on_update` |
-| `types` | `Text`（insert / delete / to_string，UTF-16 下标）和 `YMap`（set / get / delete，值为 `Any`） |
+| `types` | `Text`（insert / delete / to_string，UTF-16 下标）、`YMap`（set / get / delete，值为 `Any`）和 `YArray`（insert / push / delete / get / to_array） |
 | `protocol` | y-protocols 同步消息：`SyncStep1` / `SyncStep2` / `Update` 的编解码、`handle_sync_message`（收到 Step1 自动回复 Step2）、y-websocket 外层消息类型（sync 之外的类型原样透传） |
 | `tests` | 与 Yjs 的互通测试、300 组并发收敛、quickcheck 属性测试 |
 | `cmd/export` | MoonBit → Yjs：执行编辑脚本并导出 JSON 报告，供 Node 验证 |
@@ -110,10 +110,11 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | 事务级增量更新事件 | ✅ | `Doc::on_update`，字节与 Yjs 的 `update` 事件一致 |
 | Y.Text 插入 / 删除 / 读取 | ✅ | UTF-16 码元下标；切开代理对时与 Yjs 一样替换为 U+FFFD |
 | Y.Map set / get / delete（`Any` 值、字节数组） | ✅ | |
-| 不支持的 content（Format、Embed、XML 类型、子文档、Y.Array 内容） | ✅ 保留 | 原样存储并在编码时写回；MoonBit 编辑带格式的文本后，Yjs 读到的格式、embed、XML、子文档都还在 |
+| 不支持的 content（Format、Embed、XML 类型、子文档、Y.Array 中的嵌套类型） | ✅ 保留 | 原样存储并在编码时写回；MoonBit 编辑带格式的文本后，Yjs 读到的格式、embed、XML、子文档都还在 |
 | 文本格式属性的读写 API（`format`、`toDelta`） | ❌ | 数据会保留，但没有 API |
 | update v2 | ❌ | |
-| Y.Array、Y.Xml* 的 API | ❌ | 数据会保留 |
+| Y.Array insert / push / delete / get | ✅ | 定位、值的打包（连续普通值合成一个 Item、字节数组单独成 Item）和 push 的语义都与 Yjs 一致；嵌套类型读作 `Undefined` |
+| Y.Xml* 的 API | ❌ | 数据会保留 |
 | 子文档加载、UndoManager、awareness、相对位置、快照 | ❌ | |
 | 垃圾回收 | ❌ | 本地文档相当于 `gc: false`，但能解码对方发来的 GC 结构和 ContentDeleted |
 | y-protocols 同步消息（SyncStep1 / SyncStep2 / Update）与 y-websocket 外层封装 | ✅ | 与 `y-protocols@1.0.7` 逐字节对照；awareness 消息原样透传，不解析 |
@@ -137,9 +138,10 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | 1. lib0 编码 | 每种编码的字节对照，含 0、127、128、负数、2^31 以上、2^53−1、空串、中文、emoji、BOM、−0、Infinity、bigint、孤立代理项 | `lib0/lib0_test.mbt` |
 | 2. 解码层 | 12 个 Yjs 生成的更新（gc / 非 gc 文本、Unicode、各种 Map 值、格式与 embed、嵌套与 XML 类型、子文档、GC 结构、多 client、差量、从 Item 中间开始的差量、含 Skip 的合并更新、旧版 ContentJSON）：解码结果与 `Y.decodeUpdate` 一致，再编码**逐字节相同** | `update/update_test.mbt` |
 | 3a. Yjs → MoonBit | 15 个场景（含乱序、重复投递）：文本、Map、状态向量与 Yjs 一致，MoonBit 重新编码的整体状态与 Yjs 的**逐字节相同**；幂等；差量同步 | `tests/interop_test.mbt` |
-| 3b. MoonBit → Yjs | `cmd/export` 导出 5 组编辑脚本（Unicode 文本、全部 Any 类型、2 / 3 副本并发、编辑含格式 / embed / XML / 子文档的 Yjs 文档）；`scripts/verify_moonbit.mjs` 用 Yjs 验证：完整状态读回一致、打乱顺序应用增量更新后收敛、在 Yjs 上用相同 client id 重放同样的操作得到**逐字节相同**的状态、不支持的内容仍在（共 42 项检查） | `cmd/export`、`scripts/verify_moonbit.mjs` |
+| 3b. MoonBit → Yjs | `cmd/export` 导出 6 组编辑脚本（Unicode 文本、全部 Any 类型、2 / 3 副本并发、编辑含格式 / embed / XML / 子文档的 Yjs 文档、Y.Array 并发编辑）；`scripts/verify_moonbit.mjs` 用 Yjs 验证：完整状态读回一致、打乱顺序应用增量更新后收敛、在 Yjs 上用相同 client id 重放同样的操作得到**逐字节相同**的状态、不支持的内容仍在（共 51 项检查） | `cmd/export`、`scripts/verify_moonbit.mjs` |
 | 4. 并发收敛 | 300 组随机场景（种子固定为 1–300，见 `scripts/gen_fixtures.mjs` 的 `convergenceScenario`），2–4 个副本、同位置并发插入删除、对同一组键并发写入和删除 Map、随机抽取（有重复）乱序交换：**每一步**的文本和 Map 都与 Yjs 一致，每个本地更新的字节都与 Yjs 发出的一致 | `tests/convergence_test.mbt` |
 | 5. 属性测试 | quickcheck，每条 300 例：任意交换顺序收敛；重复应用幂等；缺依赖的更新进入 pending，补齐后自动应用（且 pending 数据经编码中继不丢失） | `tests/property_test.mbt` |
+| Y.Array | 100 组随机场景（种子固定为 1–100），2–3 个副本并发 insert / push / delete、乱序重复同步：每一步数组内容与每个本地更新的字节都与 Yjs 一致；读取 Yjs 写的嵌套内容 | `tests/array_test.mbt` |
 
 运行：
 

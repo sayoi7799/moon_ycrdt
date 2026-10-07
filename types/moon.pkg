@@ -2,6 +2,7 @@ import {
   "sayoi7799/moon_ycrdt/lib0",
   "sayoi7799/moon_ycrdt/update",
   "sayoi7799/moon_ycrdt/doc",
+  "moonbitlang/core/json",
 }
 
 warnings = "-implicit_impl_as_method"

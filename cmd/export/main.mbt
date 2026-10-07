@@ -43,6 +43,7 @@ priv struct Script {
   ops : Array[Json]
   texts : Array[String]
   maps : Array[String]
+  arrays : Array[String]
 }
 
 ///|
@@ -51,13 +52,14 @@ fn Script::new(
   clients : Array[UInt],
   texts? : Array[String] = ["t"],
   maps? : Array[String] = [],
+  arrays? : Array[String] = [],
 ) -> Script {
   let docs = clients.map(id => @doc.Doc::new(id))
   let logs : Array[Array[Bytes]] = docs.map(_ => [])
   for i, d in docs {
     d.on_update((u, is_local) => if is_local { logs[i].push(u) })
   }
-  { name, clients, docs, logs, ops: [], texts, maps, }
+  { name, clients, docs, logs, ops: [], texts, maps, arrays, }
 }
 
 ///|
@@ -131,6 +133,58 @@ fn Script::map_delete(
 }
 
 ///|
+fn Script::array_insert(
+  self : Script,
+  doc : Int,
+  pos : Int,
+  values : Array[@lib0.Any],
+  name? : String = "a",
+) -> Unit {
+  @types.YArray::new(self.docs[doc], name).insert(pos, values)
+  self.ops.push({
+    "op": "arrayInsert",
+    "doc": doc.to_json(),
+    "name": name.to_json(),
+    "pos": pos.to_json(),
+    "values": Json::array(values.map(any_to_json)),
+  })
+}
+
+///|
+fn Script::array_push(
+  self : Script,
+  doc : Int,
+  values : Array[@lib0.Any],
+  name? : String = "a",
+) -> Unit {
+  @types.YArray::new(self.docs[doc], name).push(values)
+  self.ops.push({
+    "op": "arrayPush",
+    "doc": doc.to_json(),
+    "name": name.to_json(),
+    "values": Json::array(values.map(any_to_json)),
+  })
+}
+
+///|
+fn Script::array_delete(
+  self : Script,
+  doc : Int,
+  pos : Int,
+  len : Int,
+  name? : String = "a",
+) -> Unit {
+  @types.YArray::new(self.docs[doc], name).delete(pos, len)
+  self.ops.push({
+    "op": "arrayDelete",
+    "doc": doc.to_json(),
+    "name": name.to_json(),
+    "pos": pos.to_json(),
+    "len": len.to_json(),
+  })
+}
+
+///|
 /// Sends `from`'s missing data to `to` as a diff against `to`'s state vector.
 fn Script::sync(self : Script, from : Int, to : Int) -> Unit {
   let diff = self.docs[from].encode_state_as_update(
@@ -178,7 +232,14 @@ fn Script::report(self : Script) -> Json {
       }
       maps[name] = Json::object(m)
     }
+    let arrays = Map([])
+    for name in self.arrays {
+      arrays[name] = Json::array(
+        @types.YArray::new(d, name).to_array().map(any_to_json),
+      )
+    }
     let json : Json = {
+      "arrays": Json::object(arrays),
       "client": Json::number(self.clients[i].to_double()),
       "state": b64(d.encode_state_as_update()),
       "stateVector": b64(d.encode_state_vector()),
@@ -306,6 +367,24 @@ fn text_len_of(d : @doc.Doc, name : String) -> Int {
 }
 
 ///|
+fn arrays() -> Script {
+  let s = Script::new("arrays", [21, 3000000002], texts=[], arrays=["a"])
+  s.array_push(0, [@lib0.Any::int(1), String("two"), Bytes(b""), Null])
+  s.sync_all()
+  // concurrent inserts at the same index, deletes and pushes
+  s.array_insert(0, 1, [String("A"), Object([("k", Bool(true))])])
+  s.array_insert(1, 1, [String("B")])
+  s.array_delete(1, 2, 1)
+  s.array_push(0, [Array([@lib0.Any::int(5)])])
+  s.array_push(1, [String("end")])
+  s.sync(1, 0)
+  s.array_delete(0, 0, 2)
+  s.array_insert(0, 0, [Bytes(b"ÿ "), @lib0.Any::int(-3)])
+  s.sync_all()
+  s
+}
+
+///|
 fn main {
   let cases = [
     text_editing(),
@@ -313,6 +392,7 @@ fn main {
     concurrent_two(),
     concurrent_three(),
     preserve_unknown(),
+    arrays(),
   ]
   let report : Json = {
     "generator": "moon_ycrdt cmd/export",

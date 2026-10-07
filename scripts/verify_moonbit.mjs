@@ -47,13 +47,15 @@ const readContent = (doc, names) => ({
   maps: Object.fromEntries(names.maps.map(n => {
     const m = doc.getMap(n)
     return [n, Object.fromEntries([...m.keys()].sort().map(k => [k, m.get(k)]))]
-  }))
+  })),
+  arrays: Object.fromEntries(names.arrays.map(n => [n, doc.getArray(n).toArray()]))
 })
 
 const expectedContent = (d) => ({
   texts: d.texts,
   maps: Object.fromEntries(Object.entries(d.maps).map(([n, m]) =>
-    [n, Object.fromEntries(Object.keys(m).sort().map(k => [k, fromJson(m[k])]))]))
+    [n, Object.fromEntries(Object.keys(m).sort().map(k => [k, fromJson(m[k])]))])),
+  arrays: Object.fromEntries(Object.entries(d.arrays ?? {}).map(([n, a]) => [n, a.map(fromJson)]))
 })
 
 let failures = 0
@@ -67,7 +69,7 @@ const check = (ok, what) => {
 }
 
 for (const c of report.cases) {
-  const names = { texts: Object.keys(c.docs[0].texts), maps: Object.keys(c.docs[0].maps) }
+  const names = { texts: Object.keys(c.docs[0].texts), maps: Object.keys(c.docs[0].maps), arrays: Object.keys(c.docs[0].arrays ?? {}) }
 
   // 1. full state of every replica
   c.docs.forEach((d, i) => {
@@ -102,6 +104,9 @@ for (const c of report.cases) {
       case 'delete': ydocs[o.doc].getText(o.name).delete(o.pos, o.len); break
       case 'set': ydocs[o.doc].getMap(o.name).set(o.key, fromJson(o.value)); break
       case 'mapDelete': ydocs[o.doc].getMap(o.name).delete(o.key); break
+      case 'arrayInsert': ydocs[o.doc].getArray(o.name).insert(o.pos, o.values.map(fromJson)); break
+      case 'arrayPush': ydocs[o.doc].getArray(o.name).push(o.values.map(fromJson)); break
+      case 'arrayDelete': ydocs[o.doc].getArray(o.name).delete(o.pos, o.len); break
       case 'sync': Y.applyUpdate(ydocs[o.to], Y.encodeStateAsUpdate(ydocs[o.from], Y.encodeStateVector(ydocs[o.to]))); break
       case 'apply': Y.applyUpdate(ydocs[o.doc], fromB64(o.update)); break
       default: throw new Error(`unknown op ${o.op}`)
