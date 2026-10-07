@@ -587,6 +587,173 @@ const genEdge = () => {
 }
 
 // ---------------------------------------------------------------------------
+// Preservation of content moon_ycrdt does not model. Replica A (Yjs) creates
+// the content; replica B loads it, edits the types it supports, then receives
+// A's further edits *inside* the unsupported types. The expected values come
+// from a Yjs replica with B's client id doing exactly the same.
+
+const PRESERVE_B = 77
+
+const preserveScenarios = () => {
+  const out = []
+  // build(a) creates the content on A; bOps run on B; later(a) edits on A again
+  const add = (name, aClient, build, bOps, later) => out.push({ name, aClient, build, bOps, later })
+
+  add('text formats and embeds', 5, a => {
+    const t = a.getText('t')
+    t.insert(0, 'hello world')
+    t.format(0, 5, { bold: true })
+    t.insertEmbed(5, { image: 'x.png' })
+    t.insert(12, '!', { italic: true, color: '#f00' })
+  }, [
+    { op: 'insert', name: 't', pos: 2, str: '-B-' },
+    { op: 'insert', name: 't', pos: 0, str: '😀' },
+    { op: 'set', name: 'm', key: 'k', value: 'v' }
+  ], a => {
+    const t = a.getText('t')
+    t.format(6, 3, { underline: true })
+    t.insertEmbed(0, { video: 'y.mp4' })
+  })
+
+  add('xml elements, attributes, xml text and hooks', 6, a => {
+    const frag = a.getXmlFragment('xml')
+    const p = new Y.XmlElement('p')
+    p.setAttribute('class', 'c1')
+    const txt = new Y.XmlText()
+    frag.insert(0, [p, new Y.XmlHook('my-hook')])
+    p.insert(0, [txt])
+    txt.insert(0, 'xml text')
+  }, [
+    { op: 'insert', name: 't', pos: 0, str: 'B text' },
+    { op: 'set', name: 'm', key: 'n', value: 1 }
+  ], a => {
+    const frag = a.getXmlFragment('xml')
+    const p = frag.get(0)
+    p.setAttribute('id', 'x')
+    p.removeAttribute('class')
+    p.get(0).insert(3, ' more')
+    frag.insert(1, [new Y.XmlElement('h1')])
+  })
+
+  add('arrays with any, binary and nested types', 7, a => {
+    const arr = a.getArray('arr')
+    const inner = new Y.Map()
+    const innerText = new Y.Text()
+    arr.insert(0, [1, 'two', new Uint8Array([3, 4]), inner, innerText, [5, { six: 6 }]])
+    inner.set('k', 'v')
+    innerText.insert(0, 'inner text')
+  }, [
+    { op: 'insert', name: 't', pos: 0, str: 'abc' },
+    { op: 'delete', name: 't', pos: 1, len: 1 },
+    { op: 'set', name: 'm', key: 'bytes', value: new Uint8Array([9]) }
+  ], a => {
+    const arr = a.getArray('arr')
+    arr.insert(1, ['inserted'])
+    arr.delete(0, 1)
+    arr.get(3).set('k2', null)
+    arr.get(4).insert(0, '>')
+  })
+
+  add('sub-documents', 8, a => {
+    a.getMap('docs').set('sub', new Y.Doc({ guid: 'sub-guid' }))
+  }, [
+    { op: 'set', name: 'm', key: 'note', value: { nested: [true] } },
+    { op: 'insert', name: 't', pos: 0, str: 'with subdoc' }
+  ], a => {
+    a.getMap('docs').set('sub2', new Y.Doc({ guid: 'sub-guid-2', meta: { a: 1 } }))
+  })
+
+  add('garbage-collected content from a gc document', 9, a => {
+    const arr = a.getArray('arr')
+    const inner = new Y.Map()
+    arr.insert(0, [inner, 'keep'])
+    inner.set('a', 1)
+    arr.delete(0, 1) // inner map and its entries become GC / ContentDeleted
+    const t = a.getText('t')
+    t.insert(0, 'abcdef')
+    t.delete(1, 3)
+  }, [
+    { op: 'insert', name: 't', pos: 1, str: 'B' },
+    { op: 'delete', name: 't', pos: 0, len: 1 }
+  ], a => {
+    a.getText('t').insert(0, 'A')
+    a.getArray('arr').insert(0, ['new'])
+  })
+
+  return out
+}
+
+const preserveCase = (sc) => {
+  const a = newDoc(sc.aClient) // default gc: true
+  const aUpdates = []
+  a.on('update', u => aUpdates.push(u))
+  sc.build(a)
+  const base = Y.encodeStateAsUpdate(a)
+  // reference replica for B
+  const b = newDoc(PRESERVE_B, { gc: false })
+  const bLocal = []
+  b.on('update', (u, _o, _d, tr) => { if (tr.local) bLocal.push(u) })
+  Y.applyUpdate(b, base)
+  const opUpdates = []
+  for (const o of sc.bOps) {
+    const before = bLocal.length
+    switch (o.op) {
+      case 'insert': b.getText(o.name).insert(o.pos, o.str); break
+      case 'delete': b.getText(o.name).delete(o.pos, o.len); break
+      case 'set': b.getMap(o.name).set(o.key, o.value); break
+    }
+    opUpdates.push(bLocal.slice(before).map(hex))
+  }
+  const before = aUpdates.length
+  sc.later(a)
+  const later = aUpdates.slice(before)
+  for (const u of later) Y.applyUpdate(b, u)
+  // A also receives B's edits: both must agree on everything
+  for (const u of bLocal) Y.applyUpdate(a, u)
+  // compare the content of both replicas through typed getters on fresh docs
+  const json = (d) => {
+    const f = new Y.Doc()
+    Y.applyUpdate(f, Y.encodeStateAsUpdate(d))
+    const content = {
+      t: f.getText('t').toDelta(),
+      m: f.getMap('m').toJSON(),
+      arr: f.getArray('arr').toJSON(),
+      xml: f.getXmlFragment('xml').toString(),
+      docs: [...f.getMap('docs').keys()].sort().map(k => f.getMap('docs').get(k).guid)
+    }
+    return JSON.stringify(content, (_k, v) => v instanceof Uint8Array ? [...v] : v)
+  }
+  if (json(a) !== json(b)) throw new Error(`${sc.name}: A and B differ`)
+  return {
+    name: sc.name,
+    base: hex(base),
+    ops: sc.bOps.map((o, i) => ({ ...o, update: opUpdates[i] })),
+    later: later.map(hex),
+    state: hex(Y.encodeStateAsUpdate(b)),
+    text: b.getText('t').toString()
+  }
+}
+
+const genPreserve = () => {
+  const cases = preserveScenarios().map(preserveCase)
+  const mbtPOp = (o) => {
+    const ups = `[${o.update.map(u => `"${u}"`).join(', ')}]`
+    switch (o.op) {
+      case 'insert': return `TextIns(${mbtString(o.name)}, ${o.pos}, ${mbtString(o.str)}, ${ups})`
+      case 'delete': return `TextDel(${mbtString(o.name)}, ${o.pos}, ${o.len}, ${ups})`
+      default: return `MapSet(${mbtString(o.name)}, ${mbtString(o.key)}, ${mbtAny(o.value)}, ${ups})`
+    }
+  }
+  let mbt = `\n///|\nlet preserve_client : UInt = ${PRESERVE_B}\n`
+  cases.forEach((c, i) => {
+    mbt += `\n///|\nlet preserve_case_${i + 1} : PreserveCase = {\n  name: ${mbtString(c.name)},\n  base: "${c.base}",\n  ops: [\n${c.ops.map(o => `    ${mbtPOp(o)},`).join('\n')}\n  ],\n  later: [${c.later.map(u => `"${u}"`).join(', ')}],\n  state: "${c.state}",\n  text: ${mbtString(c.text)},\n}\n`
+  })
+  mbt += `\n///|\nlet preserve_cases : Array[PreserveCase] = [${cases.map((_, i) => `preserve_case_${i + 1}`).join(', ')}]\n`
+  const json = cases.map(c => ({ ...c, ops: c.ops.map(o => ({ ...o, value: o.value === undefined ? undefined : describe(o.value) })) }))
+  writeFixture('preserve', 'tests', json, mbt)
+}
+
+// ---------------------------------------------------------------------------
 // Yjs documents with content moon_ycrdt does not model (formats, embeds, XML,
 // sub-documents), used by cmd/export to check that they survive MoonBit edits.
 
@@ -605,4 +772,5 @@ genUpdates()
 genInterop()
 genConvergence()
 genEdge()
+genPreserve()
 genExportBase()
