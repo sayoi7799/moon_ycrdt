@@ -1,13 +1,15 @@
 // Concurrent convergence against Yjs (convergence_gen_test.mbt): random edits
-// on 2-3 replicas at nearby positions, exchanged in a random order with
+// on 2-4 replicas (text at nearby positions, concurrent map keys), exchanged
+// in a random order with
 // duplicates; see script_replay_test.mbt for what is checked at every step.
 
 ///|
-test "200 random concurrent scenarios converge exactly like Yjs" {
-  assert_eq(convergence_cases.length(), 200)
+test "300 random concurrent scenarios converge exactly like Yjs" {
+  let cases = convergence_cases()
+  assert_eq(cases.length(), 300)
   let mut steps = 0
-  for c in convergence_cases {
+  for c in cases {
     steps += replay(c)
   }
-  assert_true(steps > 4000)
+  assert_true(steps > 8000)
 }

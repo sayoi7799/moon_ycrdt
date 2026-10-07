@@ -6,8 +6,9 @@
 test "inserts and deletes at every UTF-16 position match Yjs" {
   // every position of the edge string for inserts, plus deletes of 1 and 2
   // code units starting at every position, plus the special scenarios
-  assert_true(edge_cases.length() > 40)
-  for c in edge_cases {
+  let cases = edge_cases()
+  assert_true(cases.length() > 40)
+  for c in cases {
     replay(c) |> ignore
   }
 }

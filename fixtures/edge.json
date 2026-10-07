@@ -16,7 +16,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -26,7 +27,8 @@
           "update": [
             "01010a11440a00015800"
           ],
-          "text": "Xa😀b👨‍👩‍👧ćd🎉"
+          "text": "Xa😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -36,10 +38,12 @@
           "update": [
             "01010a12440a1104f09f988000"
           ],
-          "text": "😀Xa😀b👨‍👩‍👧ćd🎉"
+          "text": "😀Xa😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "😀Xa😀b👨‍👩‍👧ćd🎉"
+      "finalText": "😀Xa😀b👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 1",
@@ -55,7 +59,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -65,7 +70,8 @@
           "update": [
             "01010a11c40a000a01015800"
           ],
-          "text": "aX😀b👨‍👩‍👧ćd🎉"
+          "text": "aX😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -75,10 +81,12 @@
           "update": [
             "01010a12c40a000a1104f09f988000"
           ],
-          "text": "a😀X😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀X😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀X😀b👨‍👩‍👧ćd🎉"
+      "finalText": "a😀X😀b👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 2",
@@ -94,7 +102,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -104,7 +113,8 @@
           "update": [
             "01010a11c40a010a02015800"
           ],
-          "text": "a�X�b👨‍👩‍👧ćd🎉"
+          "text": "a�X�b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -114,10 +124,12 @@
           "update": [
             "01010a12c40a010a1104f09f988000"
           ],
-          "text": "a�😀X�b👨‍👩‍👧ćd🎉"
+          "text": "a�😀X�b👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a�😀X�b👨‍👩‍👧ćd🎉"
+      "finalText": "a�😀X�b👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 3",
@@ -133,7 +145,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -143,7 +156,8 @@
           "update": [
             "01010a11c40a020a03015800"
           ],
-          "text": "a😀Xb👨‍👩‍👧ćd🎉"
+          "text": "a😀Xb👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -153,10 +167,12 @@
           "update": [
             "01010a12c40a020a1104f09f988000"
           ],
-          "text": "a😀😀Xb👨‍👩‍👧ćd🎉"
+          "text": "a😀😀Xb👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀😀Xb👨‍👩‍👧ćd🎉"
+      "finalText": "a😀😀Xb👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 4",
@@ -172,7 +188,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -182,7 +199,8 @@
           "update": [
             "01010a11c40a030a04015800"
           ],
-          "text": "a😀bX👨‍👩‍👧ćd🎉"
+          "text": "a😀bX👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -192,10 +210,12 @@
           "update": [
             "01010a12c40a030a1104f09f988000"
           ],
-          "text": "a😀b😀X👨‍👩‍👧ćd🎉"
+          "text": "a😀b😀X👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b😀X👨‍👩‍👧ćd🎉"
+      "finalText": "a😀b😀X👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 5",
@@ -211,7 +231,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -221,7 +242,8 @@
           "update": [
             "01010a11c40a040a05015800"
           ],
-          "text": "a😀b�X�‍👩‍👧ćd🎉"
+          "text": "a😀b�X�‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -231,10 +253,12 @@
           "update": [
             "01010a12c40a040a1104f09f988000"
           ],
-          "text": "a😀b�😀X�‍👩‍👧ćd🎉"
+          "text": "a😀b�😀X�‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b�😀X�‍👩‍👧ćd🎉"
+      "finalText": "a😀b�😀X�‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 6",
@@ -250,7 +274,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -260,7 +285,8 @@
           "update": [
             "01010a11c40a050a06015800"
           ],
-          "text": "a😀b👨X‍👩‍👧ćd🎉"
+          "text": "a😀b👨X‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -270,10 +296,12 @@
           "update": [
             "01010a12c40a050a1104f09f988000"
           ],
-          "text": "a😀b👨😀X‍👩‍👧ćd🎉"
+          "text": "a😀b👨😀X‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨😀X‍👩‍👧ćd🎉"
+      "finalText": "a😀b👨😀X‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 7",
@@ -289,7 +317,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -299,7 +328,8 @@
           "update": [
             "01010a11c40a060a07015800"
           ],
-          "text": "a😀b👨‍X👩‍👧ćd🎉"
+          "text": "a😀b👨‍X👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -309,10 +339,12 @@
           "update": [
             "01010a12c40a060a1104f09f988000"
           ],
-          "text": "a😀b👨‍😀X👩‍👧ćd🎉"
+          "text": "a😀b👨‍😀X👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍😀X👩‍👧ćd🎉"
+      "finalText": "a😀b👨‍😀X👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 8",
@@ -328,7 +360,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -338,7 +371,8 @@
           "update": [
             "01010a11c40a070a08015800"
           ],
-          "text": "a😀b👨‍�X�‍👧ćd🎉"
+          "text": "a😀b👨‍�X�‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -348,10 +382,12 @@
           "update": [
             "01010a12c40a070a1104f09f988000"
           ],
-          "text": "a😀b👨‍�😀X�‍👧ćd🎉"
+          "text": "a😀b👨‍�😀X�‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍�😀X�‍👧ćd🎉"
+      "finalText": "a😀b👨‍�😀X�‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 9",
@@ -367,7 +403,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -377,7 +414,8 @@
           "update": [
             "01010a11c40a080a09015800"
           ],
-          "text": "a😀b👨‍👩X‍👧ćd🎉"
+          "text": "a😀b👨‍👩X‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -387,10 +425,12 @@
           "update": [
             "01010a12c40a080a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩😀X‍👧ćd🎉"
+          "text": "a😀b👨‍👩😀X‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩😀X‍👧ćd🎉"
+      "finalText": "a😀b👨‍👩😀X‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 10",
@@ -406,7 +446,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -416,7 +457,8 @@
           "update": [
             "01010a11c40a090a0a015800"
           ],
-          "text": "a😀b👨‍👩‍X👧ćd🎉"
+          "text": "a😀b👨‍👩‍X👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -426,10 +468,12 @@
           "update": [
             "01010a12c40a090a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩‍😀X👧ćd🎉"
+          "text": "a😀b👨‍👩‍😀X👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍😀X👧ćd🎉"
+      "finalText": "a😀b👨‍👩‍😀X👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 11",
@@ -445,7 +489,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -455,7 +500,8 @@
           "update": [
             "01010a11c40a0a0a0b015800"
           ],
-          "text": "a😀b👨‍👩‍�X�ćd🎉"
+          "text": "a😀b👨‍👩‍�X�ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -465,10 +511,12 @@
           "update": [
             "01010a12c40a0a0a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩‍�😀X�ćd🎉"
+          "text": "a😀b👨‍👩‍�😀X�ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍�😀X�ćd🎉"
+      "finalText": "a😀b👨‍👩‍�😀X�ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 12",
@@ -484,7 +532,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -494,7 +543,8 @@
           "update": [
             "01010a11c40a0b0a0c015800"
           ],
-          "text": "a😀b👨‍👩‍👧Xćd🎉"
+          "text": "a😀b👨‍👩‍👧Xćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -504,10 +554,12 @@
           "update": [
             "01010a12c40a0b0a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩‍👧😀Xćd🎉"
+          "text": "a😀b👨‍👩‍👧😀Xćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧😀Xćd🎉"
+      "finalText": "a😀b👨‍👩‍👧😀Xćd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 13",
@@ -523,7 +575,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -533,7 +586,8 @@
           "update": [
             "01010a11c40a0c0a0d015800"
           ],
-          "text": "a😀b👨‍👩‍👧cX́d🎉"
+          "text": "a😀b👨‍👩‍👧cX́d🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -543,10 +597,12 @@
           "update": [
             "01010a12c40a0c0a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩‍👧c😀X́d🎉"
+          "text": "a😀b👨‍👩‍👧c😀X́d🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧c😀X́d🎉"
+      "finalText": "a😀b👨‍👩‍👧c😀X́d🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 14",
@@ -562,7 +618,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -572,7 +629,8 @@
           "update": [
             "01010a11c40a0d0a0e015800"
           ],
-          "text": "a😀b👨‍👩‍👧ćXd🎉"
+          "text": "a😀b👨‍👩‍👧ćXd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -582,10 +640,12 @@
           "update": [
             "01010a12c40a0d0a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩‍👧ć😀Xd🎉"
+          "text": "a😀b👨‍👩‍👧ć😀Xd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ć😀Xd🎉"
+      "finalText": "a😀b👨‍👩‍👧ć😀Xd🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 15",
@@ -601,7 +661,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -611,7 +672,8 @@
           "update": [
             "01010a11c40a0e0a0f015800"
           ],
-          "text": "a😀b👨‍👩‍👧ćdX🎉"
+          "text": "a😀b👨‍👩‍👧ćdX🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -621,10 +683,12 @@
           "update": [
             "01010a12c40a0e0a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩‍👧ćd😀X🎉"
+          "text": "a😀b👨‍👩‍👧ćd😀X🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ćd😀X🎉"
+      "finalText": "a😀b👨‍👩‍👧ćd😀X🎉",
+      "finalMap": ""
     },
     {
       "name": "insert at 16",
@@ -640,7 +704,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -650,7 +715,8 @@
           "update": [
             "01010a11c40a0f0a10015800"
           ],
-          "text": "a😀b👨‍👩‍👧ćd�X�"
+          "text": "a😀b👨‍👩‍👧ćd�X�",
+          "map": ""
         },
         {
           "op": "insert",
@@ -660,10 +726,12 @@
           "update": [
             "01010a12c40a0f0a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩‍👧ćd�😀X�"
+          "text": "a😀b👨‍👩‍👧ćd�😀X�",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ćd�😀X�"
+      "finalText": "a😀b👨‍👩‍👧ćd�😀X�",
+      "finalMap": ""
     },
     {
       "name": "insert at 17",
@@ -679,7 +747,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "insert",
@@ -689,7 +758,8 @@
           "update": [
             "01010a11840a10015800"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉X"
+          "text": "a😀b👨‍👩‍👧ćd🎉X",
+          "map": ""
         },
         {
           "op": "insert",
@@ -699,10 +769,12 @@
           "update": [
             "01010a12c40a100a1104f09f988000"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉😀X"
+          "text": "a😀b👨‍👩‍👧ćd🎉😀X",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ćd🎉😀X"
+      "finalText": "a😀b👨‍👩‍👧ćd🎉😀X",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 0",
@@ -718,7 +790,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -728,10 +801,12 @@
           "update": [
             "00010a010001"
           ],
-          "text": "😀b👨‍👩‍👧ćd🎉"
+          "text": "😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "😀b👨‍👩‍👧ćd🎉"
+      "finalText": "😀b👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 1",
@@ -747,7 +822,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -757,10 +833,12 @@
           "update": [
             "00010a010101"
           ],
-          "text": "a�b👨‍👩‍👧ćd🎉"
+          "text": "a�b👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a�b👨‍👩‍👧ćd🎉"
+      "finalText": "a�b👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 2",
@@ -776,7 +854,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -786,10 +865,12 @@
           "update": [
             "00010a010201"
           ],
-          "text": "a�b👨‍👩‍👧ćd🎉"
+          "text": "a�b👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a�b👨‍👩‍👧ćd🎉"
+      "finalText": "a�b👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 3",
@@ -805,7 +886,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -815,10 +897,12 @@
           "update": [
             "00010a010301"
           ],
-          "text": "a😀👨‍👩‍👧ćd🎉"
+          "text": "a😀👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀👨‍👩‍👧ćd🎉"
+      "finalText": "a😀👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 4",
@@ -834,7 +918,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -844,10 +929,12 @@
           "update": [
             "00010a010401"
           ],
-          "text": "a😀b�‍👩‍👧ćd🎉"
+          "text": "a😀b�‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b�‍👩‍👧ćd🎉"
+      "finalText": "a😀b�‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 5",
@@ -863,7 +950,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -873,10 +961,12 @@
           "update": [
             "00010a010501"
           ],
-          "text": "a😀b�‍👩‍👧ćd🎉"
+          "text": "a😀b�‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b�‍👩‍👧ćd🎉"
+      "finalText": "a😀b�‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 6",
@@ -892,7 +982,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -902,10 +993,12 @@
           "update": [
             "00010a010601"
           ],
-          "text": "a😀b👨👩‍👧ćd🎉"
+          "text": "a😀b👨👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨👩‍👧ćd🎉"
+      "finalText": "a😀b👨👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 7",
@@ -921,7 +1014,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -931,10 +1025,12 @@
           "update": [
             "00010a010701"
           ],
-          "text": "a😀b👨‍�‍👧ćd🎉"
+          "text": "a😀b👨‍�‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍�‍👧ćd🎉"
+      "finalText": "a😀b👨‍�‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 8",
@@ -950,7 +1046,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -960,10 +1057,12 @@
           "update": [
             "00010a010801"
           ],
-          "text": "a😀b👨‍�‍👧ćd🎉"
+          "text": "a😀b👨‍�‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍�‍👧ćd🎉"
+      "finalText": "a😀b👨‍�‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 9",
@@ -979,7 +1078,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -989,10 +1089,12 @@
           "update": [
             "00010a010901"
           ],
-          "text": "a😀b👨‍👩👧ćd🎉"
+          "text": "a😀b👨‍👩👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩👧ćd🎉"
+      "finalText": "a😀b👨‍👩👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 10",
@@ -1008,7 +1110,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1018,10 +1121,12 @@
           "update": [
             "00010a010a01"
           ],
-          "text": "a😀b👨‍👩‍�ćd🎉"
+          "text": "a😀b👨‍👩‍�ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍�ćd🎉"
+      "finalText": "a😀b👨‍👩‍�ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 11",
@@ -1037,7 +1142,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1047,10 +1153,12 @@
           "update": [
             "00010a010b01"
           ],
-          "text": "a😀b👨‍👩‍�ćd🎉"
+          "text": "a😀b👨‍👩‍�ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍�ćd🎉"
+      "finalText": "a😀b👨‍👩‍�ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 12",
@@ -1066,7 +1174,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1076,10 +1185,12 @@
           "update": [
             "00010a010c01"
           ],
-          "text": "a😀b👨‍👩‍👧́d🎉"
+          "text": "a😀b👨‍👩‍👧́d🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧́d🎉"
+      "finalText": "a😀b👨‍👩‍👧́d🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 13",
@@ -1095,7 +1206,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1105,10 +1217,12 @@
           "update": [
             "00010a010d01"
           ],
-          "text": "a😀b👨‍👩‍👧cd🎉"
+          "text": "a😀b👨‍👩‍👧cd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧cd🎉"
+      "finalText": "a😀b👨‍👩‍👧cd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 14",
@@ -1124,7 +1238,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1134,10 +1249,12 @@
           "update": [
             "00010a010e01"
           ],
-          "text": "a😀b👨‍👩‍👧ć🎉"
+          "text": "a😀b👨‍👩‍👧ć🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ć🎉"
+      "finalText": "a😀b👨‍👩‍👧ć🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 15",
@@ -1153,7 +1270,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1163,10 +1281,12 @@
           "update": [
             "00010a010f01"
           ],
-          "text": "a😀b👨‍👩‍👧ćd�"
+          "text": "a😀b👨‍👩‍👧ćd�",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ćd�"
+      "finalText": "a😀b👨‍👩‍👧ćd�",
+      "finalMap": ""
     },
     {
       "name": "delete 1 at 16",
@@ -1182,7 +1302,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1192,10 +1313,12 @@
           "update": [
             "00010a011001"
           ],
-          "text": "a😀b👨‍👩‍👧ćd�"
+          "text": "a😀b👨‍👩‍👧ćd�",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ćd�"
+      "finalText": "a😀b👨‍👩‍👧ćd�",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 0",
@@ -1211,7 +1334,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1221,10 +1345,12 @@
           "update": [
             "00010a010002"
           ],
-          "text": "�b👨‍👩‍👧ćd🎉"
+          "text": "�b👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "�b👨‍👩‍👧ćd🎉"
+      "finalText": "�b👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 1",
@@ -1240,7 +1366,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1250,10 +1377,12 @@
           "update": [
             "00010a010102"
           ],
-          "text": "ab👨‍👩‍👧ćd🎉"
+          "text": "ab👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "ab👨‍👩‍👧ćd🎉"
+      "finalText": "ab👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 2",
@@ -1269,7 +1398,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1279,10 +1409,12 @@
           "update": [
             "00010a010202"
           ],
-          "text": "a�👨‍👩‍👧ćd🎉"
+          "text": "a�👨‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a�👨‍👩‍👧ćd🎉"
+      "finalText": "a�👨‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 3",
@@ -1298,7 +1430,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1308,10 +1441,12 @@
           "update": [
             "00010a010302"
           ],
-          "text": "a😀�‍👩‍👧ćd🎉"
+          "text": "a😀�‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀�‍👩‍👧ćd🎉"
+      "finalText": "a😀�‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 4",
@@ -1327,7 +1462,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1337,10 +1473,12 @@
           "update": [
             "00010a010402"
           ],
-          "text": "a😀b‍👩‍👧ćd🎉"
+          "text": "a😀b‍👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b‍👩‍👧ćd🎉"
+      "finalText": "a😀b‍👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 5",
@@ -1356,7 +1494,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1366,10 +1505,12 @@
           "update": [
             "00010a010502"
           ],
-          "text": "a😀b�👩‍👧ćd🎉"
+          "text": "a😀b�👩‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b�👩‍👧ćd🎉"
+      "finalText": "a😀b�👩‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 6",
@@ -1385,7 +1526,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1395,10 +1537,12 @@
           "update": [
             "00010a010602"
           ],
-          "text": "a😀b👨�‍👧ćd🎉"
+          "text": "a😀b👨�‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨�‍👧ćd🎉"
+      "finalText": "a😀b👨�‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 7",
@@ -1414,7 +1558,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1424,10 +1569,12 @@
           "update": [
             "00010a010702"
           ],
-          "text": "a😀b👨‍‍👧ćd🎉"
+          "text": "a😀b👨‍‍👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍‍👧ćd🎉"
+      "finalText": "a😀b👨‍‍👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 8",
@@ -1443,7 +1590,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1453,10 +1601,12 @@
           "update": [
             "00010a010802"
           ],
-          "text": "a😀b👨‍�👧ćd🎉"
+          "text": "a😀b👨‍�👧ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍�👧ćd🎉"
+      "finalText": "a😀b👨‍�👧ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 9",
@@ -1472,7 +1622,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1482,10 +1633,12 @@
           "update": [
             "00010a010902"
           ],
-          "text": "a😀b👨‍👩�ćd🎉"
+          "text": "a😀b👨‍👩�ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩�ćd🎉"
+      "finalText": "a😀b👨‍👩�ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 10",
@@ -1501,7 +1654,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1511,10 +1665,12 @@
           "update": [
             "00010a010a02"
           ],
-          "text": "a😀b👨‍👩‍ćd🎉"
+          "text": "a😀b👨‍👩‍ćd🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍ćd🎉"
+      "finalText": "a😀b👨‍👩‍ćd🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 11",
@@ -1530,7 +1686,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1540,10 +1697,12 @@
           "update": [
             "00010a010b02"
           ],
-          "text": "a😀b👨‍👩‍�́d🎉"
+          "text": "a😀b👨‍👩‍�́d🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍�́d🎉"
+      "finalText": "a😀b👨‍👩‍�́d🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 12",
@@ -1559,7 +1718,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1569,10 +1729,12 @@
           "update": [
             "00010a010c02"
           ],
-          "text": "a😀b👨‍👩‍👧d🎉"
+          "text": "a😀b👨‍👩‍👧d🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧d🎉"
+      "finalText": "a😀b👨‍👩‍👧d🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 13",
@@ -1588,7 +1750,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1598,10 +1761,12 @@
           "update": [
             "00010a010d02"
           ],
-          "text": "a😀b👨‍👩‍👧c🎉"
+          "text": "a😀b👨‍👩‍👧c🎉",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧c🎉"
+      "finalText": "a😀b👨‍👩‍👧c🎉",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 14",
@@ -1617,7 +1782,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1627,10 +1793,12 @@
           "update": [
             "00010a010e02"
           ],
-          "text": "a😀b👨‍👩‍👧ć�"
+          "text": "a😀b👨‍👩‍👧ć�",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ć�"
+      "finalText": "a😀b👨‍👩‍👧ć�",
+      "finalMap": ""
     },
     {
       "name": "delete 2 at 15",
@@ -1646,7 +1814,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1656,10 +1825,12 @@
           "update": [
             "00010a010f02"
           ],
-          "text": "a😀b👨‍👩‍👧ćd"
+          "text": "a😀b👨‍👩‍👧ćd",
+          "map": ""
         }
       ],
-      "finalText": "a😀b👨‍👩‍👧ćd"
+      "finalText": "a😀b👨‍👩‍👧ćd",
+      "finalMap": ""
     },
     {
       "name": "empty insert, delete everything, write again",
@@ -1673,7 +1844,8 @@
           "str": "",
           "replica": 0,
           "update": [],
-          "text": ""
+          "text": "",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1683,7 +1855,8 @@
           "update": [
             "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
           ],
-          "text": "a😀b👨‍👩‍👧ćd🎉"
+          "text": "a😀b👨‍👩‍👧ćd🎉",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1693,7 +1866,8 @@
           "update": [
             "00010a010011"
           ],
-          "text": ""
+          "text": "",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1703,7 +1877,8 @@
           "update": [
             "01010a11840a1003e696b000"
           ],
-          "text": "新"
+          "text": "新",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1713,7 +1888,8 @@
           "update": [
             "00010a011101"
           ],
-          "text": ""
+          "text": "",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1723,10 +1899,12 @@
           "update": [
             "01010a12840a1104f09f988000"
           ],
-          "text": "😀"
+          "text": "😀",
+          "map": ""
         }
       ],
-      "finalText": "😀"
+      "finalText": "😀",
+      "finalMap": ""
     },
     {
       "name": "typing at the end merges into one item",
@@ -1742,7 +1920,8 @@
           "update": [
             "01010a0004010174016800"
           ],
-          "text": "h"
+          "text": "h",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1752,7 +1931,8 @@
           "update": [
             "01010a01840a00016500"
           ],
-          "text": "he"
+          "text": "he",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1762,7 +1942,8 @@
           "update": [
             "01010a02840a01016c00"
           ],
-          "text": "hel"
+          "text": "hel",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1772,7 +1953,8 @@
           "update": [
             "01010a03840a02016c00"
           ],
-          "text": "hell"
+          "text": "hell",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1782,7 +1964,8 @@
           "update": [
             "01010a04840a03016f00"
           ],
-          "text": "hello"
+          "text": "hello",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1792,7 +1975,8 @@
           "update": [
             "01010a05840a0404f09f988000"
           ],
-          "text": "hello😀"
+          "text": "hello😀",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1802,10 +1986,12 @@
           "update": [
             "01010a07840a06012100"
           ],
-          "text": "hello😀!"
+          "text": "hello😀!",
+          "map": ""
         }
       ],
-      "finalText": "hello😀!"
+      "finalText": "hello😀!",
+      "finalMap": ""
     },
     {
       "name": "client ids 0 and 2^32-1",
@@ -1822,7 +2008,8 @@
           "update": [
             "0101000004010174047a65726f00"
           ],
-          "text": "zero"
+          "text": "zero",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1832,7 +2019,8 @@
           "update": [
             "0101ffffffff0f0004010174036d617800"
           ],
-          "text": "max"
+          "text": "max",
+          "map": ""
         },
         {
           "op": "sync",
@@ -1841,7 +2029,8 @@
           "indices": [
             0
           ],
-          "text": "zeromax"
+          "text": "zeromax",
+          "map": ""
         },
         {
           "op": "sync",
@@ -1850,7 +2039,8 @@
           "indices": [
             0
           ],
-          "text": "zeromax"
+          "text": "zeromax",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1860,7 +2050,8 @@
           "update": [
             "01010004c400010002017c00"
           ],
-          "text": "ze|romax"
+          "text": "ze|romax",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1870,7 +2061,8 @@
           "update": [
             "0101ffffffff0f03c400010002017c00"
           ],
-          "text": "ze|romax"
+          "text": "ze|romax",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1880,7 +2072,8 @@
           "update": [
             "000100010001"
           ],
-          "text": "e|romax"
+          "text": "e|romax",
+          "map": ""
         },
         {
           "op": "sync",
@@ -1891,7 +2084,8 @@
             1,
             2
           ],
-          "text": "e||romax"
+          "text": "e||romax",
+          "map": ""
         },
         {
           "op": "sync",
@@ -1901,10 +2095,12 @@
             0,
             1
           ],
-          "text": "e||romax"
+          "text": "e||romax",
+          "map": ""
         }
       ],
-      "finalText": "e||romax"
+      "finalText": "e||romax",
+      "finalMap": ""
     },
     {
       "name": "two replicas split the same surrogate pair",
@@ -1921,7 +2117,8 @@
           "update": [
             "01010100040101740678f09f98807900"
           ],
-          "text": "x😀y"
+          "text": "x😀y",
+          "map": ""
         },
         {
           "op": "sync",
@@ -1930,7 +2127,8 @@
           "indices": [
             0
           ],
-          "text": "x😀y"
+          "text": "x😀y",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1940,7 +2138,8 @@
           "update": [
             "01010104c401010102014100"
           ],
-          "text": "x�A�y"
+          "text": "x�A�y",
+          "map": ""
         },
         {
           "op": "insert",
@@ -1950,7 +2149,8 @@
           "update": [
             "01010200c401010102014200"
           ],
-          "text": "x�B�y"
+          "text": "x�B�y",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1960,7 +2160,8 @@
           "update": [
             "000101010101"
           ],
-          "text": "xB�y"
+          "text": "xB�y",
+          "map": ""
         },
         {
           "op": "sync",
@@ -1970,7 +2171,8 @@
             0,
             1
           ],
-          "text": "xAB�y"
+          "text": "xAB�y",
+          "map": ""
         },
         {
           "op": "sync",
@@ -1980,7 +2182,8 @@
             0,
             1
           ],
-          "text": "xAB�y"
+          "text": "xAB�y",
+          "map": ""
         },
         {
           "op": "delete",
@@ -1990,7 +2193,8 @@
           "update": [
             "000101010001"
           ],
-          "text": "AB�y"
+          "text": "AB�y",
+          "map": ""
         },
         {
           "op": "insert",
@@ -2000,7 +2204,8 @@
           "update": [
             "0101020144010004f09f918d00"
           ],
-          "text": "👍xAB�y"
+          "text": "👍xAB�y",
+          "map": ""
         },
         {
           "op": "sync",
@@ -2011,7 +2216,8 @@
             1,
             2
           ],
-          "text": "👍AB�y"
+          "text": "👍AB�y",
+          "map": ""
         },
         {
           "op": "sync",
@@ -2022,10 +2228,12 @@
             1,
             2
           ],
-          "text": "👍AB�y"
+          "text": "👍AB�y",
+          "map": ""
         }
       ],
-      "finalText": "👍AB�y"
+      "finalText": "👍AB�y",
+      "finalMap": ""
     }
   ]
 }

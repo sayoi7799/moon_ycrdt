@@ -79,7 +79,7 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | `update` | update v1 的纯数据层：`ID`、9 种 content、Item / GC / Skip、info 字节、`DeleteSet`、状态向量；解码再编码逐字节还原 |
 | `doc` | `Doc`、按 client 存储的 struct store、YATA integrate、pending 队列、`apply_update`、`encode_state_as_update`、`encode_state_vector`、事务级 `on_update` |
 | `types` | `Text`（insert / delete / to_string，UTF-16 下标）和 `YMap`（set / get / delete，值为 `Any`） |
-| `tests` | 与 Yjs 的互通测试、200 组并发收敛、quickcheck 属性测试 |
+| `tests` | 与 Yjs 的互通测试、300 组并发收敛、quickcheck 属性测试 |
 | `cmd/export` | MoonBit → Yjs：执行编辑脚本并导出 JSON 报告，供 Node 验证 |
 | `examples/concurrent` | 可运行示例 |
 
@@ -123,7 +123,7 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | 2. 解码层 | 12 个 Yjs 生成的更新（gc / 非 gc 文本、Unicode、各种 Map 值、格式与 embed、嵌套与 XML 类型、子文档、GC 结构、多 client、差量、从 Item 中间开始的差量、含 Skip 的合并更新、旧版 ContentJSON）：解码结果与 `Y.decodeUpdate` 一致，再编码**逐字节相同** | `update/update_test.mbt` |
 | 3a. Yjs → MoonBit | 15 个场景（含乱序、重复投递）：文本、Map、状态向量与 Yjs 一致，MoonBit 重新编码的整体状态与 Yjs 的**逐字节相同**；幂等；差量同步 | `tests/interop_test.mbt` |
 | 3b. MoonBit → Yjs | `cmd/export` 导出 5 组编辑脚本（Unicode 文本、全部 Any 类型、2 / 3 副本并发、编辑含格式 / embed / XML / 子文档的 Yjs 文档）；`scripts/verify_moonbit.mjs` 用 Yjs 验证：完整状态读回一致、打乱顺序应用增量更新后收敛、在 Yjs 上用相同 client id 重放同样的操作得到**逐字节相同**的状态、不支持的内容仍在（共 42 项检查） | `cmd/export`、`scripts/verify_moonbit.mjs` |
-| 4. 并发收敛 | 200 组随机场景，2–3 个副本、同位置并发插入删除、随机抽取（有重复）乱序交换：**每一步**的文本都与 Yjs 一致，每个本地更新的字节都与 Yjs 发出的一致 | `tests/convergence_test.mbt` |
+| 4. 并发收敛 | 300 组随机场景（种子固定为 1–300，见 `scripts/gen_fixtures.mjs` 的 `convergenceScenario`），2–4 个副本、同位置并发插入删除、对同一组键并发写入和删除 Map、随机抽取（有重复）乱序交换：**每一步**的文本和 Map 都与 Yjs 一致，每个本地更新的字节都与 Yjs 发出的一致 | `tests/convergence_test.mbt` |
 | 5. 属性测试 | quickcheck，每条 300 例：任意交换顺序收敛；重复应用幂等；缺依赖的更新进入 pending，补齐后自动应用（且 pending 数据经编码中继不丢失） | `tests/property_test.mbt` |
 
 运行：

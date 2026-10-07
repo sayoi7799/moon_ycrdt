@@ -402,10 +402,18 @@ const genInterop = () => {
 
 const CHUNKS = ['a', 'b', 'xy', 'Z', '中', '文字', '😀', 'e😀', '👍z', ' ']
 
+// Map state as "key=value,..." sorted by key (MoonBit builds the same string).
+export const mapState = (doc) => {
+  const m = doc.getMap('m')
+  return [...m.keys()].sort().map(k => `${k}=${m.get(k)}`).join(',')
+}
+
+export const CONVERGENCE_SEED_BASE = 7919
+
 export const convergenceScenario = (seed) => {
-  const rand = rng(seed * 7919 + 13)
+  const rand = rng(seed * CONVERGENCE_SEED_BASE + 13)
   const pick = (arr) => arr[Math.floor(rand() * arr.length)]
-  const n = 2 + Math.floor(rand() * 2)
+  const n = 2 + Math.floor(rand() * 3)
   const ids = []
   while (ids.length < n) {
     const id = rand() < 0.5 ? 1 + Math.floor(rand() * 5) : Math.floor(rand() * 4294967295)
@@ -415,29 +423,40 @@ export const convergenceScenario = (seed) => {
   const logs = docs.map(() => [])
   docs.forEach((d, i) => d.on('update', (u, _origin, _doc, tr) => { if (tr.local) logs[i].push(u) }))
   const ops = []
+  const local = (r, op, f) => {
+    const before = logs[r].length
+    f()
+    ops.push({ ...op, replica: r, update: logs[r].slice(before).map(hex), text: docs[r].getText('t').toString(), map: mapState(docs[r]) })
+  }
   const deliver = (from, to, indices) => {
     for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
-    ops.push({ op: 'sync', from, to, indices, text: docs[to].getText('t').toString() })
+    ops.push({ op: 'sync', from, to, indices, text: docs[to].getText('t').toString(), map: mapState(docs[to]) })
   }
-  const steps = 15 + Math.floor(rand() * 25)
+  const steps = 15 + Math.floor(rand() * 30)
   for (let s = 0; s < steps; s++) {
     const r = Math.floor(rand() * n)
     const t = docs[r].getText('t')
+    const m = docs[r].getMap('m')
     const len = t.length
     const choice = rand()
-    if (choice < 0.45 || len === 0) {
+    if (choice < 0.4 || len === 0) {
       const bias = rand()
       const pos = bias < 0.15 ? 0 : bias < 0.3 ? len : bias < 0.4 ? Math.floor(len / 2) : Math.floor(rand() * (len + 1))
-      const text = pick(CHUNKS)
-      const before = logs[r].length
-      t.insert(pos, text)
-      ops.push({ op: 'insert', replica: r, pos, str: text, update: logs[r].slice(before).map(hex), text: t.toString() })
-    } else if (choice < 0.7) {
+      const str = pick(CHUNKS)
+      local(r, { op: 'insert', pos, str }, () => t.insert(pos, str))
+    } else if (choice < 0.6) {
       const pos = Math.floor(rand() * len)
       const dl = 1 + Math.floor(rand() * Math.min(3, len - pos))
-      const before = logs[r].length
-      t.delete(pos, dl)
-      ops.push({ op: 'delete', replica: r, pos, len: dl, update: logs[r].slice(before).map(hex), text: t.toString() })
+      local(r, { op: 'delete', pos, len: dl }, () => t.delete(pos, dl))
+    } else if (choice < 0.75) {
+      // concurrent writes to a small set of keys
+      const key = pick(['a', 'b', 'c'])
+      if (m.has(key) && rand() < 0.3) {
+        local(r, { op: 'mapDelete', key }, () => m.delete(key))
+      } else {
+        const value = Math.floor(rand() * 100)
+        local(r, { op: 'mapSet', key, value }, () => m.set(key, value))
+      }
     } else {
       const from = Math.floor(rand() * n)
       const to = (from + 1 + Math.floor(rand() * (n - 1))) % n
@@ -454,32 +473,38 @@ export const convergenceScenario = (seed) => {
     }
   }
   const finalText = docs[0].getText('t').toString()
+  const finalMap = mapState(docs[0])
   for (const d of docs) {
-    if (d.getText('t').toString() !== finalText) throw new Error(`seed ${seed}: Yjs replicas did not converge`)
+    if (d.getText('t').toString() !== finalText || mapState(d) !== finalMap) throw new Error(`seed ${seed}: Yjs replicas did not converge`)
   }
-  return { seed, clients: ids, ops, finalText }
+  return { seed, clients: ids, ops, finalText, finalMap }
 }
 
-const CONVERGENCE_CASES = 200
+export const CONVERGENCE_CASES = 300
 
 const mbtOp = (o) => {
+  const ups = `[${(o.update ?? []).map(u => `"${u}"`).join(', ')}]`
+  const after = `${mbtString(o.text)}, ${mbtString(o.map)}`
   switch (o.op) {
-    case 'insert': return `Ins(${o.replica}, ${o.pos}, ${mbtString(o.str)}, [${o.update.map(u => `"${u}"`).join(', ')}], ${mbtString(o.text)})`
-    case 'delete': return `Del(${o.replica}, ${o.pos}, ${o.len}, [${o.update.map(u => `"${u}"`).join(', ')}], ${mbtString(o.text)})`
-    default: return `Sync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${mbtString(o.text)})`
+    case 'insert': return `Ins(${o.replica}, ${o.pos}, ${mbtString(o.str)}, ${ups}, ${after})`
+    case 'delete': return `Del(${o.replica}, ${o.pos}, ${o.len}, ${ups}, ${after})`
+    case 'mapSet': return `MSet(${o.replica}, ${mbtString(o.key)}, ${o.value}, ${ups}, ${after})`
+    case 'mapDelete': return `MDel(${o.replica}, ${mbtString(o.key)}, ${ups}, ${after})`
+    default: return `Sync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${after})`
   }
 }
 
-// Script cases as MoonBit code. One top-level definition per case keeps each
-// text segment small.
+// Script cases as MoonBit code. Each case is built by its own function: a
+// single initializer for all the data would exceed the wasm limit on the
+// number of locals per function, and small segments format quickly.
 const mbtScriptCases = (prefix, listName, cases) => {
   let mbt = ''
   cases.forEach((c, i) => {
-    mbt += `\n///|\nlet ${prefix}_${i + 1} : ScriptCase = {\n  name: ${mbtString(c.name)},\n  clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n  ops: [\n`
-    mbt += c.ops.map(o => `    ${mbtOp(o)},`).join('\n')
-    mbt += `\n  ],\n  final_text: ${mbtString(c.finalText)},\n}\n`
+    mbt += `\n///|\nfn ${prefix}_${i + 1}() -> ScriptCase {\n  {\n    name: ${mbtString(c.name)},\n    clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n    ops: [\n`
+    mbt += c.ops.map(o => `      ${mbtOp(o)},`).join('\n')
+    mbt += `\n    ],\n    final_text: ${mbtString(c.finalText)},\n    final_map: ${mbtString(c.finalMap)},\n  }\n}\n`
   })
-  mbt += `\n///|\nlet ${listName} : Array[ScriptCase] = [\n${cases.map((_, i) => `  ${prefix}_${i + 1},`).join('\n')}\n]\n`
+  mbt += `\n///|\nfn ${listName}() -> Array[ScriptCase] {\n  [\n${cases.map((_, i) => `    ${prefix}_${i + 1}(),`).join('\n')}\n  ]\n}\n`
   return mbt
 }
 
@@ -503,7 +528,7 @@ const scriptRecorder = (name, ids) => {
   const local = (r, op, f) => {
     const before = logs[r].length
     f()
-    ops.push({ ...op, replica: r, update: logs[r].slice(before).map(hex), text: text(r).toString() })
+    ops.push({ ...op, replica: r, update: logs[r].slice(before).map(hex), text: text(r).toString(), map: mapState(docs[r]) })
   }
   return {
     length: (r) => text(r).length,
@@ -515,7 +540,7 @@ const scriptRecorder = (name, ids) => {
           if (from === to || logs[from].length === 0) continue
           const indices = logs[from].map((_, i) => i)
           for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
-          ops.push({ op: 'sync', from, to, indices, text: text(to).toString() })
+          ops.push({ op: 'sync', from, to, indices, text: text(to).toString(), map: mapState(docs[to]) })
         }
       }
     },
@@ -524,7 +549,7 @@ const scriptRecorder = (name, ids) => {
       for (let r = 0; r < docs.length; r++) {
         if (text(r).toString() !== finalText) throw new Error(`${name}: replicas differ`)
       }
-      return { name, clients: ids, ops, finalText }
+      return { name, clients: ids, ops, finalText, finalMap: mapState(docs[0]) }
     }
   }
 }
