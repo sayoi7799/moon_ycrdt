@@ -87,6 +87,9 @@ jobs:
       - name: export MoonBit edits
         run: moon run cmd/export --target native > fixtures/moonbit_out.json
 
+      - name: benchmarks run (timings are not checked)
+        run: moon bench -p sayoi7799/moon_ycrdt/benchmarks --target native --release
+
       - name: verify with yjs
         run: node scripts/verify_moonbit.mjs fixtures/moonbit_out.json
 

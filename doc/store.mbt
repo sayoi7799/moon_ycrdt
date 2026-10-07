@@ -68,7 +68,16 @@ fn Doc::add_struct(self : Doc, s : Struct) -> Unit {
       self.clients[client] = [s]
     }
   }
-  self.touched.add(client)
+  self.touch(client, s.id().clock)
+}
+
+///|
+/// Records that the struct starting at `clock` changed in this transaction.
+fn Doc::touch(self : Doc, client : UInt, clock : Int) -> Unit {
+  match self.touched.get(client) {
+    Some(clocks) => clocks.push(clock)
+    None => self.touched[client] = [clock]
+  }
 }
 
 ///|
@@ -101,7 +110,7 @@ fn Doc::split_item(self : Doc, left : Item, diff : Int) -> Item {
   if right.parent_sub is Some(key) && right.right is None {
     right.parent.map[key] = right
   }
-  self.touched.add(client)
+  self.touch(client, clock + diff)
   right
 }
 
@@ -190,21 +199,32 @@ fn try_merge(left : Struct, right : Struct) -> Bool {
 }
 
 ///|
-/// End-of-transaction cleanup: merge adjacent structs of the clients that
-/// changed, keeping the store (and encoded updates) compact like Yjs does.
+/// End-of-transaction cleanup: merges adjacent structs like Yjs does, which
+/// keeps the store and the encoded updates compact.
+///
+/// After every cleanup no two adjacent structs can be merged. A pair can only
+/// become mergeable when one of its structs changed (was added, split off or
+/// deleted): origins never change and items are never unlinked. So only the
+/// neighbours of the touched clocks are checked. Clocks are processed from
+/// the highest down, so earlier indices stay valid while structs are removed.
 fn Doc::cleanup(self : Doc) -> Unit {
-  for client in self.touched {
+  for client, clocks in self.touched {
     guard self.clients.get(client) is Some(structs) else { continue }
-    let merged : Array[Struct] = []
-    for s in structs {
-      if merged.length() > 0 && try_merge(merged[merged.length() - 1], s) {
+    clocks.sort()
+    let mut k = clocks.length() - 1
+    while k >= 0 {
+      let clock = clocks[k]
+      k -= 1
+      if k >= 0 && clocks[k] == clock {
         continue
       }
-      merged.push(s)
-    }
-    if merged.length() != structs.length() {
-      structs.clear()
-      structs.append(merged)
+      let i = find_index(structs, clock)
+      if i + 1 < structs.length() && try_merge(structs[i], structs[i + 1]) {
+        structs.remove(i + 1) |> ignore
+      }
+      if i > 0 && try_merge(structs[i - 1], structs[i]) {
+        structs.remove(i) |> ignore
+      }
     }
   }
   self.touched.clear()

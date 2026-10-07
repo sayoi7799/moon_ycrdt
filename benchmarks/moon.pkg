@@ -1,0 +1,13 @@
+import {
+  "sayoi7799/moon_ycrdt/doc",
+  "sayoi7799/moon_ycrdt/types",
+  "moonbitlang/core/cmp",
+}
+
+import {
+  "sayoi7799/moon_ycrdt/lib0",
+  "sayoi7799/moon_ycrdt/update",
+  "moonbitlang/core/bench",
+} for "test"
+
+warnings = "-implicit_impl_as_method"

@@ -1,0 +1,30 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sayoi7799/moon_ycrdt/benchmarks"
+
+import {
+  "sayoi7799/moon_ycrdt/doc",
+}
+
+// Values
+pub fn fragmented_document(Int) -> Bytes
+
+pub fn random_deletes(@doc.Doc, Int, UInt) -> Unit
+
+pub fn random_inserts(@doc.Doc, Int, UInt) -> Unit
+
+pub fn three_way_sync(Int) -> Int
+
+pub fn type_at_end(@doc.Doc, Int) -> Unit
+
+// Errors
+
+// Types and methods
+pub struct Lcg {
+  mut state : UInt
+}
+pub fn Lcg::new(UInt) -> Self
+pub fn Lcg::next(Self, Int) -> Int
+
+// Type aliases
+
+// Traits

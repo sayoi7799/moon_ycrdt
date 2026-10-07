@@ -95,7 +95,8 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | `protocol` | y-protocols 同步消息：`SyncStep1` / `SyncStep2` / `Update` 的编解码、`handle_sync_message`（收到 Step1 自动回复 Step2）、y-websocket 外层消息类型（sync 之外的类型原样透传） |
 | `tests` | 与 Yjs 的互通测试、300 组并发收敛、quickcheck 属性测试 |
 | `cmd/export` | MoonBit → Yjs：执行编辑脚本并导出 JSON 报告，供 Node 验证 |
-| `examples/concurrent` | 可运行示例 |
+| `examples/concurrent`、`examples/roundtrip` | 可运行示例 |
+| `benchmarks` | `moon bench` 基准测试 |
 
 ## 支持范围
 
@@ -127,7 +128,33 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
   文档的行为。纯文本完全一致；带格式时文字内容和各副本之间的收敛不受影响，
   个别情况下多余格式标记的取舍可能和某个具体的 Yjs 客户端不同。
 - 不检测 client id 冲突（Yjs 会在冲突时换 id）。
-- 性能是 MVP 水平：定位按链表线性查找，事务结束时对改动过的 client 做全量合并。
+- 定位按链表线性查找，没有 search marker 缓存（见“性能”一节）。
+
+## 性能
+
+基准测试在 `benchmarks` 包里，工作负载使用固定种子的伪随机数：
+
+```bash
+moon bench -p sayoi7799/moon_ycrdt/benchmarks --target native --release
+```
+
+参考数据：AMD Ryzen 9 7945HX、Windows 11、native release，单位为每次运行的平均时间。
+"优化前"是事务结束时对整个 client 数组做合并的版本，"现在"只检查本事务改动过的位置。
+
+| 基准 | 优化前 | 现在 |
+|---|---|---|
+| lib0：编解码 1 万个 varUint 和 1000 个 Any 对象 | 1.80 ms | 1.84 ms |
+| 解码并重新编码一个 4000 项的碎片化文档 | 2.96 ms | 2.88 ms |
+| 在文本末尾逐字输入 2000 个字符（每字一个事务） | 1.61 ms | 1.77 ms |
+| 2000 次随机位置插入 | 96.8 ms | 8.58 ms |
+| 4000 字的文本里 1000 次随机删除 | 208 ms | 18.3 ms |
+| 加载一个 4000 项的碎片化文档（`apply_update`） | 4.92 ms | 5.94 ms |
+| 导出这个文档的完整状态 | 1.66 ms | 1.66 ms |
+| 3 个副本 × 300 轮并发编辑并互相同步 | 18.7 ms | 8.82 ms |
+| Map：在 100 个键上 set 5000 次 | 430 ms | 5.95 ms |
+| Array：push 2000 次再随机插入 500 次 | 13.8 ms | 6.37 ms |
+
+定位仍是沿链表线性查找（没有实现 Yjs 的 search marker 缓存），对很长的文档，随机位置编辑的开销与文档的 Item 数成正比。
 
 ## 测试
 

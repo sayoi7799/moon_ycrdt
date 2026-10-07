@@ -12,8 +12,10 @@ pub struct Doc {
   priv mut pending_structs : Map[UInt, Array[@update.StructRef]]
   /// Deletions of clocks that have not arrived yet.
   priv mut pending_ds : @update.DeleteSet
-  /// Clients whose structs changed in the current transaction.
-  priv touched : @hashset.HashSet[UInt]
+  /// Clocks of structs that changed in the current transaction (added,
+  /// split off or deleted), per client: the only places where adjacent
+  /// structs can have become mergeable.
+  priv touched : Map[UInt, Array[Int]]
   /// State of each client before its first new struct in this transaction.
   priv txn_before : Map[UInt, Int]
   /// Deletions performed in this transaction.
@@ -32,7 +34,7 @@ pub fn Doc::new(client_id : UInt) -> Doc {
     share: {},
     pending_structs: {},
     pending_ds: @update.DeleteSet::new(),
-    touched: @hashset.HashSet([]),
+    touched: {},
     txn_before: {},
     txn_ds: @update.DeleteSet::new(),
     listeners: [],
