@@ -97,3 +97,10 @@ jobs:
         run: |
           moon run examples/concurrent --target native | tee example.txt
           node scripts/read_update.mjs "$(tail -1 example.txt | cut -d' ' -f3)" doc
+
+      - name: Yjs -> MoonBit -> Yjs round trip example
+        run: |
+          node scripts/make_example_input.mjs > input.txt
+          moon run examples/roundtrip --target native -- "$(cat input.txt)" | tee roundtrip.txt
+          node scripts/read_update.mjs "$(tail -1 roundtrip.txt | cut -d' ' -f3)" doc | tee read.txt
+          grep -q 'MoonBit\] Written in Yjs' read.txt

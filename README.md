@@ -53,6 +53,19 @@ map.set("theme", String("dark"))
 moon run examples/concurrent
 ```
 
+第二个示例演示 Yjs → MoonBit → Yjs 的往返：加载 Yjs 写的文档，用状态向量做差量同步，
+乱序投递的更新先进入 pending、依赖到齐后自动应用，最后导出给 Yjs：
+
+```bash
+node scripts/make_example_input.mjs > input.txt
+```
+
+```bash
+moon run examples/roundtrip -- "$(cat input.txt)"
+```
+
+不带参数运行时使用内置的样例文档（同一脚本生成）。
+
 ### 用 Node + Yjs 读取示例的输出
 
 示例最后一行是 `update (base64): ...`。在 `scripts/` 里安装固定版本的 Yjs 后读取：
