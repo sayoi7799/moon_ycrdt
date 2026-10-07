@@ -10,4 +10,4 @@ license = "Apache-2.0"
 
 keywords = [ "crdt", "yjs", "collaboration", "lib0" ]
 
-description = "Yjs-compatible CRDT for MoonBit: reads and writes the Yjs v1 binary update format."
+description = "Yjs-compatible CRDT for MoonBit: reads and writes Yjs v1 updates and y-protocols sync messages, byte-identical to Yjs."
