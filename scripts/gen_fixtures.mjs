@@ -462,24 +462,128 @@ export const convergenceScenario = (seed) => {
 
 const CONVERGENCE_CASES = 200
 
-const genConvergence = () => {
-  const cases = Array.from({ length: CONVERGENCE_CASES }, (_, i) => convergenceScenario(i + 1))
-  const mbtOp = (o) => {
-    switch (o.op) {
-      case 'insert': return `Ins(${o.replica}, ${o.pos}, ${mbtString(o.str)}, [${o.update.map(u => `"${u}"`).join(', ')}], ${mbtString(o.text)})`
-      case 'delete': return `Del(${o.replica}, ${o.pos}, ${o.len}, [${o.update.map(u => `"${u}"`).join(', ')}], ${mbtString(o.text)})`
-      default: return `Sync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${mbtString(o.text)})`
-    }
+const mbtOp = (o) => {
+  switch (o.op) {
+    case 'insert': return `Ins(${o.replica}, ${o.pos}, ${mbtString(o.str)}, [${o.update.map(u => `"${u}"`).join(', ')}], ${mbtString(o.text)})`
+    case 'delete': return `Del(${o.replica}, ${o.pos}, ${o.len}, [${o.update.map(u => `"${u}"`).join(', ')}], ${mbtString(o.text)})`
+    default: return `Sync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${mbtString(o.text)})`
   }
-  // One top-level definition per scenario keeps each text segment small.
+}
+
+// Script cases as MoonBit code. One top-level definition per case keeps each
+// text segment small.
+const mbtScriptCases = (prefix, listName, cases) => {
   let mbt = ''
-  for (const c of cases) {
-    mbt += `\n///|\nlet convergence_case_${c.seed} : ConvergenceCase = {\n  seed: ${c.seed},\n  clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n  ops: [\n`
+  cases.forEach((c, i) => {
+    mbt += `\n///|\nlet ${prefix}_${i + 1} : ScriptCase = {\n  name: ${mbtString(c.name)},\n  clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n  ops: [\n`
     mbt += c.ops.map(o => `    ${mbtOp(o)},`).join('\n')
     mbt += `\n  ],\n  final_text: ${mbtString(c.finalText)},\n}\n`
+  })
+  mbt += `\n///|\nlet ${listName} : Array[ScriptCase] = [\n${cases.map((_, i) => `  ${prefix}_${i + 1},`).join('\n')}\n]\n`
+  return mbt
+}
+
+const genConvergence = () => {
+  const cases = Array.from({ length: CONVERGENCE_CASES }, (_, i) => convergenceScenario(i + 1))
+    .map(c => ({ name: `seed ${c.seed}`, ...c }))
+  writeFixture('convergence', 'tests', cases, mbtScriptCases('convergence_case', 'convergence_cases', cases))
+}
+
+// ---------------------------------------------------------------------------
+// Edge cases in the same format: every UTF-16 position of a string with emoji,
+// a ZWJ sequence and a combining mark (so inserts / deletes split surrogate
+// pairs), empty inserts, deleting everything, extreme client ids.
+
+const scriptRecorder = (name, ids) => {
+  const docs = ids.map(id => newDoc(id))
+  const logs = docs.map(() => [])
+  docs.forEach((d, i) => d.on('update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
+  const ops = []
+  const text = (r) => docs[r].getText('t')
+  const local = (r, op, f) => {
+    const before = logs[r].length
+    f()
+    ops.push({ ...op, replica: r, update: logs[r].slice(before).map(hex), text: text(r).toString() })
   }
-  mbt += `\n///|\nlet convergence_cases : Array[ConvergenceCase] = [\n${cases.map(c => `  convergence_case_${c.seed},`).join('\n')}\n]\n`
-  writeFixture('convergence', 'tests', cases, mbt)
+  return {
+    length: (r) => text(r).length,
+    insert: (r, pos, str) => local(r, { op: 'insert', pos, str }, () => text(r).insert(pos, str)),
+    del: (r, pos, len) => local(r, { op: 'delete', pos, len }, () => text(r).delete(pos, len)),
+    syncAll: () => {
+      for (let to = 0; to < docs.length; to++) {
+        for (let from = 0; from < docs.length; from++) {
+          if (from === to || logs[from].length === 0) continue
+          const indices = logs[from].map((_, i) => i)
+          for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+          ops.push({ op: 'sync', from, to, indices, text: text(to).toString() })
+        }
+      }
+    },
+    finish: () => {
+      const finalText = text(0).toString()
+      for (let r = 0; r < docs.length; r++) {
+        if (text(r).toString() !== finalText) throw new Error(`${name}: replicas differ`)
+      }
+      return { name, clients: ids, ops, finalText }
+    }
+  }
+}
+
+export const EDGE_STRING = 'a😀b👨‍👩‍👧ćd🎉'
+
+const edgeScenarios = () => {
+  const out = []
+  const s = EDGE_STRING
+  for (let p = 0; p <= s.length; p++) {
+    const r = scriptRecorder(`insert at ${p}`, [10])
+    r.insert(0, 0, s); r.insert(0, p, 'X'); r.insert(0, p, '😀')
+    out.push(r.finish())
+  }
+  for (const len of [1, 2]) {
+    for (let p = 0; p + len <= s.length; p++) {
+      const r = scriptRecorder(`delete ${len} at ${p}`, [10])
+      r.insert(0, 0, s); r.del(0, p, len)
+      out.push(r.finish())
+    }
+  }
+  {
+    const r = scriptRecorder('empty insert, delete everything, write again', [10])
+    r.insert(0, 0, ''); r.insert(0, 0, s); r.del(0, 0, s.length)
+    r.insert(0, 0, '新'); r.del(0, 0, 1); r.insert(0, 0, '😀')
+    out.push(r.finish())
+  }
+  {
+    const r = scriptRecorder('typing at the end merges into one item', [10])
+    for (const ch of ['h', 'e', 'l', 'l', 'o', '😀', '!']) r.insert(0, r.length(0), ch)
+    out.push(r.finish())
+  }
+  {
+    const r = scriptRecorder('client ids 0 and 2^32-1', [0, 4294967295])
+    r.insert(0, 0, 'zero'); r.insert(1, 0, 'max'); r.syncAll()
+    r.insert(0, 2, '|'); r.insert(1, 2, '|'); r.del(1, 0, 1); r.syncAll()
+    out.push(r.finish())
+  }
+  {
+    const r = scriptRecorder('two replicas split the same surrogate pair', [1, 2])
+    r.insert(0, 0, 'x😀y'); r.syncAll()
+    r.insert(0, 2, 'A'); r.insert(1, 2, 'B'); r.del(1, 1, 1); r.syncAll()
+    r.del(0, 0, 1); r.insert(1, 0, '👍'); r.syncAll()
+    out.push(r.finish())
+  }
+  return out
+}
+
+const genEdge = () => {
+  const cases = edgeScenarios()
+  const empty = new Y.Doc()
+  const json = {
+    emptyState: hex(Y.encodeStateAsUpdate(empty)),
+    emptyStateVector: hex(Y.encodeStateVector(empty)),
+    cases
+  }
+  let mbt = `\n///|\nlet empty_doc_state : String = "${json.emptyState}"\n\n///|\nlet empty_doc_state_vector : String = "${json.emptyStateVector}"\n`
+  mbt += mbtScriptCases('edge_case', 'edge_cases', cases)
+  writeFixture('edge', 'tests', json, mbt)
 }
 
 // ---------------------------------------------------------------------------
@@ -500,4 +604,5 @@ genLib0()
 genUpdates()
 genInterop()
 genConvergence()
+genEdge()
 genExportBase()

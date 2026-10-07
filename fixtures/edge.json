@@ -1,0 +1,2031 @@
+{
+  "emptyState": "0000",
+  "emptyStateVector": "00",
+  "cases": [
+    {
+      "name": "insert at 0",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11440a00015800"
+          ],
+          "text": "Xa😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12440a1104f09f988000"
+          ],
+          "text": "😀Xa😀b👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "😀Xa😀b👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 1",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 1,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a000a01015800"
+          ],
+          "text": "aX😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 1,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a000a1104f09f988000"
+          ],
+          "text": "a😀X😀b👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀X😀b👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 2",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 2,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a010a02015800"
+          ],
+          "text": "a�X�b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 2,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a010a1104f09f988000"
+          ],
+          "text": "a�😀X�b👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a�😀X�b👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 3",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 3,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a020a03015800"
+          ],
+          "text": "a😀Xb👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 3,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a020a1104f09f988000"
+          ],
+          "text": "a😀😀Xb👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀😀Xb👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 4",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 4,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a030a04015800"
+          ],
+          "text": "a😀bX👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 4,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a030a1104f09f988000"
+          ],
+          "text": "a😀b😀X👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b😀X👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 5",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 5,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a040a05015800"
+          ],
+          "text": "a😀b�X�‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 5,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a040a1104f09f988000"
+          ],
+          "text": "a😀b�😀X�‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b�😀X�‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 6",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 6,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a050a06015800"
+          ],
+          "text": "a😀b👨X‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 6,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a050a1104f09f988000"
+          ],
+          "text": "a😀b👨😀X‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨😀X‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 7",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 7,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a060a07015800"
+          ],
+          "text": "a😀b👨‍X👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 7,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a060a1104f09f988000"
+          ],
+          "text": "a😀b👨‍😀X👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍😀X👩‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 8",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 8,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a070a08015800"
+          ],
+          "text": "a😀b👨‍�X�‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 8,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a070a1104f09f988000"
+          ],
+          "text": "a😀b👨‍�😀X�‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍�😀X�‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 9",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 9,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a080a09015800"
+          ],
+          "text": "a😀b👨‍👩X‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 9,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a080a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩😀X‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩😀X‍👧ćd🎉"
+    },
+    {
+      "name": "insert at 10",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 10,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a090a0a015800"
+          ],
+          "text": "a😀b👨‍👩‍X👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 10,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a090a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩‍😀X👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍😀X👧ćd🎉"
+    },
+    {
+      "name": "insert at 11",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 11,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a0a0a0b015800"
+          ],
+          "text": "a😀b👨‍👩‍�X�ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 11,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a0a0a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩‍�😀X�ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍�😀X�ćd🎉"
+    },
+    {
+      "name": "insert at 12",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 12,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a0b0a0c015800"
+          ],
+          "text": "a😀b👨‍👩‍👧Xćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 12,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a0b0a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩‍👧😀Xćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧😀Xćd🎉"
+    },
+    {
+      "name": "insert at 13",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 13,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a0c0a0d015800"
+          ],
+          "text": "a😀b👨‍👩‍👧cX́d🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 13,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a0c0a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩‍👧c😀X́d🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧c😀X́d🎉"
+    },
+    {
+      "name": "insert at 14",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 14,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a0d0a0e015800"
+          ],
+          "text": "a😀b👨‍👩‍👧ćXd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 14,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a0d0a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩‍👧ć😀Xd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ć😀Xd🎉"
+    },
+    {
+      "name": "insert at 15",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 15,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a0e0a0f015800"
+          ],
+          "text": "a😀b👨‍👩‍👧ćdX🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 15,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a0e0a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd😀X🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ćd😀X🎉"
+    },
+    {
+      "name": "insert at 16",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 16,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11c40a0f0a10015800"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd�X�"
+        },
+        {
+          "op": "insert",
+          "pos": 16,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a0f0a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd�😀X�"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ćd�😀X�"
+    },
+    {
+      "name": "insert at 17",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "insert",
+          "pos": 17,
+          "str": "X",
+          "replica": 0,
+          "update": [
+            "01010a11840a10015800"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉X"
+        },
+        {
+          "op": "insert",
+          "pos": 17,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12c40a100a1104f09f988000"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉😀X"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ćd🎉😀X"
+    },
+    {
+      "name": "delete 1 at 0",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 0,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010001"
+          ],
+          "text": "😀b👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "😀b👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 1",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 1,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010101"
+          ],
+          "text": "a�b👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a�b👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 2",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 2,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010201"
+          ],
+          "text": "a�b👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a�b👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 3",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 3,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010301"
+          ],
+          "text": "a😀👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 4",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 4,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010401"
+          ],
+          "text": "a😀b�‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b�‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 5",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 5,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010501"
+          ],
+          "text": "a😀b�‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b�‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 6",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 6,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010601"
+          ],
+          "text": "a😀b👨👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 7",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 7,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010701"
+          ],
+          "text": "a😀b👨‍�‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍�‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 8",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 8,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010801"
+          ],
+          "text": "a😀b👨‍�‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍�‍👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 9",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 9,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010901"
+          ],
+          "text": "a😀b👨‍👩👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩👧ćd🎉"
+    },
+    {
+      "name": "delete 1 at 10",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 10,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010a01"
+          ],
+          "text": "a😀b👨‍👩‍�ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍�ćd🎉"
+    },
+    {
+      "name": "delete 1 at 11",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 11,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010b01"
+          ],
+          "text": "a😀b👨‍👩‍�ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍�ćd🎉"
+    },
+    {
+      "name": "delete 1 at 12",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 12,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010c01"
+          ],
+          "text": "a😀b👨‍👩‍👧́d🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧́d🎉"
+    },
+    {
+      "name": "delete 1 at 13",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 13,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010d01"
+          ],
+          "text": "a😀b👨‍👩‍👧cd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧cd🎉"
+    },
+    {
+      "name": "delete 1 at 14",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 14,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010e01"
+          ],
+          "text": "a😀b👨‍👩‍👧ć🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ć🎉"
+    },
+    {
+      "name": "delete 1 at 15",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 15,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a010f01"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd�"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ćd�"
+    },
+    {
+      "name": "delete 1 at 16",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 16,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a011001"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd�"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ćd�"
+    },
+    {
+      "name": "delete 2 at 0",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 0,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010002"
+          ],
+          "text": "�b👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "�b👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 1",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 1,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010102"
+          ],
+          "text": "ab👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "ab👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 2",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 2,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010202"
+          ],
+          "text": "a�👨‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a�👨‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 3",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 3,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010302"
+          ],
+          "text": "a😀�‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀�‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 4",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 4,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010402"
+          ],
+          "text": "a😀b‍👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b‍👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 5",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 5,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010502"
+          ],
+          "text": "a😀b�👩‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b�👩‍👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 6",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 6,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010602"
+          ],
+          "text": "a😀b👨�‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨�‍👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 7",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 7,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010702"
+          ],
+          "text": "a😀b👨‍‍👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍‍👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 8",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 8,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010802"
+          ],
+          "text": "a😀b👨‍�👧ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍�👧ćd🎉"
+    },
+    {
+      "name": "delete 2 at 9",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 9,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010902"
+          ],
+          "text": "a😀b👨‍👩�ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩�ćd🎉"
+    },
+    {
+      "name": "delete 2 at 10",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 10,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010a02"
+          ],
+          "text": "a😀b👨‍👩‍ćd🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍ćd🎉"
+    },
+    {
+      "name": "delete 2 at 11",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 11,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010b02"
+          ],
+          "text": "a😀b👨‍👩‍�́d🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍�́d🎉"
+    },
+    {
+      "name": "delete 2 at 12",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 12,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010c02"
+          ],
+          "text": "a😀b👨‍👩‍👧d🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧d🎉"
+    },
+    {
+      "name": "delete 2 at 13",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 13,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010d02"
+          ],
+          "text": "a😀b👨‍👩‍👧c🎉"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧c🎉"
+    },
+    {
+      "name": "delete 2 at 14",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 14,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010e02"
+          ],
+          "text": "a😀b👨‍👩‍👧ć�"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ć�"
+    },
+    {
+      "name": "delete 2 at 15",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 15,
+          "len": 2,
+          "replica": 0,
+          "update": [
+            "00010a010f02"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd"
+        }
+      ],
+      "finalText": "a😀b👨‍👩‍👧ćd"
+    },
+    {
+      "name": "empty insert, delete everything, write again",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "",
+          "replica": 0,
+          "update": [],
+          "text": ""
+        },
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "a😀b👨‍👩‍👧ćd🎉",
+          "replica": 0,
+          "update": [
+            "01010a00040101742061f09f988062f09f91a8e2808df09f91a9e2808df09f91a763cc8164f09f8e8900"
+          ],
+          "text": "a😀b👨‍👩‍👧ćd🎉"
+        },
+        {
+          "op": "delete",
+          "pos": 0,
+          "len": 17,
+          "replica": 0,
+          "update": [
+            "00010a010011"
+          ],
+          "text": ""
+        },
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "新",
+          "replica": 0,
+          "update": [
+            "01010a11840a1003e696b000"
+          ],
+          "text": "新"
+        },
+        {
+          "op": "delete",
+          "pos": 0,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "00010a011101"
+          ],
+          "text": ""
+        },
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a12840a1104f09f988000"
+          ],
+          "text": "😀"
+        }
+      ],
+      "finalText": "😀"
+    },
+    {
+      "name": "typing at the end merges into one item",
+      "clients": [
+        10
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "h",
+          "replica": 0,
+          "update": [
+            "01010a0004010174016800"
+          ],
+          "text": "h"
+        },
+        {
+          "op": "insert",
+          "pos": 1,
+          "str": "e",
+          "replica": 0,
+          "update": [
+            "01010a01840a00016500"
+          ],
+          "text": "he"
+        },
+        {
+          "op": "insert",
+          "pos": 2,
+          "str": "l",
+          "replica": 0,
+          "update": [
+            "01010a02840a01016c00"
+          ],
+          "text": "hel"
+        },
+        {
+          "op": "insert",
+          "pos": 3,
+          "str": "l",
+          "replica": 0,
+          "update": [
+            "01010a03840a02016c00"
+          ],
+          "text": "hell"
+        },
+        {
+          "op": "insert",
+          "pos": 4,
+          "str": "o",
+          "replica": 0,
+          "update": [
+            "01010a04840a03016f00"
+          ],
+          "text": "hello"
+        },
+        {
+          "op": "insert",
+          "pos": 5,
+          "str": "😀",
+          "replica": 0,
+          "update": [
+            "01010a05840a0404f09f988000"
+          ],
+          "text": "hello😀"
+        },
+        {
+          "op": "insert",
+          "pos": 7,
+          "str": "!",
+          "replica": 0,
+          "update": [
+            "01010a07840a06012100"
+          ],
+          "text": "hello😀!"
+        }
+      ],
+      "finalText": "hello😀!"
+    },
+    {
+      "name": "client ids 0 and 2^32-1",
+      "clients": [
+        0,
+        4294967295
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "zero",
+          "replica": 0,
+          "update": [
+            "0101000004010174047a65726f00"
+          ],
+          "text": "zero"
+        },
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "max",
+          "replica": 1,
+          "update": [
+            "0101ffffffff0f0004010174036d617800"
+          ],
+          "text": "max"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0,
+          "indices": [
+            0
+          ],
+          "text": "zeromax"
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1,
+          "indices": [
+            0
+          ],
+          "text": "zeromax"
+        },
+        {
+          "op": "insert",
+          "pos": 2,
+          "str": "|",
+          "replica": 0,
+          "update": [
+            "01010004c400010002017c00"
+          ],
+          "text": "ze|romax"
+        },
+        {
+          "op": "insert",
+          "pos": 2,
+          "str": "|",
+          "replica": 1,
+          "update": [
+            "0101ffffffff0f03c400010002017c00"
+          ],
+          "text": "ze|romax"
+        },
+        {
+          "op": "delete",
+          "pos": 0,
+          "len": 1,
+          "replica": 1,
+          "update": [
+            "000100010001"
+          ],
+          "text": "e|romax"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0,
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "text": "e||romax"
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1,
+          "indices": [
+            0,
+            1
+          ],
+          "text": "e||romax"
+        }
+      ],
+      "finalText": "e||romax"
+    },
+    {
+      "name": "two replicas split the same surrogate pair",
+      "clients": [
+        1,
+        2
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "x😀y",
+          "replica": 0,
+          "update": [
+            "01010100040101740678f09f98807900"
+          ],
+          "text": "x😀y"
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1,
+          "indices": [
+            0
+          ],
+          "text": "x😀y"
+        },
+        {
+          "op": "insert",
+          "pos": 2,
+          "str": "A",
+          "replica": 0,
+          "update": [
+            "01010104c401010102014100"
+          ],
+          "text": "x�A�y"
+        },
+        {
+          "op": "insert",
+          "pos": 2,
+          "str": "B",
+          "replica": 1,
+          "update": [
+            "01010200c401010102014200"
+          ],
+          "text": "x�B�y"
+        },
+        {
+          "op": "delete",
+          "pos": 1,
+          "len": 1,
+          "replica": 1,
+          "update": [
+            "000101010101"
+          ],
+          "text": "xB�y"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0,
+          "indices": [
+            0,
+            1
+          ],
+          "text": "xAB�y"
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1,
+          "indices": [
+            0,
+            1
+          ],
+          "text": "xAB�y"
+        },
+        {
+          "op": "delete",
+          "pos": 0,
+          "len": 1,
+          "replica": 0,
+          "update": [
+            "000101010001"
+          ],
+          "text": "AB�y"
+        },
+        {
+          "op": "insert",
+          "pos": 0,
+          "str": "👍",
+          "replica": 1,
+          "update": [
+            "0101020144010004f09f918d00"
+          ],
+          "text": "👍xAB�y"
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0,
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "text": "👍AB�y"
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1,
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "text": "👍AB�y"
+        }
+      ],
+      "finalText": "👍AB�y"
+    }
+  ]
+}
