@@ -1,0 +1,10 @@
+import {
+  "sayoi7799/moon_ycrdt/lib0",
+  "sayoi7799/moon_ycrdt/doc",
+}
+
+warnings = "-implicit_impl_as_method"
+
+import {
+  "sayoi7799/moon_ycrdt/types",
+} for "test"

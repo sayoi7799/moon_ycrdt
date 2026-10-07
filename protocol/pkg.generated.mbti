@@ -1,0 +1,65 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sayoi7799/moon_ycrdt/protocol"
+
+import {
+  "moonbitlang/core/debug",
+  "sayoi7799/moon_ycrdt/doc",
+  "sayoi7799/moon_ycrdt/lib0",
+}
+
+// Values
+pub const MESSAGE_AUTH : Int = 2
+
+pub const MESSAGE_AWARENESS : Int = 1
+
+pub const MESSAGE_QUERY_AWARENESS : Int = 3
+
+pub const MESSAGE_SYNC : Int = 0
+
+pub const MESSAGE_SYNC_STEP1 : Int = 0
+
+pub const MESSAGE_SYNC_STEP2 : Int = 1
+
+pub const MESSAGE_UPDATE : Int = 2
+
+pub fn decode_sync_message(Bytes) -> SyncMessage raise @lib0.DecodeError
+
+pub fn decode_ws_message(Bytes) -> WsMessage raise @lib0.DecodeError
+
+pub fn handle_sync_message(@doc.Doc, SyncMessage) -> SyncMessage? raise @lib0.DecodeError
+
+pub fn handle_ws_message(@doc.Doc, Bytes) -> Bytes? raise @lib0.DecodeError
+
+pub fn read_sync_message(@lib0.Decoder) -> SyncMessage raise @lib0.DecodeError
+
+pub fn sync_step1(@doc.Doc) -> SyncMessage
+
+pub fn sync_step2(@doc.Doc, Bytes) -> SyncMessage raise @lib0.DecodeError
+
+pub fn update_message(Bytes) -> SyncMessage
+
+// Errors
+
+// Types and methods
+pub(all) enum SyncMessage {
+  SyncStep1(Bytes)
+  SyncStep2(Bytes)
+  Update(Bytes)
+} derive(Eq, @debug.Debug)
+pub fn SyncMessage::encode(Self) -> Bytes
+pub fn SyncMessage::equal(Self, Self) -> Bool
+pub fn SyncMessage::message_type(Self) -> Int
+pub fn SyncMessage::not_equal(Self, Self) -> Bool
+pub fn SyncMessage::write(Self, @lib0.Encoder) -> Unit
+
+pub(all) enum WsMessage {
+  Sync(SyncMessage)
+  Other(Int, Bytes)
+} derive(Eq, @debug.Debug)
+pub fn WsMessage::encode(Self) -> Bytes
+pub fn WsMessage::equal(Self, Self) -> Bool
+pub fn WsMessage::not_equal(Self, Self) -> Bool
+
+// Type aliases
+
+// Traits

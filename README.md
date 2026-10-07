@@ -92,6 +92,7 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | `update` | update v1 的纯数据层：`ID`、9 种 content、Item / GC / Skip、info 字节、`DeleteSet`、状态向量；解码再编码逐字节还原 |
 | `doc` | `Doc`、按 client 存储的 struct store、YATA integrate、pending 队列、`apply_update`、`encode_state_as_update`、`encode_state_vector`、事务级 `on_update` |
 | `types` | `Text`（insert / delete / to_string，UTF-16 下标）和 `YMap`（set / get / delete，值为 `Any`） |
+| `protocol` | y-protocols 同步消息：`SyncStep1` / `SyncStep2` / `Update` 的编解码、`handle_sync_message`（收到 Step1 自动回复 Step2）、y-websocket 外层消息类型（sync 之外的类型原样透传） |
 | `tests` | 与 Yjs 的互通测试、300 组并发收敛、quickcheck 属性测试 |
 | `cmd/export` | MoonBit → Yjs：执行编辑脚本并导出 JSON 报告，供 Node 验证 |
 | `examples/concurrent` | 可运行示例 |
@@ -115,6 +116,7 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | Y.Array、Y.Xml* 的 API | ❌ | 数据会保留 |
 | 子文档加载、UndoManager、awareness、相对位置、快照 | ❌ | |
 | 垃圾回收 | ❌ | 本地文档相当于 `gc: false`，但能解码对方发来的 GC 结构和 ContentDeleted |
+| y-protocols 同步消息（SyncStep1 / SyncStep2 / Update）与 y-websocket 外层封装 | ✅ | 与 `y-protocols@1.0.7` 逐字节对照；awareness 消息原样透传，不解析 |
 | y-websocket 服务端、编辑器绑定 | ❌ | |
 
 已知限制：
@@ -158,7 +160,7 @@ node scripts/verify_moonbit.mjs fixtures/moonbit_out.json
 ## 重新生成 fixtures
 
 - 生成脚本：[`scripts/gen_fixtures.mjs`](scripts/gen_fixtures.mjs)
-- Yjs 版本：`yjs@13.6.33`、`lib0@0.2.119`，固定在 [`scripts/package.json`](scripts/package.json) 和 `package-lock.json`
+- 版本：`yjs@13.6.33`、`lib0@0.2.119`、`y-protocols@1.0.7`，固定在 [`scripts/package.json`](scripts/package.json) 和 `package-lock.json`
 - 输出：`fixtures/*.json`（可读的记录）以及内嵌同样数据的 MoonBit 文件
   `lib0/lib0_gen_test.mbt`、`update/updates_gen_test.mbt`、`tests/interop_gen_test.mbt`、
   `tests/convergence_gen_test.mbt`、`cmd/export/yjs_base_gen.mbt`
@@ -178,7 +180,7 @@ cd scripts && npm ci && node gen_fixtures.mjs && cd .. && moon fmt
 |---|---|---|
 | [yjs](https://github.com/yjs/yjs) | MIT | update v1 格式、struct store、YATA integrate、Y.Text / Y.Map 的语义（含定位、格式清理、删除集、pending 处理）；生成测试数据 |
 | [lib0](https://github.com/dmonad/lib0) | MIT | 二进制编码（varUint、varInt、字符串、`Any`）；生成测试数据 |
-| [y-protocols](https://github.com/yjs/y-protocols) | MIT | 状态向量 / 差量更新的同步语义 |
+| [y-protocols](https://github.com/yjs/y-protocols) | MIT | sync 消息格式与握手流程（`protocol` 包）；生成测试数据（固定 `y-protocols@1.0.7`） |
 
 `fixtures/` 和 `*_gen_test.mbt` 中的测试数据由上述 MIT 许可的官方实现生成。
 moon_ycrdt 本身使用 Apache-2.0 许可证（见 [LICENSE](LICENSE)）。
