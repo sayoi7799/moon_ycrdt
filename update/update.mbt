@@ -9,7 +9,7 @@
 ///|
 /// All structs of one client in an update, with consecutive clocks.
 pub(all) struct ClientStructs {
-  client : UInt
+  client : UInt32
   structs : Array[StructRef]
 } derive(Eq, Debug)
 
@@ -83,7 +83,7 @@ pub fn Update::encode(self : Update) -> Bytes {
 /// The state vector of an update, like `Y.encodeStateVectorFromUpdate`: for
 /// every client, the end of the contiguous run of structs starting at clock 0
 /// and stopping at the first Skip. Clients not starting at 0 are left out.
-pub fn Update::state_vector(self : Update) -> Map[UInt, Int] {
+pub fn Update::state_vector(self : Update) -> Map[UInt32, Int32] {
   let sv = Map([])
   for cs in self.clients {
     let mut clock = 0

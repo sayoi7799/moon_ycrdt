@@ -2,12 +2,12 @@
 /// Unique id of every inserted element: the creating client plus a per-client
 /// logical clock. An item of length n occupies clocks `clock ..< clock + n`.
 pub(all) struct ID {
-  client : UInt
-  clock : Int
+  client : UInt32
+  clock : Int32
 } derive(Eq, Hash, Debug)
 
 ///|
-pub fn ID::new(client : UInt, clock : Int) -> ID {
+pub fn ID::new(client : UInt32, clock : Int32) -> ID {
   { client, clock, }
 }
 

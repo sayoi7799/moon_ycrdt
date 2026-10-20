@@ -1,7 +1,7 @@
 ///|
 /// Encodes a state vector (client -> next expected clock), clients in
 /// descending order like `Y.encodeStateVector`.
-pub fn encode_state_vector(sv : Map[UInt, Int]) -> Bytes {
+pub fn encode_state_vector(sv : Map[UInt32, Int32]) -> Bytes {
   let e = @lib0.Encoder::new()
   let clients = sv.keys().to_array()
   clients.sort_by((a, b) => b.compare(a))
@@ -16,7 +16,7 @@ pub fn encode_state_vector(sv : Map[UInt, Int]) -> Bytes {
 ///|
 pub fn decode_state_vector(
   data : Bytes,
-) -> Map[UInt, Int] raise @lib0.DecodeError {
+) -> Map[UInt32, Int32] raise @lib0.DecodeError {
   let d = @lib0.Decoder::new(data)
   let n = d.read_var_uint()
   let sv = Map([])

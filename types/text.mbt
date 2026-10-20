@@ -19,7 +19,7 @@ pub fn Text::new(doc : @doc.Doc, name : String) -> Text {
 
 ///|
 /// Length in UTF-16 code units (embeds count as 1).
-pub fn Text::length(self : Text) -> Int {
+pub fn Text::length(self : Text) -> Int32 {
   self.ty.length
 }
 
@@ -80,7 +80,7 @@ fn Pos::forward(self : Pos) -> Unit {
 /// containing `index`, moved left over items of the same client with
 /// consecutive clocks. For text without formatting the result is the same as
 /// walking from the start.
-fn Text::find_position(self : Text, index : Int) -> Pos {
+fn Text::find_position(self : Text, index : Int32) -> Pos {
   guard index >= 0 && index <= self.ty.length else {
     abort("index \{index} out of range (length \{self.ty.length})")
   }
@@ -124,7 +124,7 @@ fn Text::find_position(self : Text, index : Int) -> Pos {
 
 ///|
 /// Inserts `s` at UTF-16 offset `index`.
-pub fn Text::insert(self : Text, index : Int, s : String) -> Unit {
+pub fn Text::insert(self : Text, index : Int32, s : String) -> Unit {
   if s.length() == 0 {
     return
   }
@@ -150,7 +150,7 @@ pub fn Text::insert(self : Text, index : Int, s : String) -> Unit {
 
 ///|
 /// Deletes `len` UTF-16 code units starting at `index`.
-pub fn Text::delete(self : Text, index : Int, len : Int) -> Unit {
+pub fn Text::delete(self : Text, index : Int32, len : Int32) -> Unit {
   if len <= 0 {
     return
   }

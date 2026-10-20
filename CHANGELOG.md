@@ -60,6 +60,8 @@
 - `moon.mod` 声明 `supported_targets = "+wasm+wasm-gc+js+native"`，与 CI 实际验证的后端一致。
 - 新增 `.moonignore`：发布包不含 `docs/`、`fixtures/` 和 `node_modules/`（压缩包约 320 KB）。
   从发布包解压出的目录单独运行 `moon check --deny-warn` 和 `moon test --target all` 均通过。
+- 适配 MoonBit 0.1.20261016：`x.to_json()` 改为 `Json(x)`（新版弃用，`--deny-warn` 下是错误），`moon fmt`
+  迁移了语法（`Int` → `Int32` 等），否则 CI 的 `moon fmt --check` 会失败。行为不变。
 
 ### 已知限制
 

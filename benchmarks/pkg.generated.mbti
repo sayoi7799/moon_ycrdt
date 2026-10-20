@@ -6,24 +6,24 @@ import {
 }
 
 // Values
-pub fn fragmented_document(Int) -> Bytes
+pub fn fragmented_document(Int32) -> Bytes
 
-pub fn random_deletes(@doc.Doc, Int, UInt) -> Unit
+pub fn random_deletes(@doc.Doc, Int32, UInt32) -> Unit
 
-pub fn random_inserts(@doc.Doc, Int, UInt) -> Unit
+pub fn random_inserts(@doc.Doc, Int32, UInt32) -> Unit
 
-pub fn three_way_sync(Int) -> Int
+pub fn three_way_sync(Int32) -> Int32
 
-pub fn type_at_end(@doc.Doc, Int) -> Unit
+pub fn type_at_end(@doc.Doc, Int32) -> Unit
 
 // Errors
 
 // Types and methods
 pub struct Lcg {
-  mut state : UInt
+  mut state : UInt32
 }
-pub fn Lcg::new(UInt) -> Self
-pub fn Lcg::next(Self, Int) -> Int
+pub fn Lcg::new(UInt32) -> Self
+pub fn Lcg::next(Self, Int32) -> Int32
 
 // Type aliases
 

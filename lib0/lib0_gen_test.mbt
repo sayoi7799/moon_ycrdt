@@ -79,7 +79,7 @@ let var_string_cases : Array[(String, String)] = [
 ]
 
 ///|
-let var_bytes_cases : Array[(Array[Int], String)] = [
+let var_bytes_cases : Array[(Array[Int32], String)] = [
   ([], "00"),
   ([0], "0100"),
   ([1, 2, 3], "03010203"),
@@ -256,7 +256,7 @@ let any_cases : Array[(@lib0.Any, String)] = [
 ]
 
 ///|
-let lone_surrogate_case : (Array[Int], String) = (
+let lone_surrogate_case : (Array[Int32], String) = (
   [97, 55357, 98],
   "0561efbfbd62",
 )

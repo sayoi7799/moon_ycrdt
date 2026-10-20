@@ -37,7 +37,7 @@ fn any_to_json(v : @lib0.Any) -> Json {
 /// can replay exactly the same operations on Yjs.
 priv struct Script {
   name : String
-  clients : Array[UInt]
+  clients : Array[UInt32]
   docs : Array[@doc.Doc]
   logs : Array[Array[Bytes]]
   ops : Array[Json]
@@ -49,10 +49,10 @@ priv struct Script {
 ///|
 fn Script::new(
   name : String,
-  clients : Array[UInt],
-  texts? : Array[String] = ["t"],
-  maps? : Array[String] = [],
-  arrays? : Array[String] = [],
+  clients : Array[UInt32],
+  texts~ : Array[String] = ["t"],
+  maps~ : Array[String] = [],
+  arrays~ : Array[String] = [],
 ) -> Script {
   let docs = clients.map(id => @doc.Doc::new(id))
   let logs : Array[Array[Bytes]] = docs.map(_ => [])
@@ -65,53 +65,53 @@ fn Script::new(
 ///|
 fn Script::insert(
   self : Script,
-  doc : Int,
-  pos : Int,
+  doc : Int32,
+  pos : Int32,
   text : String,
-  name? : String = "t",
+  name~ : String = "t",
 ) -> Unit {
   @types.Text::new(self.docs[doc], name).insert(pos, text)
   self.ops.push({
     "op": "insert",
-    "doc": doc.to_json(),
-    "name": name.to_json(),
-    "pos": pos.to_json(),
-    "text": text.to_json(),
+    "doc": Json(doc),
+    "name": Json(name),
+    "pos": Json(pos),
+    "text": Json(text),
   })
 }
 
 ///|
 fn Script::delete(
   self : Script,
-  doc : Int,
-  pos : Int,
-  len : Int,
-  name? : String = "t",
+  doc : Int32,
+  pos : Int32,
+  len : Int32,
+  name~ : String = "t",
 ) -> Unit {
   @types.Text::new(self.docs[doc], name).delete(pos, len)
   self.ops.push({
     "op": "delete",
-    "doc": doc.to_json(),
-    "name": name.to_json(),
-    "pos": pos.to_json(),
-    "len": len.to_json(),
+    "doc": Json(doc),
+    "name": Json(name),
+    "pos": Json(pos),
+    "len": Json(len),
   })
 }
 
 ///|
 fn Script::set(
   self : Script,
-  doc : Int,
+  doc : Int32,
   key : String,
   value : @lib0.Any,
-  name? : String = "m",
+  name~ : String = "m",
 ) -> Unit {
   @types.YMap::new(self.docs[doc], name).set(key, value)
   self.ops.push({
     "op": "set",
-    "doc": doc.to_json(),
-    "name": name.to_json(),
-    "key": key.to_json(),
+    "doc": Json(doc),
+    "name": Json(name),
+    "key": Json(key),
     "value": any_to_json(value),
   })
 }
@@ -119,33 +119,33 @@ fn Script::set(
 ///|
 fn Script::map_delete(
   self : Script,
-  doc : Int,
+  doc : Int32,
   key : String,
-  name? : String = "m",
+  name~ : String = "m",
 ) -> Unit {
   @types.YMap::new(self.docs[doc], name).delete(key)
   self.ops.push({
     "op": "mapDelete",
-    "doc": doc.to_json(),
-    "name": name.to_json(),
-    "key": key.to_json(),
+    "doc": Json(doc),
+    "name": Json(name),
+    "key": Json(key),
   })
 }
 
 ///|
 fn Script::array_insert(
   self : Script,
-  doc : Int,
-  pos : Int,
+  doc : Int32,
+  pos : Int32,
   values : Array[@lib0.Any],
-  name? : String = "a",
+  name~ : String = "a",
 ) -> Unit {
   @types.YArray::new(self.docs[doc], name).insert(pos, values)
   self.ops.push({
     "op": "arrayInsert",
-    "doc": doc.to_json(),
-    "name": name.to_json(),
-    "pos": pos.to_json(),
+    "doc": Json(doc),
+    "name": Json(name),
+    "pos": Json(pos),
     "values": Json::array(values.map(any_to_json)),
   })
 }
@@ -153,15 +153,15 @@ fn Script::array_insert(
 ///|
 fn Script::array_push(
   self : Script,
-  doc : Int,
+  doc : Int32,
   values : Array[@lib0.Any],
-  name? : String = "a",
+  name~ : String = "a",
 ) -> Unit {
   @types.YArray::new(self.docs[doc], name).push(values)
   self.ops.push({
     "op": "arrayPush",
-    "doc": doc.to_json(),
-    "name": name.to_json(),
+    "doc": Json(doc),
+    "name": Json(name),
     "values": Json::array(values.map(any_to_json)),
   })
 }
@@ -169,31 +169,31 @@ fn Script::array_push(
 ///|
 fn Script::array_delete(
   self : Script,
-  doc : Int,
-  pos : Int,
-  len : Int,
-  name? : String = "a",
+  doc : Int32,
+  pos : Int32,
+  len : Int32,
+  name~ : String = "a",
 ) -> Unit {
   @types.YArray::new(self.docs[doc], name).delete(pos, len)
   self.ops.push({
     "op": "arrayDelete",
-    "doc": doc.to_json(),
-    "name": name.to_json(),
-    "pos": pos.to_json(),
-    "len": len.to_json(),
+    "doc": Json(doc),
+    "name": Json(name),
+    "pos": Json(pos),
+    "len": Json(len),
   })
 }
 
 ///|
 /// Sends `from`'s missing data to `to` as a diff against `to`'s state vector.
-fn Script::sync(self : Script, from : Int, to : Int) -> Unit {
+fn Script::sync(self : Script, from : Int32, to : Int32) -> Unit {
   let diff = self.docs[from].encode_state_as_update(
     sv=self.docs[to].state_vector(),
   )
   self.docs[to].apply_update(diff) catch {
     e => abort(e.to_string())
   }
-  self.ops.push({ "op": "sync", "from": from.to_json(), "to": to.to_json() })
+  self.ops.push({ "op": "sync", "from": Json(from), "to": Json(to) })
 }
 
 ///|
@@ -209,12 +209,12 @@ fn Script::sync_all(self : Script) -> Unit {
 
 ///|
 /// Applies an update produced by Yjs (hex) to replica `doc`.
-fn Script::apply_yjs(self : Script, doc : Int, update_hex : String) -> Unit {
+fn Script::apply_yjs(self : Script, doc : Int32, update_hex : String) -> Unit {
   let update = @lib0.from_hex(update_hex) catch { e => abort(e.to_string()) }
   self.docs[doc].apply_update(update) catch {
     e => abort(e.to_string())
   }
-  self.ops.push({ "op": "apply", "doc": doc.to_json(), "update": b64(update) })
+  self.ops.push({ "op": "apply", "doc": Json(doc), "update": b64(update) })
 }
 
 ///|
@@ -250,7 +250,7 @@ fn Script::report(self : Script) -> Json {
     json
   })
   {
-    "name": self.name.to_json(),
+    "name": Json(self.name),
     "clients": Json::array(self.clients.map(c => Json::number(c.to_double()))),
     "ops": Json::array(self.ops),
     "docs": Json::array(docs),
@@ -275,7 +275,7 @@ fn text_editing() -> Script {
 }
 
 ///|
-fn text_len(d : @doc.Doc) -> Int {
+fn text_len(d : @doc.Doc) -> Int32 {
   @types.Text::new(d, "t").length()
 }
 
@@ -362,7 +362,7 @@ fn preserve_unknown() -> Script {
 }
 
 ///|
-fn text_len_of(d : @doc.Doc, name : String) -> Int {
+fn text_len_of(d : @doc.Doc, name : String) -> Int32 {
   @types.Text::new(d, name).length()
 }
 

@@ -1,8 +1,8 @@
 ///|
 /// A deleted clock range `[clock, clock + len)`.
 pub(all) struct DeleteRange {
-  clock : Int
-  len : Int
+  clock : Int32
+  len : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -12,7 +12,7 @@ pub extend DeleteRange with Eq::{equal, not_equal}
 /// Deleted ranges per client. Deletions are not tracked by clocks of their
 /// own, so every update carries the set of ranges it deletes.
 pub struct DeleteSet {
-  clients : Map[UInt, Array[DeleteRange]]
+  clients : Map[UInt32, Array[DeleteRange]]
 } derive(Eq, Debug)
 
 ///|
@@ -31,9 +31,9 @@ pub fn DeleteSet::is_empty(self : DeleteSet) -> Bool {
 ///|
 pub fn DeleteSet::add(
   self : DeleteSet,
-  client : UInt,
-  clock : Int,
-  len : Int,
+  client : UInt32,
+  clock : Int32,
+  len : Int32,
 ) -> Unit {
   guard len > 0 else { return }
   match self.clients.get(client) {

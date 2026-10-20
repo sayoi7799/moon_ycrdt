@@ -6,7 +6,7 @@
 let chunks : Array[String] = ["a", "bc", "中", "😀", "x😀y", " "]
 
 ///|
-fn nonneg(n : Int) -> Int {
+fn nonneg(n : Int32) -> Int32 {
   if n < 0 {
     -(n + 1)
   } else {
@@ -25,7 +25,7 @@ priv struct Session {
 /// Interprets `(op, a, b)` triples: insert / delete text or set / delete map
 /// keys on replica `a % 3`, or send replica `a % 3`'s updates to `b % 3`
 /// (partial syncs make later edits concurrent with earlier ones).
-fn run_script(script : Array[(Int, Int, Int)]) -> Session {
+fn run_script(script : Array[(Int32, Int32, Int32)]) -> Session {
   let docs = [1U, 2U, 3000000000U].map(id => @doc.Doc::new(id))
   let logs : Array[Array[Bytes]] = docs.map(_ => [])
   for i, d in docs {
@@ -84,7 +84,7 @@ fn has_structs(u : Bytes) -> Bool {
 }
 
 ///|
-fn first_insert(log : Array[Bytes]) -> Int? {
+fn first_insert(log : Array[Bytes]) -> Int32? {
   for i, u in log {
     if has_structs(u) {
       return Some(i)
@@ -120,7 +120,7 @@ fn apply_all(d : @doc.Doc, updates : Array[Bytes]) -> Unit {
 
 ///|
 /// Deterministic permutation of `xs` driven by `keys`.
-fn permute(xs : Array[Bytes], keys : Array[Int]) -> Array[Bytes] {
+fn permute(xs : Array[Bytes], keys : Array[Int32]) -> Array[Bytes] {
   let out = xs.copy()
   for i in 0..<out.length() {
     let j = if keys.length() == 0 {
@@ -138,7 +138,7 @@ fn permute(xs : Array[Bytes], keys : Array[Int]) -> Array[Bytes] {
 ///|
 test "property: any exchange order converges to the same state" {
   @quickcheck.check(
-    (input : (Array[(Int, Int, Int)], Array[Int])) => {
+    (input : (Array[(Int32, Int32, Int32)], Array[Int32])) => {
       let (script, keys) = input
       let session = run_script(script)
       let updates = all_updates(session)
@@ -160,7 +160,7 @@ test "property: any exchange order converges to the same state" {
 ///|
 test "property: applying an update twice does not change the state" {
   @quickcheck.check(
-    (script : Array[(Int, Int, Int)]) => {
+    (script : Array[(Int32, Int32, Int32)]) => {
       let session = run_script(script)
       let d = @doc.Doc::new(77)
       let mut ok = true
@@ -179,7 +179,7 @@ test "property: applying an update twice does not change the state" {
 ///|
 test "property: updates with missing dependencies wait in pending" {
   @quickcheck.check(
-    (script : Array[(Int, Int, Int)]) => {
+    (script : Array[(Int32, Int32, Int32)]) => {
       let session = run_script(script)
       // Replica 0's updates that insert content form a chain: each depends on
       // the previous ones of the same client. Withhold the first of them.

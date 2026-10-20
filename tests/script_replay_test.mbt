@@ -6,21 +6,21 @@
 ///|
 enum Op {
   /// replica, position, inserted string, Yjs' local update(s), text and map after
-  Ins(Int, Int, String, Array[String], String, String)
+  Ins(Int32, Int32, String, Array[String], String, String)
   /// replica, position, length, Yjs' local update(s), text and map after
-  Del(Int, Int, Int, Array[String], String, String)
+  Del(Int32, Int32, Int32, Array[String], String, String)
   /// replica, key, integer value, Yjs' local update(s), text and map after
-  MSet(Int, String, Int, Array[String], String, String)
+  MSet(Int32, String, Int32, Array[String], String, String)
   /// replica, key, Yjs' local update(s), text and map after
-  MDel(Int, String, Array[String], String, String)
+  MDel(Int32, String, Array[String], String, String)
   /// from, to, indices into the sender's log of local updates, text and map after
-  Sync(Int, Int, Array[Int], String, String)
+  Sync(Int32, Int32, Array[Int32], String, String)
 }
 
 ///|
 struct ScriptCase {
   name : String
-  clients : Array[UInt]
+  clients : Array[UInt32]
   ops : Array[Op]
   final_text : String
   final_map : String
@@ -40,7 +40,7 @@ fn map_state(doc : @doc.Doc) -> String {
 
 ///|
 /// Replays `c` and returns the number of steps checked.
-fn replay(c : ScriptCase) -> Int raise {
+fn replay(c : ScriptCase) -> Int32 raise {
   let docs = c.clients.map(id => @doc.Doc::new(id))
   let logs : Array[Array[Bytes]] = docs.map(_ => [])
   for i, d in docs {

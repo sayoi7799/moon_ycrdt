@@ -5,19 +5,19 @@
 pub struct Doc {
   /// This replica's client id. Must be unique among all collaborators;
   /// Yjs uses a random 32-bit unsigned integer.
-  client_id : UInt
-  priv clients : Map[UInt, Array[Struct]]
+  client_id : UInt32
+  priv clients : Map[UInt32, Array[Struct]]
   priv share : Map[String, YType]
   /// Structs whose dependencies have not arrived yet, per client.
-  priv mut pending_structs : Map[UInt, Array[@update.StructRef]]
+  priv mut pending_structs : Map[UInt32, Array[@update.StructRef]]
   /// Deletions of clocks that have not arrived yet.
   priv mut pending_ds : @update.DeleteSet
   /// Clocks of structs that changed in the current transaction (added,
   /// split off or deleted), per client: the only places where adjacent
   /// structs can have become mergeable.
-  priv touched : Map[UInt, Array[Int]]
+  priv touched : Map[UInt32, Array[Int32]]
   /// State of each client before its first new struct in this transaction.
-  priv txn_before : Map[UInt, Int]
+  priv txn_before : Map[UInt32, Int32]
   /// Deletions performed in this transaction.
   priv mut txn_ds : @update.DeleteSet
   priv listeners : Array[(Bytes, Bool) -> Unit]
@@ -27,7 +27,7 @@ pub struct Doc {
 /// Creates an empty document. Garbage collection is not implemented (the
 /// document behaves like `new Y.Doc({ gc: false })`), but GC structs received
 /// from other clients are understood.
-pub fn Doc::new(client_id : UInt) -> Doc {
+pub fn Doc::new(client_id : UInt32) -> Doc {
   {
     client_id,
     clients: {},
@@ -57,7 +57,7 @@ fn Doc::root_type(self : Doc, name : String) -> YType {
 /// Returns the root type `name`, fixing its kind to `type_ref` (one of the
 /// `@update.TYPE_REF_*` constants). A root created by a remote update has an
 /// unknown kind until the application asks for it, like `doc.get(name)`.
-pub fn Doc::get_root(self : Doc, name : String, type_ref : Int) -> YType {
+pub fn Doc::get_root(self : Doc, name : String, type_ref : Int32) -> YType {
   let t = self.root_type(name)
   if t.type_ref == TYPE_REF_UNKNOWN {
     t.type_ref = type_ref
@@ -77,7 +77,7 @@ pub fn Doc::root_names(self : Doc) -> Array[String] {
 
 ///|
 /// Client -> next expected clock of every client in the store.
-pub fn Doc::state_vector(self : Doc) -> Map[UInt, Int] {
+pub fn Doc::state_vector(self : Doc) -> Map[UInt32, Int32] {
   let sv = Map([])
   for client, _ in self.clients {
     sv[client] = self.get_state(client)
@@ -204,8 +204,8 @@ fn to_struct_ref(s : Struct) -> @update.StructRef {
 /// so that it starts exactly at `from`.
 fn Doc::structs_from(
   self : Doc,
-  client : UInt,
-  from : Int,
+  client : UInt32,
+  from : Int32,
 ) -> Array[@update.StructRef] {
   let stored = self.structs_of(client)
   let out = []
@@ -237,7 +237,7 @@ fn Doc::store_delete_set(self : Doc) -> @update.DeleteSet {
 /// deletions are included, like Yjs does, so a relay never loses data.
 pub fn Doc::encode_state_as_update(
   self : Doc,
-  sv? : Map[UInt, Int] = Map([]),
+  sv~ : Map[UInt32, Int32] = Map([]),
 ) -> Bytes {
   let ids = @hashset.HashSet([])
   for client, _ in self.clients {

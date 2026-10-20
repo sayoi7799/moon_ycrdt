@@ -7,7 +7,7 @@
 /// time of insertion and never change — they drive conflict resolution.
 pub struct Item {
   id : @update.ID
-  mut length : Int
+  mut length : Int32
   /// Id of the last element of the left neighbour at insertion time.
   origin : @update.ID?
   /// Id of the first element of the right neighbour at insertion time.
@@ -38,7 +38,7 @@ pub fn Item::is_countable(self : Item) -> Bool {
 /// A garbage-collected range: content is gone, only the clocks remain.
 pub struct GCRange {
   id : @update.ID
-  mut length : Int
+  mut length : Int32
 }
 
 ///|
@@ -57,7 +57,7 @@ pub fn Struct::id(self : Struct) -> @update.ID {
 }
 
 ///|
-pub fn Struct::length(self : Struct) -> Int {
+pub fn Struct::length(self : Struct) -> Int32 {
   match self {
     GC(g) => g.length
     Item(i) => i.length
@@ -75,7 +75,7 @@ pub fn Struct::deleted(self : Struct) -> Bool {
 ///|
 /// Type ref of a root type that was created by a remote update before the
 /// application asked for it with a concrete type.
-pub const TYPE_REF_UNKNOWN : Int = -1
+pub const TYPE_REF_UNKNOWN : Int32 = -1
 
 ///|
 /// A shared type (Y.Text, Y.Map, ...). All shared types store their content
@@ -84,7 +84,7 @@ pub const TYPE_REF_UNKNOWN : Int = -1
 /// only matters to the typed API, so unknown or unsupported types (XML, ...)
 /// are handled by the same code and survive re-encoding unchanged.
 pub struct YType {
-  mut type_ref : Int
+  mut type_ref : Int32
   /// Node name of XmlElement / hook name of XmlHook.
   name : String?
   /// Name under which a root type is registered in the document.
@@ -94,15 +94,15 @@ pub struct YType {
   mut start : Item?
   map : Map[String, Item]
   /// Sum of the lengths of countable, non-deleted sequence items.
-  mut length : Int
+  mut length : Int32
 }
 
 ///|
 fn YType::new(
-  type_ref : Int,
-  name? : String? = None,
-  root_name? : String? = None,
-  item? : Item? = None,
+  type_ref : Int32,
+  name~ : String? = None,
+  root_name~ : String? = None,
+  item~ : Item? = None,
 ) -> YType {
   { type_ref, name, root_name, item, start: None, map: {}, length: 0, }
 }

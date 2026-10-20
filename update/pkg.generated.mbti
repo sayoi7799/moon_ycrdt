@@ -7,35 +7,35 @@ import {
 }
 
 // Values
-pub const BITS_CONTENT_REF : Int = 0x1F
+pub const BITS_CONTENT_REF : Int32 = 0x1F
 
-pub const BIT_ORIGIN : Int = 0x80
+pub const BIT_ORIGIN : Int32 = 0x80
 
-pub const BIT_PARENT_SUB : Int = 0x20
+pub const BIT_PARENT_SUB : Int32 = 0x20
 
-pub const BIT_RIGHT_ORIGIN : Int = 0x40
+pub const BIT_RIGHT_ORIGIN : Int32 = 0x40
 
-pub const TYPE_REF_ARRAY : Int = 0
+pub const TYPE_REF_ARRAY : Int32 = 0
 
-pub const TYPE_REF_MAP : Int = 1
+pub const TYPE_REF_MAP : Int32 = 1
 
-pub const TYPE_REF_TEXT : Int = 2
+pub const TYPE_REF_TEXT : Int32 = 2
 
-pub const TYPE_REF_XML_ELEMENT : Int = 3
+pub const TYPE_REF_XML_ELEMENT : Int32 = 3
 
-pub const TYPE_REF_XML_FRAGMENT : Int = 4
+pub const TYPE_REF_XML_FRAGMENT : Int32 = 4
 
-pub const TYPE_REF_XML_HOOK : Int = 5
+pub const TYPE_REF_XML_HOOK : Int32 = 5
 
-pub const TYPE_REF_XML_TEXT : Int = 6
+pub const TYPE_REF_XML_TEXT : Int32 = 6
 
-pub fn decode_state_vector(Bytes) -> Map[UInt, Int] raise @lib0.DecodeError
+pub fn decode_state_vector(Bytes) -> Map[UInt32, Int32] raise @lib0.DecodeError
 
 pub fn decode_update(Bytes) -> Update raise @lib0.DecodeError
 
-pub fn encode_state_vector(Map[UInt, Int]) -> Bytes
+pub fn encode_state_vector(Map[UInt32, Int32]) -> Bytes
 
-pub fn read_content(@lib0.Decoder, Int) -> Content raise @lib0.DecodeError
+pub fn read_content(@lib0.Decoder, Int32) -> Content raise @lib0.DecodeError
 
 pub fn read_delete_set(@lib0.Decoder) -> DeleteSet raise @lib0.DecodeError
 
@@ -49,42 +49,42 @@ pub fn write_id(@lib0.Encoder, ID) -> Unit
 
 // Types and methods
 pub(all) struct ClientStructs {
-  client : UInt
+  client : UInt32
   structs : Array[StructRef]
 } derive(Eq, @debug.Debug)
 pub fn ClientStructs::equal(Self, Self) -> Bool
 pub fn ClientStructs::not_equal(Self, Self) -> Bool
 
 pub(all) enum Content {
-  Deleted(Int)
+  Deleted(Int32)
   JSON(Array[String])
   Binary(Bytes)
   String(String)
   Embed(String)
   Format(String, String)
-  Type(Int, String?)
+  Type(Int32, String?)
   Any(Array[@lib0.Any])
   Doc(String, @lib0.Any)
 } derive(Eq, @debug.Debug)
 pub fn Content::equal(Self, Self) -> Bool
 pub fn Content::is_countable(Self) -> Bool
-pub fn Content::length(Self) -> Int
+pub fn Content::length(Self) -> Int32
 pub fn Content::not_equal(Self, Self) -> Bool
-pub fn Content::ref_number(Self) -> Int
-pub fn Content::split(Self, Int) -> (Self, Self)
-pub fn Content::write(Self, @lib0.Encoder, Int) -> Unit
+pub fn Content::ref_number(Self) -> Int32
+pub fn Content::split(Self, Int32) -> (Self, Self)
+pub fn Content::write(Self, @lib0.Encoder, Int32) -> Unit
 
 pub(all) struct DeleteRange {
-  clock : Int
-  len : Int
+  clock : Int32
+  len : Int32
 } derive(Eq, @debug.Debug)
 pub fn DeleteRange::equal(Self, Self) -> Bool
 pub fn DeleteRange::not_equal(Self, Self) -> Bool
 
 pub struct DeleteSet {
-  clients : Map[UInt, Array[DeleteRange]]
+  clients : Map[UInt32, Array[DeleteRange]]
 } derive(Eq, @debug.Debug)
-pub fn DeleteSet::add(Self, UInt, Int, Int) -> Unit
+pub fn DeleteSet::add(Self, UInt32, Int32, Int32) -> Unit
 pub fn DeleteSet::contains(Self, ID) -> Bool
 pub fn DeleteSet::equal(Self, Self) -> Bool
 pub fn DeleteSet::is_empty(Self) -> Bool
@@ -94,11 +94,11 @@ pub fn DeleteSet::sort_and_merge(Self) -> Unit
 pub fn DeleteSet::write(Self, @lib0.Encoder) -> Unit
 
 pub(all) struct ID {
-  client : UInt
-  clock : Int
+  client : UInt32
+  clock : Int32
 } derive(Eq, Hash, @debug.Debug)
 pub fn ID::equal(Self, Self) -> Bool
-pub fn ID::new(UInt, Int) -> Self
+pub fn ID::new(UInt32, Int32) -> Self
 pub fn ID::not_equal(Self, Self) -> Bool
 pub fn ID::output(Self, &Logger) -> Unit
 pub fn ID::to_string(Self) -> String
@@ -124,16 +124,16 @@ pub fn ParentRef::equal(Self, Self) -> Bool
 pub fn ParentRef::not_equal(Self, Self) -> Bool
 
 pub(all) enum StructRef {
-  GC(ID, Int)
-  Skip(ID, Int)
+  GC(ID, Int32)
+  Skip(ID, Int32)
   Item(ItemRef)
 } derive(Eq, @debug.Debug)
 pub fn StructRef::equal(Self, Self) -> Bool
 pub fn StructRef::id(Self) -> ID
-pub fn StructRef::length(Self) -> Int
+pub fn StructRef::length(Self) -> Int32
 pub fn StructRef::not_equal(Self, Self) -> Bool
-pub fn StructRef::slice(Self, Int) -> Self
-pub fn StructRef::write(Self, @lib0.Encoder, Int) -> Unit
+pub fn StructRef::slice(Self, Int32) -> Self
+pub fn StructRef::write(Self, @lib0.Encoder, Int32) -> Unit
 
 pub struct Update {
   clients : Array[ClientStructs]
@@ -143,7 +143,7 @@ pub fn Update::encode(Self) -> Bytes
 pub fn Update::equal(Self, Self) -> Bool
 pub fn Update::new(Array[ClientStructs], DeleteSet) -> Self
 pub fn Update::not_equal(Self, Self) -> Bool
-pub fn Update::state_vector(Self) -> Map[UInt, Int]
+pub fn Update::state_vector(Self) -> Map[UInt32, Int32]
 
 // Type aliases
 

@@ -5,30 +5,30 @@
 // unchanged — dropping them would break synchronisation with other clients.
 
 ///|
-pub const TYPE_REF_ARRAY : Int = 0
+pub const TYPE_REF_ARRAY : Int32 = 0
 
 ///|
-pub const TYPE_REF_MAP : Int = 1
+pub const TYPE_REF_MAP : Int32 = 1
 
 ///|
-pub const TYPE_REF_TEXT : Int = 2
+pub const TYPE_REF_TEXT : Int32 = 2
 
 ///|
-pub const TYPE_REF_XML_ELEMENT : Int = 3
+pub const TYPE_REF_XML_ELEMENT : Int32 = 3
 
 ///|
-pub const TYPE_REF_XML_FRAGMENT : Int = 4
+pub const TYPE_REF_XML_FRAGMENT : Int32 = 4
 
 ///|
-pub const TYPE_REF_XML_HOOK : Int = 5
+pub const TYPE_REF_XML_HOOK : Int32 = 5
 
 ///|
-pub const TYPE_REF_XML_TEXT : Int = 6
+pub const TYPE_REF_XML_TEXT : Int32 = 6
 
 ///|
 pub(all) enum Content {
   /// Placeholder for deleted (garbage-collected) content of the given length.
-  Deleted(Int)
+  Deleted(Int32)
   /// Legacy JSON content; each element is a JSON string ("undefined" allowed).
   JSON(Array[String])
   Binary(Bytes)
@@ -38,7 +38,7 @@ pub(all) enum Content {
   /// Formatting attribute of Y.Text: key and JSON-encoded value.
   Format(String, String)
   /// Nested shared type: type ref and, for XmlElement / XmlHook, its name.
-  Type(Int, String?)
+  Type(Int32, String?)
   Any(Array[@lib0.Any])
   /// Sub-document: guid and options.
   Doc(String, @lib0.Any)
@@ -49,7 +49,7 @@ pub extend Content with Eq::{equal, not_equal}
 
 ///|
 /// The content ref stored in the low 5 bits of an item's info byte.
-pub fn Content::ref_number(self : Content) -> Int {
+pub fn Content::ref_number(self : Content) -> Int32 {
   match self {
     Deleted(_) => 1
     JSON(_) => 2
@@ -65,7 +65,7 @@ pub fn Content::ref_number(self : Content) -> Int {
 
 ///|
 /// Number of clock ticks the content occupies (UTF-16 code units for strings).
-pub fn Content::length(self : Content) -> Int {
+pub fn Content::length(self : Content) -> Int32 {
   match self {
     Deleted(n) => n
     JSON(a) => a.length()
@@ -88,7 +88,7 @@ pub fn Content::is_countable(self : Content) -> Bool {
 /// Splits the content at `offset` (0 < offset < length), like `Content.splice`.
 /// Splitting a string inside a surrogate pair replaces both halves with
 /// U+FFFD, exactly like Yjs does.
-pub fn Content::split(self : Content, offset : Int) -> (Content, Content) {
+pub fn Content::split(self : Content, offset : Int32) -> (Content, Content) {
   match self {
     Deleted(n) => (Deleted(offset), Deleted(n - offset))
     JSON(a) => (JSON(a[:offset].to_owned()), JSON(a[offset:].to_owned()))
@@ -117,7 +117,11 @@ pub fn Content::split(self : Content, offset : Int) -> (Content, Content) {
 /// update starts in the middle of an item). Unlike `split`, this mirrors
 /// `Content.write(encoder, offset)` which slices strings without repairing
 /// surrogate pairs.
-pub fn Content::write(self : Content, e : @lib0.Encoder, offset : Int) -> Unit {
+pub fn Content::write(
+  self : Content,
+  e : @lib0.Encoder,
+  offset : Int32,
+) -> Unit {
   match self {
     Deleted(n) => e.write_var_uint(n - offset)
     JSON(a) => {
@@ -162,7 +166,7 @@ pub fn Content::write(self : Content, e : @lib0.Encoder, offset : Int) -> Unit {
 ///|
 pub fn read_content(
   d : @lib0.Decoder,
-  ref_number : Int,
+  ref_number : Int32,
 ) -> Content raise @lib0.DecodeError {
   match ref_number {
     1 => Deleted(d.read_var_uint())

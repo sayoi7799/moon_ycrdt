@@ -5,7 +5,7 @@ pub(all) suberror DecodeError {
   UnexpectedEnd
   IntegerOutOfRange
   InvalidUtf8
-  UnknownAnyTag(Int)
+  UnknownAnyTag(Int32)
   TrailingBytes
   /// Raised by higher layers for structurally invalid input.
   Malformed(String)
@@ -14,7 +14,7 @@ pub(all) suberror DecodeError {
 ///|
 pub struct Decoder {
   priv data : Bytes
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
@@ -28,12 +28,12 @@ pub fn Decoder::has_content(self : Decoder) -> Bool {
 }
 
 ///|
-pub fn Decoder::remaining(self : Decoder) -> Int {
+pub fn Decoder::remaining(self : Decoder) -> Int32 {
   self.data.length() - self.pos
 }
 
 ///|
-pub fn Decoder::read_u8(self : Decoder) -> Int raise DecodeError {
+pub fn Decoder::read_u8(self : Decoder) -> Int32 raise DecodeError {
   guard self.pos < self.data.length() else { raise UnexpectedEnd }
   let b = self.data[self.pos].to_int()
   self.pos += 1
@@ -43,7 +43,7 @@ pub fn Decoder::read_u8(self : Decoder) -> Int raise DecodeError {
 ///|
 pub fn Decoder::read_raw_bytes(
   self : Decoder,
-  len : Int,
+  len : Int32,
 ) -> Bytes raise DecodeError {
   guard len >= 0 && self.pos + len <= self.data.length() else {
     raise UnexpectedEnd
@@ -80,7 +80,7 @@ pub fn Decoder::read_var_uint64(self : Decoder) -> UInt64 raise DecodeError {
 
 ///|
 /// `read_var_uint64` restricted to the non-negative `Int` range.
-pub fn Decoder::read_var_uint(self : Decoder) -> Int raise DecodeError {
+pub fn Decoder::read_var_uint(self : Decoder) -> Int32 raise DecodeError {
   let n = self.read_var_uint64()
   guard n <= 0x7FFFFFFFUL else { raise IntegerOutOfRange }
   n.to_int()
@@ -88,7 +88,7 @@ pub fn Decoder::read_var_uint(self : Decoder) -> Int raise DecodeError {
 
 ///|
 /// Client ids are 32-bit unsigned integers.
-pub fn Decoder::read_var_uint32(self : Decoder) -> UInt raise DecodeError {
+pub fn Decoder::read_var_uint32(self : Decoder) -> UInt32 raise DecodeError {
   let n = self.read_var_uint64()
   guard n <= 0xFFFFFFFFUL else { raise IntegerOutOfRange }
   n.to_uint()
