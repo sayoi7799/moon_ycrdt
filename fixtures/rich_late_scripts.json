@@ -1,0 +1,505 @@
+[
+  {
+    "name": "insert without attributes in content that was formatted elsewhere",
+    "clients": [
+      1,
+      2
+    ],
+    "lazy": true,
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "hello world",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000b68656c6c6f20776f726c6486010b04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"hello world\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 1,
+        "indices": [
+          0
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"hello world\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 3,
+        "str": "X",
+        "replica": 1,
+        "update": [
+          "01010200c401030104015800"
+        ],
+        "delta": "[{\"insert\":\"helXlo world\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"hello world\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"helXlo world\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": false
+  },
+  {
+    "name": "delete, then insert, in formatted content that arrived",
+    "clients": [
+      1,
+      2
+    ],
+    "lazy": true,
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "attrs": {
+          "italic": true
+        },
+        "replica": 0,
+        "update": [
+          "0103010006010174066974616c696304747275658401000a6162636465666768696a86010a066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"italic\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 4,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "0102010cc60102010304626f6c640474727565c60106010704626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"italic\":true}},{\"insert\":\"cdef\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"ghij\",\"attributes\":{\"italic\":true}}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 1,
+        "indices": [
+          0,
+          1
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"italic\":true}},{\"insert\":\"cdef\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"ghij\",\"attributes\":{\"italic\":true}}]"
+      },
+      {
+        "op": "delete",
+        "pos": 1,
+        "len": 3,
+        "replica": 1,
+        "update": [
+          "000101010203"
+        ],
+        "delta": "[{\"insert\":\"a\",\"attributes\":{\"italic\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"ghij\",\"attributes\":{\"italic\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 2,
+        "str": "Q",
+        "replica": 1,
+        "update": [
+          "01010200c401050106015100"
+        ],
+        "delta": "[{\"insert\":\"a\",\"attributes\":{\"italic\":true}},{\"insert\":\"eQf\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"ghij\",\"attributes\":{\"italic\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"ab\",\"attributes\":{\"italic\":true}},{\"insert\":\"cdef\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"ghij\",\"attributes\":{\"italic\":true}}]",
+      "[{\"insert\":\"a\",\"attributes\":{\"italic\":true}},{\"insert\":\"eQf\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"ghij\",\"attributes\":{\"italic\":true}}]"
+    ],
+    "converged": false
+  },
+  {
+    "name": "the first local operation is a format",
+    "clients": [
+      1,
+      2
+    ],
+    "lazy": true,
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000a6162636465666768696a86010a04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 1,
+        "indices": [
+          0
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 3,
+        "attrs": {
+          "underline": true
+        },
+        "replica": 1,
+        "update": [
+          "01020200c60102010309756e6465726c696e650474727565c60105010609756e6465726c696e65046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cde\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\"fghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 3,
+        "str": "Y",
+        "replica": 1,
+        "update": [
+          "01010202c401030104015900"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cYde\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\"fghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 7,
+        "str": "Z",
+        "replica": 1,
+        "update": [
+          "01010203c401060107015a00"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cYde\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\"fZghij\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cYde\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\"fZghij\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": false
+  },
+  {
+    "name": "the first local operation is a delta",
+    "clients": [
+      1,
+      2
+    ],
+    "lazy": true,
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000a6162636465666768696a86010a04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 1,
+        "indices": [
+          0
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 3
+          },
+          {
+            "insert": "W"
+          },
+          {
+            "delete": 1
+          }
+        ],
+        "sanitize": true,
+        "replica": 1,
+        "update": [
+          "01030200c60103010404626f6c64046e756c6cc4020001040157c60201010404626f6c6404747275650101010401"
+        ],
+        "delta": "[{\"insert\":\"abc\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\"},{\"insert\":\"efghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 5,
+        "str": "V",
+        "replica": 1,
+        "update": [
+          "01010203c401050106015600"
+        ],
+        "delta": "[{\"insert\":\"abc\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\"},{\"insert\":\"eVfghij\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"abc\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\"},{\"insert\":\"eVfghij\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": false
+  },
+  {
+    "name": "the first local operation is an insert with attributes",
+    "clients": [
+      1,
+      2
+    ],
+    "lazy": true,
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000a6162636465666768696a86010a04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 1,
+        "indices": [
+          0
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 4,
+        "str": "N",
+        "attrs": {
+          "italic": true,
+          "bold": null
+        },
+        "replica": 1,
+        "update": [
+          "01050200c601040105066974616c69630474727565c60200010504626f6c64046e756c6cc402010105014ec602020105066974616c6963046e756c6cc60203010504626f6c64047472756500"
+        ],
+        "delta": "[{\"insert\":\"abcd\",\"attributes\":{\"bold\":true}},{\"insert\":\"N\",\"attributes\":{\"italic\":true}},{\"insert\":\"efghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 8,
+        "str": "M",
+        "replica": 1,
+        "update": [
+          "01010205c401070108014d00"
+        ],
+        "delta": "[{\"insert\":\"abcd\",\"attributes\":{\"bold\":true}},{\"insert\":\"N\",\"attributes\":{\"italic\":true}},{\"insert\":\"efgMhij\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"abcd\",\"attributes\":{\"bold\":true}},{\"insert\":\"N\",\"attributes\":{\"italic\":true}},{\"insert\":\"efgMhij\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": false
+  },
+  {
+    "name": "formatting written by another client than the text",
+    "clients": [
+      1,
+      2,
+      3
+    ],
+    "lazy": true,
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "replica": 0,
+        "update": [
+          "01010100040101740a6162636465666768696a00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\"}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 1,
+        "indices": [
+          0
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"abcdefghij\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 5,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 1,
+        "update": [
+          "01020200c60101010204626f6c640474727565c60106010704626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"ab\"},{\"insert\":\"cdefg\",\"attributes\":{\"bold\":true}},{\"insert\":\"hij\"}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 2,
+        "indices": [
+          0
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"abcdefghij\"}]"
+      },
+      {
+        "op": "sync",
+        "from": 1,
+        "to": 2,
+        "indices": [
+          0
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"ab\"},{\"insert\":\"cdefg\",\"attributes\":{\"bold\":true}},{\"insert\":\"hij\"}]"
+      },
+      {
+        "op": "insert",
+        "pos": 3,
+        "str": "X",
+        "replica": 2,
+        "update": [
+          "01010300c401020103015800"
+        ],
+        "delta": "[{\"insert\":\"ab\"},{\"insert\":\"cXdefg\",\"attributes\":{\"bold\":true}},{\"insert\":\"hij\"}]"
+      },
+      {
+        "op": "insert",
+        "pos": 6,
+        "str": "Y",
+        "replica": 2,
+        "update": [
+          "01010301c401040105015900"
+        ],
+        "delta": "[{\"insert\":\"ab\"},{\"insert\":\"cXdeYfg\",\"attributes\":{\"bold\":true}},{\"insert\":\"hij\"}]"
+      },
+      {
+        "op": "delete",
+        "pos": 4,
+        "len": 2,
+        "replica": 2,
+        "update": [
+          "000101010302"
+        ],
+        "delta": "[{\"insert\":\"ab\"},{\"insert\":\"cXYfg\",\"attributes\":{\"bold\":true}},{\"insert\":\"hij\"}]"
+      },
+      {
+        "op": "insert",
+        "pos": 1,
+        "str": "Z",
+        "replica": 2,
+        "update": [
+          "01010302c401000101015a00"
+        ],
+        "delta": "[{\"insert\":\"aZb\"},{\"insert\":\"cXYfg\",\"attributes\":{\"bold\":true}},{\"insert\":\"hij\"}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"abcdefghij\"}]",
+      "[{\"insert\":\"ab\"},{\"insert\":\"cdefg\",\"attributes\":{\"bold\":true}},{\"insert\":\"hij\"}]",
+      "[{\"insert\":\"aZb\"},{\"insert\":\"cXYfg\",\"attributes\":{\"bold\":true}},{\"insert\":\"hij\"}]"
+    ],
+    "converged": false
+  },
+  {
+    "name": "inserts at the start and at the end",
+    "clients": [
+      1,
+      2
+    ],
+    "lazy": true,
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdef",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000661626364656686010604626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 1,
+        "len": 3,
+        "attrs": {
+          "italic": true
+        },
+        "replica": 0,
+        "update": [
+          "01020108c601010102066974616c69630474727565c601040105066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"bcd\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ef\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 1,
+        "indices": [
+          0,
+          1
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"bcd\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ef\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "S",
+        "replica": 1,
+        "update": [
+          "01010200440100015300"
+        ],
+        "delta": "[{\"insert\":\"S\"},{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"bcd\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ef\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "insert",
+        "pos": 7,
+        "str": "E",
+        "replica": 1,
+        "update": [
+          "01010201840107014500"
+        ],
+        "delta": "[{\"insert\":\"S\"},{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"bcd\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ef\",\"attributes\":{\"bold\":true}},{\"insert\":\"E\"}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"bcd\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ef\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"S\"},{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"bcd\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ef\",\"attributes\":{\"bold\":true}},{\"insert\":\"E\"}]"
+    ],
+    "converged": false
+  }
+]

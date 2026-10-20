@@ -6,6 +6,8 @@ import {
 }
 
 // Values
+pub fn any_from_json_string(String) -> Any raise DecodeError
+
 pub fn decode_any(Bytes) -> Any raise DecodeError
 
 pub fn encode_any(Any) -> Bytes
@@ -45,12 +47,16 @@ pub(all) enum Any {
   Bytes(Bytes)
 } derive(Eq, @debug.Debug)
 pub fn Any::equal(Self, Self) -> Bool
+pub fn Any::from_json(Json) -> Self
 pub fn Any::int(Int32) -> Self
 pub fn Any::not_equal(Self, Self) -> Bool
 pub fn Any::output(Self, &Logger) -> Unit
+pub fn Any::to_json(Self) -> Json
+pub fn Any::to_json_string(Self) -> String
 pub fn Any::to_repr(Self) -> @debug.Repr
 pub fn Any::to_string(Self) -> String
 pub impl Show for Any
+pub impl ToJson for Any
 
 pub struct Decoder {
   mut pos : Int32

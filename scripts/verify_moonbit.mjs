@@ -44,6 +44,7 @@ const canon = (v) => JSON.stringify(v, (_k, x) => {
 
 const readContent = (doc, names) => ({
   texts: Object.fromEntries(names.texts.map(n => [n, doc.getText(n).toString()])),
+  deltas: Object.fromEntries(names.texts.map(n => [n, doc.getText(n).toDelta()])),
   maps: Object.fromEntries(names.maps.map(n => {
     const m = doc.getMap(n)
     return [n, Object.fromEntries([...m.keys()].sort().map(k => [k, m.get(k)]))]
@@ -53,6 +54,7 @@ const readContent = (doc, names) => ({
 
 const expectedContent = (d) => ({
   texts: d.texts,
+  deltas: d.deltas,
   maps: Object.fromEntries(Object.entries(d.maps).map(([n, m]) =>
     [n, Object.fromEntries(Object.keys(m).sort().map(k => [k, fromJson(m[k])]))])),
   arrays: Object.fromEntries(Object.entries(d.arrays ?? {}).map(([n, a]) => [n, a.map(fromJson)]))
@@ -100,7 +102,10 @@ for (const c of report.cases) {
   })
   for (const o of c.ops) {
     switch (o.op) {
-      case 'insert': ydocs[o.doc].getText(o.name).insert(o.pos, o.text); break
+      case 'insert': o.attributes === undefined ? ydocs[o.doc].getText(o.name).insert(o.pos, o.text) : ydocs[o.doc].getText(o.name).insert(o.pos, o.text, o.attributes); break
+      case 'format': ydocs[o.doc].getText(o.name).format(o.pos, o.len, o.attributes); break
+      case 'embed': o.attributes === undefined ? ydocs[o.doc].getText(o.name).insertEmbed(o.pos, o.embed) : ydocs[o.doc].getText(o.name).insertEmbed(o.pos, o.embed, o.attributes); break
+      case 'applyDelta': ydocs[o.doc].getText(o.name).applyDelta(o.delta); break
       case 'delete': ydocs[o.doc].getText(o.name).delete(o.pos, o.len); break
       case 'set': ydocs[o.doc].getMap(o.name).set(o.key, fromJson(o.value)); break
       case 'mapDelete': ydocs[o.doc].getMap(o.name).delete(o.key); break

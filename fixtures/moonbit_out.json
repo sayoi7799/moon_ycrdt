@@ -99,6 +99,13 @@
           "texts": {
             "t": "he, 中文  world!�👍"
           },
+          "deltas": {
+            "t": [
+              {
+                "insert": "he, 中文  world!�👍"
+              }
+            ]
+          },
           "maps": {}
         }
       ]
@@ -237,6 +244,7 @@
             "AAGBvMGWCwEDAQ=="
           ],
           "texts": {},
+          "deltas": {},
           "maps": {
             "m": {
               "big": {
@@ -375,6 +383,13 @@
           "texts": {
             "t": "a0<after-sync>b0base[A] text"
           },
+          "deltas": {
+            "t": [
+              {
+                "insert": "a0<after-sync>b0base[A] text"
+              }
+            ]
+          },
           "maps": {
             "m": {
               "who": "second"
@@ -394,6 +409,13 @@
           ],
           "texts": {
             "t": "a0<after-sync>b0base[A] text"
+          },
+          "deltas": {
+            "t": [
+              {
+                "insert": "a0<after-sync>b0base[A] text"
+              }
+            ]
           },
           "maps": {
             "m": {
@@ -605,6 +627,13 @@
           "texts": {
             "t": ">XYafterb😀"
           },
+          "deltas": {
+            "t": [
+              {
+                "insert": ">XYafterb😀"
+              }
+            ]
+          },
           "maps": {
             "m": {
               "k": 1
@@ -624,6 +653,13 @@
           "texts": {
             "t": ">XYafterb😀"
           },
+          "deltas": {
+            "t": [
+              {
+                "insert": ">XYafterb😀"
+              }
+            ]
+          },
           "maps": {
             "m": {
               "k": 1
@@ -642,6 +678,13 @@
           ],
           "texts": {
             "t": ">XYafterb😀"
+          },
+          "deltas": {
+            "t": [
+              {
+                "insert": ">XYafterb😀"
+              }
+            ]
           },
           "maps": {
             "m": {
@@ -718,6 +761,43 @@
           ],
           "texts": {
             "rich": "he-iold-l worl!d end"
+          },
+          "deltas": {
+            "rich": [
+              {
+                "insert": "he-iold-l",
+                "attributes": {
+                  "bold": true
+                }
+              },
+              {
+                "insert": {
+                  "image": "x.png"
+                },
+                "attributes": {
+                  "bold": true
+                }
+              },
+              {
+                "insert": " worl",
+                "attributes": {
+                  "bold": true
+                }
+              },
+              {
+                "insert": "!",
+                "attributes": {
+                  "bold": true,
+                  "italic": true
+                }
+              },
+              {
+                "insert": "d end",
+                "attributes": {
+                  "bold": true
+                }
+              }
+            ]
           },
           "maps": {
             "m": {
@@ -871,6 +951,7 @@
             "AQIVB0MVAAPDvwDIFQcVAAF9QwA="
           ],
           "texts": {},
+          "deltas": {},
           "maps": {}
         },
         {
@@ -903,6 +984,333 @@
             "AQGCvMGWCwGIFQMBdwNlbmQA"
           ],
           "texts": {},
+          "deltas": {},
+          "maps": {}
+        }
+      ]
+    },
+    {
+      "name": "rich_text",
+      "clients": [
+        31,
+        3000000003
+      ],
+      "ops": [
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "rich",
+          "pos": 0,
+          "text": "Hello world",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "format",
+          "doc": 0,
+          "name": "rich",
+          "pos": 0,
+          "len": 5,
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "op": "format",
+          "doc": 1,
+          "name": "rich",
+          "pos": 3,
+          "len": 6,
+          "attributes": {
+            "color": "red"
+          }
+        },
+        {
+          "op": "insert",
+          "doc": 1,
+          "name": "rich",
+          "pos": 4,
+          "text": "!"
+        },
+        {
+          "op": "embed",
+          "doc": 0,
+          "name": "rich",
+          "pos": 6,
+          "embed": {
+            "image": "x.png",
+            "width": 100
+          },
+          "attributes": {
+            "link": {
+              "href": "https://example.com"
+            }
+          }
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "format",
+          "doc": 0,
+          "name": "rich",
+          "pos": 0,
+          "len": 4,
+          "attributes": {
+            "underline": true
+          }
+        },
+        {
+          "op": "format",
+          "doc": 1,
+          "name": "rich",
+          "pos": 0,
+          "len": 4,
+          "attributes": {
+            "underline": true
+          }
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "applyDelta",
+          "doc": 1,
+          "name": "rich",
+          "delta": [
+            {
+              "retain": 2
+            },
+            {
+              "delete": 3
+            },
+            {
+              "insert": "é😀",
+              "attributes": {
+                "link": {
+                  "href": "https://x.org"
+                }
+              }
+            },
+            {
+              "retain": 1,
+              "attributes": {
+                "bold": null
+              }
+            }
+          ]
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "op": "delete",
+          "doc": 0,
+          "name": "rich",
+          "pos": 1,
+          "len": 4
+        },
+        {
+          "op": "insert",
+          "doc": 0,
+          "name": "rich",
+          "pos": 2,
+          "text": "中",
+          "attributes": {
+            "size": 14
+          }
+        },
+        {
+          "op": "sync",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "op": "sync",
+          "from": 0,
+          "to": 1
+        }
+      ],
+      "docs": [
+        {
+          "arrays": {},
+          "client": 31,
+          "state": "AhCDvMGWCwDGHwMfBAVjb2xvcgUicmVkIsYfCR8KBWNvbG9yBG51bGzEHwQfBQEhRh8NCXVuZGVybGluZQR0cnVlxh8Eg7zBlgsCCXVuZGVybGluZQRudWxsxoO8wZYLAh8FBGxpbmsYeyJocmVmIjoiaHR0cHM6Ly94Lm9yZyJ9xoO8wZYLBR8FBml0YWxpYwRudWxsxoO8wZYLBh8FBGJvbGQEbnVsbMaDvMGWCwcfBQVjb2xvcgRudWxsxIO8wZYLCB8FBsOp8J+YgMaDvMGWCwsfBQRsaW5rBG51bGzGg7zBlgsMHwUGaXRhbGljBHRydWXGg7zBlgsNHwUEYm9sZAR0cnVlxoO8wZYLDh8FBWNvbG9yBSJyZWQixoO8wZYLDx8FBGJvbGQEbnVsbMYfDh8GBGJvbGQEdHJ1ZRcfAAYBBHJpY2gEYm9sZAR0cnVlhB8AAUiEHwECZWyEHwMBbIQfBAFvhB8FASCEHwYDd29yhB8JAmxkhh8LBGJvbGQEbnVsbEYfAAZpdGFsaWMEdHJ1ZcYfBR8GBml0YWxpYwRudWxsxh8GHwcEbGluax57ImhyZWYiOiJodHRwczovL2V4YW1wbGUuY29tIn3GHw8fBwRib2xkBG51bGzFHxAfBx17ImltYWdlIjoieC5wbmciLCJ3aWR0aCI6MTAwfcYfER8HBGxpbmsEbnVsbMYfEh8HBGJvbGQEdHJ1ZUYfDQl1bmRlcmxpbmUEdHJ1ZcYfBIO8wZYLAgl1bmRlcmxpbmUEbnVsbMYfDoO8wZYLEQRzaXplAjE0xh8Wg7zBlgsRBWNvbG9yBG51bGzEHxeDvMGWCxED5Litxh8Yg7zBlgsRBHNpemUEbnVsbMYfGYO8wZYLEQVjb2xvcgUicmVkIgKDvMGWCwMAAQIBBQofAgIDFAI=",
+          "stateVector": "AoO8wZYLEh8b",
+          "localUpdates": [
+            "AQMfAAYBBHJpY2gEYm9sZAR0cnVlhB8AC0hlbGxvIHdvcmxkhh8LBGJvbGQEbnVsbAA=",
+            "AQIfDUYfAAZpdGFsaWMEdHJ1ZcYfBR8GBml0YWxpYwRudWxsAA==",
+            "AQUfD8YfBh8HBGxpbmseeyJocmVmIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSJ9xh8PHwcEYm9sZARudWxsxR8QHwcdeyJpbWFnZSI6IngucG5nIiwid2lkdGgiOjEwMH3GHxEfBwRsaW5rBG51bGzGHxIfBwRib2xkBHRydWUA",
+            "AQIfFEYfDQl1bmRlcmxpbmUEdHJ1ZcYfBIO8wZYLAgl1bmRlcmxpbmUEbnVsbAA=",
+            "AAEfARQB",
+            "AAKDvMGWCwIAAQUKHwECAQ==",
+            "AQUfFsYfDoO8wZYLEQRzaXplAjE0xh8Wg7zBlgsRBWNvbG9yBG51bGzEHxeDvMGWCxED5Litxh8Yg7zBlgsRBHNpemUEbnVsbMYfGYO8wZYLEQVjb2xvcgUicmVkIgA="
+          ],
+          "texts": {
+            "rich": "Ho中 world"
+          },
+          "deltas": {
+            "rich": [
+              {
+                "insert": "H",
+                "attributes": {
+                  "underline": true,
+                  "italic": true,
+                  "bold": true
+                }
+              },
+              {
+                "insert": "o",
+                "attributes": {
+                  "italic": true,
+                  "color": "red"
+                }
+              },
+              {
+                "insert": "中",
+                "attributes": {
+                  "size": 14
+                }
+              },
+              {
+                "insert": " ",
+                "attributes": {
+                  "color": "red",
+                  "bold": true
+                }
+              },
+              {
+                "insert": {
+                  "image": "x.png",
+                  "width": 100
+                },
+                "attributes": {
+                  "color": "red",
+                  "link": {
+                    "href": "https://example.com"
+                  }
+                }
+              },
+              {
+                "insert": "wor",
+                "attributes": {
+                  "color": "red",
+                  "bold": true
+                }
+              },
+              {
+                "insert": "ld",
+                "attributes": {
+                  "bold": true
+                }
+              }
+            ]
+          },
+          "maps": {}
+        },
+        {
+          "arrays": {},
+          "client": 3000000003,
+          "state": "AhCDvMGWCwDGHwMfBAVjb2xvcgUicmVkIsYfCR8KBWNvbG9yBG51bGzEHwQfBQEhRh8NCXVuZGVybGluZQR0cnVlxh8Eg7zBlgsCCXVuZGVybGluZQRudWxsxoO8wZYLAh8FBGxpbmsYeyJocmVmIjoiaHR0cHM6Ly94Lm9yZyJ9xoO8wZYLBR8FBml0YWxpYwRudWxsxoO8wZYLBh8FBGJvbGQEbnVsbMaDvMGWCwcfBQVjb2xvcgRudWxsxIO8wZYLCB8FBsOp8J+YgMaDvMGWCwsfBQRsaW5rBG51bGzGg7zBlgsMHwUGaXRhbGljBHRydWXGg7zBlgsNHwUEYm9sZAR0cnVlxoO8wZYLDh8FBWNvbG9yBSJyZWQixoO8wZYLDx8FBGJvbGQEbnVsbMYfDh8GBGJvbGQEdHJ1ZRcfAAYBBHJpY2gEYm9sZAR0cnVlhB8AAUiEHwECZWyEHwMBbIQfBAFvhB8FASCEHwYDd29yhB8JAmxkhh8LBGJvbGQEbnVsbEYfAAZpdGFsaWMEdHJ1ZcYfBR8GBml0YWxpYwRudWxsxh8GHwcEbGluax57ImhyZWYiOiJodHRwczovL2V4YW1wbGUuY29tIn3GHw8fBwRib2xkBG51bGzFHxAfBx17ImltYWdlIjoieC5wbmciLCJ3aWR0aCI6MTAwfcYfER8HBGxpbmsEbnVsbMYfEh8HBGJvbGQEdHJ1ZUYfDQl1bmRlcmxpbmUEdHJ1ZcYfBIO8wZYLAgl1bmRlcmxpbmUEbnVsbMYfDoO8wZYLEQRzaXplAjE0xh8Wg7zBlgsRBWNvbG9yBG51bGzEHxeDvMGWCxED5Litxh8Yg7zBlgsRBHNpemUEbnVsbMYfGYO8wZYLEQVjb2xvcgUicmVkIgKDvMGWCwMAAQIBBQofAgIDFAI=",
+          "stateVector": "AoO8wZYLEh8b",
+          "localUpdates": [
+            "AQKDvMGWCwDGHwMfBAVjb2xvcgUicmVkIsYfCR8KBWNvbG9yBG51bGwA",
+            "AQGDvMGWCwLEHwQfBQEhAA==",
+            "AQKDvMGWCwNGHw0JdW5kZXJsaW5lBHRydWXGHwSDvMGWCwIJdW5kZXJsaW5lBG51bGwA",
+            "AQuDvMGWCwXGg7zBlgsCHwUEbGluaxh7ImhyZWYiOiJodHRwczovL3gub3JnIn3Gg7zBlgsFHwUGaXRhbGljBG51bGzGg7zBlgsGHwUEYm9sZARudWxsxoO8wZYLBx8FBWNvbG9yBG51bGzEg7zBlgsIHwUGw6nwn5iAxoO8wZYLCx8FBGxpbmsEbnVsbMaDvMGWCwwfBQZpdGFsaWMEdHJ1ZcaDvMGWCw0fBQRib2xkBHRydWXGg7zBlgsOHwUFY29sb3IFInJlZCLGg7zBlgsPHwUEYm9sZARudWxsxh8OHwYEYm9sZAR0cnVlAoO8wZYLAQIBHwIDAhUB"
+          ],
+          "texts": {
+            "rich": "Ho中 world"
+          },
+          "deltas": {
+            "rich": [
+              {
+                "insert": "H",
+                "attributes": {
+                  "underline": true,
+                  "italic": true,
+                  "bold": true
+                }
+              },
+              {
+                "insert": "o",
+                "attributes": {
+                  "italic": true,
+                  "color": "red"
+                }
+              },
+              {
+                "insert": "中",
+                "attributes": {
+                  "size": 14
+                }
+              },
+              {
+                "insert": " ",
+                "attributes": {
+                  "color": "red",
+                  "bold": true
+                }
+              },
+              {
+                "insert": {
+                  "image": "x.png",
+                  "width": 100
+                },
+                "attributes": {
+                  "color": "red",
+                  "link": {
+                    "href": "https://example.com"
+                  }
+                }
+              },
+              {
+                "insert": "wor",
+                "attributes": {
+                  "color": "red",
+                  "bold": true
+                }
+              },
+              {
+                "insert": "ld",
+                "attributes": {
+                  "bold": true
+                }
+              }
+            ]
+          },
           "maps": {}
         }
       ]

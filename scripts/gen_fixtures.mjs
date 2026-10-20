@@ -972,6 +972,676 @@ const genExportBase = () => {
   console.log('wrote fixtures/export_base.json and cmd/export/yjs_base_gen.mbt')
 }
 
+// ---------------------------------------------------------------------------
+// Rich text: Yjs documents with formatting, and what Yjs's toDelta() says about
+// them. The delta is compared as JSON text (key order included).
+
+const richDeltaScenarios = () => {
+  const out = []
+  const add = (name, build, clientID = 1) => {
+    const d = newDoc(clientID)
+    const t = d.getText('t')
+    build(t, d)
+    out.push({ name, update: Y.encodeStateAsUpdate(d), delta: JSON.stringify(t.toDelta()), text: t.toString() })
+  }
+  add('empty', () => {})
+  add('plain text', t => t.insert(0, 'hello world'))
+  add('bold range', t => { t.insert(0, 'hello world'); t.format(0, 5, { bold: true }) })
+  add('insert with attributes', t => t.insert(0, 'abc', { bold: true, italic: true }))
+  add('attribute key order', t => t.insert(0, 'abc', { zeta: 1, alpha: 2, mid: 3 }))
+  add('overlapping bold and italic', t => {
+    t.insert(0, 'abcdefghij')
+    t.format(0, 6, { bold: true })
+    t.format(3, 6, { italic: true })
+  })
+  add('remove an attribute with null', t => {
+    t.insert(0, 'abcdefgh', { bold: true })
+    t.format(2, 3, { bold: null })
+  })
+  add('object, array, number and string values', t => {
+    t.insert(0, 'link text', { link: { href: 'https://example.com', rel: 'nofollow' } })
+    t.insert(9, ' and more', { color: '#ff0000', size: 12, tags: ['a', 'b'], ratio: 1.5 })
+  })
+  add('embeds with and without attributes', t => {
+    t.insert(0, 'a')
+    t.insertEmbed(1, { image: 'x.png', width: 100 })
+    t.insertEmbed(2, { video: 'y.mp4' }, { bold: true })
+    t.insert(3, 'b', { italic: true })
+  })
+  add('deleted text inside a formatted run', t => {
+    t.insert(0, 'abcdefghij', { bold: true })
+    t.delete(3, 4)
+    t.insert(3, 'XY')
+  })
+  add('unicode text with attributes', t => {
+    t.insert(0, '你好😀', { bold: true })
+    t.insert(4, 'é🎉', { 'font-size': 14 })
+  })
+  add('format that spans text inserted later', t => {
+    t.insert(0, 'abcdef')
+    t.format(1, 3, { underline: true })
+    t.insert(2, 'ZZ')
+    t.insert(0, 'start ')
+  })
+  add('two clients format concurrently', (t, d) => {
+    t.insert(0, 'shared text here')
+    const d2 = newDoc(2)
+    Y.applyUpdate(d2, Y.encodeStateAsUpdate(d))
+    const t2 = d2.getText('t')
+    t.format(0, 6, { bold: true })
+    t2.format(3, 9, { bold: true, italic: true })
+    t2.insert(0, '>> ', { color: 'red' })
+    Y.applyUpdate(d, Y.encodeStateAsUpdate(d2))
+  })
+  return out
+}
+
+const genRichDelta = () => {
+  const cases = richDeltaScenarios()
+  let mbt = '\n///|\nlet rich_delta_cases : Array[(String, String, String, String)] = [\n'
+  for (const c of cases) {
+    mbt += `  (${mbtString(c.name)}, "${hex(c.update)}", ${mbtString(c.delta)}, ${mbtString(c.text)}),\n`
+  }
+  mbt += ']\n'
+  writeFixture('rich_delta', 'tests', cases.map(c => ({ name: c.name, update: hex(c.update), delta: JSON.parse(c.delta), text: c.text })), mbt)
+}
+
+// ---------------------------------------------------------------------------
+// Rich-text edit scripts. Replicas request the text type up front (the usual
+// way an editor binding does it), edit, and exchange updates. After every step
+// the recorder stores the bytes of the local updates Yjs emitted — including
+// the clean-up transactions Yjs runs after remote changes — and toDelta().
+
+const richRecorder = (name, ids, lazy = false) => {
+  const docs = ids.map(id => newDoc(id))
+  const logs = docs.map(() => [])
+  docs.forEach((d, i) => d.on('update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
+  const text = (r) => docs[r].getText('t')
+  // Request the type before anything arrives, the way editor bindings do. A
+  // type that is requested after content has been applied is a different
+  // object in Yjs (see richLateScripts).
+  if (!lazy) docs.forEach((_, r) => text(r))
+  const ops = []
+  const step = (r, op, f) => {
+    const before = logs[r].length
+    f()
+    ops.push({ ...op, replica: r, update: logs[r].slice(before).map(hex), delta: JSON.stringify(text(r).toDelta()) })
+  }
+  return {
+    insert: (r, pos, str, attrs) => step(r, { op: 'insert', pos, str, attrs }, () => attrs === undefined ? text(r).insert(pos, str) : text(r).insert(pos, str, attrs)),
+    embed: (r, pos, embed, attrs) => step(r, { op: 'embed', pos, embed, attrs }, () => attrs === undefined ? text(r).insertEmbed(pos, embed) : text(r).insertEmbed(pos, embed, attrs)),
+    format: (r, pos, len, attrs) => step(r, { op: 'format', pos, len, attrs }, () => text(r).format(pos, len, attrs)),
+    del: (r, pos, len) => step(r, { op: 'delete', pos, len }, () => text(r).delete(pos, len)),
+    applyDelta: (r, delta, opts) => step(r, { op: 'applyDelta', input: delta, sanitize: opts === undefined ? true : opts.sanitize }, () => opts === undefined ? text(r).applyDelta(delta) : text(r).applyDelta(delta, opts)),
+    delta: (r) => JSON.parse(JSON.stringify(text(r).toDelta())),
+    length: (r) => text(r).length,
+    logLength: (r) => logs[r].length,
+    // the positions of the text that are not inside a surrogate pair
+    boundaries: (r) => {
+      const out = [0]
+      let at = 0
+      for (const op of text(r).toDelta()) {
+        if (typeof op.insert === 'string') {
+          for (let i = 0; i < op.insert.length; i++) {
+            at++
+            const c = op.insert.charCodeAt(i)
+            const next = op.insert.charCodeAt(i + 1)
+            const inside = c >= 0xD800 && c <= 0xDBFF && next >= 0xDC00 && next <= 0xDFFF
+            if (!inside) out.push(at)
+          }
+        } else {
+          at++
+          out.push(at)
+        }
+      }
+      return out
+    },
+    totalLogs: () => logs.reduce((a, l) => a + l.length, 0),
+    deliver: (from, to, indices) => {
+      const before = logs[to].length
+      for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+      ops.push({ op: 'sync', from, to, indices, update: logs[to].slice(before).map(hex), delta: JSON.stringify(text(to).toDelta()) })
+    },
+    syncAll: () => {
+      for (let to = 0; to < docs.length; to++) {
+        for (let from = 0; from < docs.length; from++) {
+          if (from === to || logs[from].length === 0) continue
+          const indices = logs[from].map((_, i) => i)
+          const before = logs[to].length
+          for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+          ops.push({ op: 'sync', from, to, indices, update: logs[to].slice(before).map(hex), delta: JSON.stringify(text(to).toDelta()) })
+        }
+      }
+    },
+    finish: () => {
+      // Yjs does not always converge on the delta; the end state of every
+      // replica is recorded as Yjs left it
+      const finalDeltas = docs.map((_, r) => JSON.stringify(text(r).toDelta()))
+      return { name, clients: ids, lazy, ops, finalDeltas, converged: finalDeltas.every(d => d === finalDeltas[0]) }
+    }
+  }
+}
+
+const mbtAttrs = (attrs) => `[${Object.keys(attrs).map(k => `(${mbtString(k)}, ${mbtAny(attrs[k])})`).join(', ')}]`
+const mbtOptAttrs = (attrs) => attrs === undefined ? 'None' : `Some(${mbtAttrs(attrs)})`
+
+const mbtRichOp = (o) => {
+  const ups = `[${o.update.map(u => `"${u}"`).join(', ')}]`
+  switch (o.op) {
+    case 'insert': return `RIns(${o.replica}, ${o.pos}, ${mbtString(o.str)}, ${mbtOptAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
+    case 'embed': return `REmbed(${o.replica}, ${o.pos}, ${mbtAny(o.embed)}, ${mbtOptAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
+    case 'format': return `RFmt(${o.replica}, ${o.pos}, ${o.len}, ${mbtAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
+    case 'applyDelta': return `RApply(${o.replica}, ${mbtString(JSON.stringify(o.input))}, ${o.sanitize}, ${ups}, ${mbtString(o.delta)})`
+    case 'delete': return `RDel(${o.replica}, ${o.pos}, ${o.len}, ${ups}, ${mbtString(o.delta)})`
+    case 'sync': return `RSync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${ups}, ${mbtString(o.delta)})`
+    default: throw new Error(`unknown rich op ${o.op}`)
+  }
+}
+
+// One function per case (see mbtScriptCases for why).
+const mbtRichCases = (prefix, listName, cases) => {
+  let mbt = ''
+  cases.forEach((c, i) => {
+    mbt += `\n///|\nfn ${prefix}_${i + 1}() -> RichCase {\n  {\n    name: ${mbtString(c.name)},\n    clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n    late_type: ${c.lazy},\n    ops: [\n`
+    mbt += c.ops.map(o => `      ${mbtRichOp(o)},`).join('\n')
+    mbt += `\n    ],\n    final_deltas: [${c.finalDeltas.map(mbtString).join(', ')}],\n  }\n}\n`
+  })
+  mbt += `\n///|\nfn ${listName}() -> Array[RichCase] {\n  [\n${cases.map((_, i) => `    ${prefix}_${i + 1}(),`).join('\n')}\n  ]\n}\n`
+  return mbt
+}
+
+const richInsertScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids); f(r); out.push(r.finish()) }
+  script('new text inherits the formatting at the position', [1], r => {
+    r.insert(0, 0, 'hello', { bold: true })
+    r.insert(0, 2, 'X')
+    r.insert(0, 0, 'S')
+    r.insert(0, r.length(0), 'E')
+  })
+  script('explicit attributes replace the inherited ones', [1], r => {
+    r.insert(0, 0, 'abcdef', { bold: true, italic: true })
+    r.insert(0, 3, 'Y', { underline: true })
+    r.insert(0, 3, 'Z', {})
+    r.insert(0, 0, 'Q', { bold: true })
+  })
+  script('null switches an attribute off', [1], r => {
+    r.insert(0, 0, 'abc', { bold: true })
+    r.insert(0, 1, 'X', { bold: null })
+    r.insert(0, 1, 'W', { bold: null, italic: true })
+  })
+  script('an unchanged value reuses the formatting items', [1], r => {
+    r.insert(0, 0, 'a', { bold: true })
+    r.insert(0, 1, 'b', { bold: true })
+    r.insert(0, 2, 'c', { bold: true })
+    r.insert(0, 3, 'd', { bold: false })
+    r.insert(0, 4, 'e', { bold: false })
+  })
+  script('object values are compared one level deep', [1], r => {
+    r.insert(0, 0, 'one', { link: { href: 'a' } })
+    r.insert(0, 3, 'two', { link: { href: 'a' } })
+    r.insert(0, 6, 'three', { link: { href: 'b' } })
+    r.insert(0, 11, 'four', { link: { href: 'b', meta: { x: 1 } } })
+    r.insert(0, 15, 'five', { link: { href: 'b', meta: { x: 1 } } })
+  })
+  script('embeds inside formatted text', [1], r => {
+    r.insert(0, 0, 'abc', { bold: true })
+    r.embed(0, 1, { image: 'x.png' })
+    r.embed(0, 3, { image: 'y.png' }, { bold: true })
+    r.embed(0, 0, { mention: 'me' })
+    r.embed(0, r.length(0), { image: 'z.png' }, { italic: true })
+  })
+  script('inserting after deletions', [1], r => {
+    r.insert(0, 0, 'abcdefg', { bold: true })
+    r.del(0, 2, 3)
+    r.insert(0, 2, 'XY')
+    r.del(0, 0, r.length(0))
+    r.insert(0, 0, 'fresh')
+    r.insert(0, 0, 'bold again', { bold: true })
+  })
+  script('attribute order follows the object keys', [1], r => {
+    r.insert(0, 0, 'abc', { b: 1, a: 2 })
+    r.insert(0, 3, 'def', { a: 3, c: 4, b: 1 })
+    r.insert(0, 6, 'ghi', { c: 4, z: 0 })
+  })
+  script('unicode text', [1], r => {
+    r.insert(0, 0, '你好😀', { bold: true })
+    r.insert(0, 3, 'x')
+    r.insert(0, 5, '🎉', { color: '#f00' })
+    r.del(0, 1, 2)
+    r.insert(0, 1, 'é')
+  })
+  script('text after unformatted text', [1], r => {
+    r.insert(0, 0, 'abc')
+    r.insert(0, 3, 'd', { bold: true })
+    r.insert(0, 4, 'e')
+    r.insert(0, 1, 'f', { bold: true })
+  })
+  script('two replicas insert into the same formatted run', [1, 2], r => {
+    r.insert(0, 0, 'shared bold text', { bold: true })
+    r.syncAll()
+    r.insert(0, 7, '-one-')
+    r.insert(1, 7, '-two-', { italic: true })
+    r.syncAll()
+    r.insert(1, 0, 'start ')
+    r.syncAll()
+  })
+  return out
+}
+
+const richFormatScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids); f(r); out.push(r.finish()) }
+  script('format ranges of plain text', [1], r => {
+    r.insert(0, 0, 'hello world')
+    r.format(0, 0, 0 + 5, { bold: true })
+    r.format(0, 6, 5, { italic: true })
+    r.format(0, 3, 5, { underline: true })
+  })
+  script('null removes an attribute from part of a range', [1], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.format(0, 2, 3, { bold: null })
+    r.format(0, 0, 10, { bold: true })
+    r.format(0, 4, 2, { bold: null, italic: true })
+  })
+  script('overwriting a value and restoring the old one', [1], r => {
+    r.insert(0, 0, 'abcdefghij')
+    r.format(0, 0, 8, { color: 'red' })
+    r.format(0, 2, 3, { color: 'blue' })
+    r.format(0, 6, 4, { color: 'green' })
+    r.format(0, 0, 10, { color: 'red' })
+  })
+  script('formatting that changes nothing', [1], r => {
+    r.insert(0, 0, 'abcdef', { bold: true })
+    r.format(0, 0, 6, { bold: true })
+    r.format(0, 1, 3, { bold: true })
+    r.format(0, 0, 6, { italic: null })
+  })
+  script('several attributes at once keep their key order', [1], r => {
+    r.insert(0, 0, 'abcdef')
+    r.format(0, 1, 4, { zeta: 1, alpha: 2 })
+    r.format(0, 2, 2, { mid: true, zeta: null })
+  })
+  script('ranges across embeds and deleted text', [1], r => {
+    r.insert(0, 0, 'abcdefghij')
+    r.embed(0, 3, { image: 'x.png' })
+    r.del(0, 6, 2)
+    r.format(0, 1, 8, { bold: true })
+    r.format(0, 0, 12, { italic: true })
+  })
+  script('a range that reaches past the end is padded with newlines', [1], r => {
+    r.insert(0, 0, 'abc')
+    r.format(0, 1, 5, { bold: true })
+  })
+  script('object values', [1], r => {
+    r.insert(0, 0, 'abcdefgh')
+    r.format(0, 0, 4, { link: { href: 'a' } })
+    r.format(0, 2, 4, { link: { href: 'a' } })
+    r.format(0, 1, 2, { link: { href: 'b' } })
+    r.format(0, 0, 8, { link: null })
+  })
+  script('inserting at the edges of a formatted range', [1], r => {
+    r.insert(0, 0, 'abcdef')
+    r.format(0, 2, 2, { bold: true })
+    r.insert(0, 2, 'X')
+    r.insert(0, 5, 'Y')
+    r.insert(0, 7, 'Z')
+    r.insert(0, 4, 'W', { bold: false })
+  })
+  script('formatting after deleting', [1], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.format(0, 0, 10, { italic: true })
+    r.del(0, 3, 4)
+    r.format(0, 2, 3, { bold: null })
+    r.del(0, 0, 3)
+  })
+  script('unicode ranges', [1], r => {
+    r.insert(0, 0, '你好😀世界🎉')
+    r.format(0, 1, 3, { bold: true })
+    r.format(0, 0, 2, { color: '#f00' })
+    r.format(0, 4, 3, { italic: true })
+  })
+  return out
+}
+
+const richApplyDeltaScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids); f(r); out.push(r.finish()) }
+  script('build a document from a delta', [1], r => {
+    r.applyDelta(0, [
+      { insert: 'Heading', attributes: { bold: true } },
+      { insert: '\n' },
+      { insert: 'plain text with ' },
+      { insert: 'a link', attributes: { link: { href: 'https://example.com' } } },
+      { insert: { image: 'x.png' } },
+      { insert: '!\n' }
+    ])
+  })
+  script('retain with attributes formats a range', [1], r => {
+    r.applyDelta(0, [{ insert: 'hello world' }])
+    r.applyDelta(0, [{ retain: 6 }, { retain: 5, attributes: { italic: true } }])
+    r.applyDelta(0, [{ retain: 2 }, { retain: 6, attributes: { bold: true, italic: null } }])
+  })
+  script('retain, delete and insert in one delta', [1], r => {
+    r.applyDelta(0, [{ insert: 'abcdefghij', attributes: { bold: true } }])
+    r.applyDelta(0, [{ retain: 2 }, { delete: 3 }, { insert: 'XY', attributes: { italic: true } }, { retain: 1 }, { delete: 1 }])
+  })
+  script('a second replica applies the delta of the first', [1, 2], r => {
+    r.insert(0, 0, 'shared text', { bold: true })
+    r.format(0, 2, 6, { italic: true })
+    r.embed(0, 4, { image: 'p.png' })
+    r.applyDelta(1, r.delta(0))
+    r.syncAll()
+  })
+  script('retain and delete beyond the end are cut off', [1], r => {
+    r.applyDelta(0, [{ insert: 'abc' }])
+    r.applyDelta(0, [{ retain: 1 }, { delete: 10 }])
+    r.applyDelta(0, [{ insert: 'xyz' }, { retain: 20 }, { insert: '!' }])
+  })
+  script('a trailing newline is kept unless sanitize is false', [1], r => {
+    r.applyDelta(0, [{ insert: 'first line\n' }])
+    r.applyDelta(0, [{ retain: 11 }, { insert: 'second line\n' }], { sanitize: false })
+    r.applyDelta(0, [{ retain: 23 }, { insert: 'third\n' }])
+  })
+  script('null attributes remove formatting', [1], r => {
+    r.applyDelta(0, [{ insert: 'abcdef', attributes: { bold: true, italic: true } }])
+    r.applyDelta(0, [{ retain: 3, attributes: { bold: null } }])
+    r.applyDelta(0, [{ retain: 4 }, { insert: 'X', attributes: { italic: null } }])
+  })
+  script('embeds and unicode', [1], r => {
+    r.applyDelta(0, [{ insert: '你好😀', attributes: { color: '#f00' } }, { insert: { mention: { id: 7, name: 'Å' } }, attributes: { bold: true } }, { insert: '🎉' }])
+    r.applyDelta(0, [{ retain: 2 }, { insert: { image: 'y.png' } }, { delete: 1 }])
+  })
+  script('formatting and deleting in one delta', [1], r => {
+    r.applyDelta(0, [{ insert: 'abcdefghij', attributes: { bold: true } }])
+    r.applyDelta(0, [{ retain: 10, attributes: { italic: true } }])
+    r.applyDelta(0, [{ retain: 2 }, { delete: 4 }, { retain: 2, attributes: { underline: true } }, { insert: 'X' }, { retain: 1, attributes: { bold: null } }])
+  })
+  script('empty and zero length operations', [1], r => {
+    r.applyDelta(0, [{ insert: 'abc' }])
+    r.applyDelta(0, [{ insert: '' }, { retain: 0 }, { delete: 0 }, { retain: 1, attributes: {} }])
+    r.applyDelta(0, [])
+  })
+  return out
+}
+
+const genRichApplyDelta = () => {
+  const cases = richApplyDeltaScripts()
+  writeFixture('rich_apply_delta', 'tests', cases, mbtRichCases('rich_apply_delta_case', 'rich_apply_delta_cases', cases))
+}
+
+const richConcurrentScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids); f(r); out.push(r.finish()) }
+  script('both replicas bold the same range', [1, 2], r => {
+    r.insert(0, 0, 'hello world')
+    r.syncAll()
+    r.format(0, 0, 5, { bold: true })
+    r.format(1, 0, 5, { bold: true })
+    r.syncAll()
+  })
+  script('both replicas format overlapping ranges', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij')
+    r.syncAll()
+    r.format(0, 0, 6, { bold: true })
+    r.format(1, 3, 6, { bold: true })
+    r.syncAll()
+    r.format(0, 2, 4, { bold: null })
+    r.format(1, 0, 10, { bold: true })
+    r.syncAll()
+  })
+  script('one replica formats while the other deletes', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { italic: true })
+    r.syncAll()
+    r.format(0, 2, 6, { bold: true })
+    r.del(1, 3, 4)
+    r.syncAll()
+    r.del(0, 0, 3)
+    r.format(1, 0, 3, { bold: true })
+    r.syncAll()
+  })
+  script('different values for the same attribute', [1, 2], r => {
+    r.insert(0, 0, 'abcdefgh')
+    r.syncAll()
+    r.format(0, 0, 8, { color: 'red' })
+    r.format(1, 2, 4, { color: 'blue' })
+    r.syncAll()
+    r.format(0, 4, 4, { color: 'green' })
+    r.format(1, 0, 8, { color: 'red' })
+    r.syncAll()
+  })
+  script('remove and apply the same attribute concurrently', [1, 2], r => {
+    r.insert(0, 0, 'abcdefgh', { bold: true })
+    r.syncAll()
+    r.format(0, 0, 8, { bold: null })
+    r.format(1, 2, 4, { bold: true, italic: true })
+    r.syncAll()
+    r.insert(1, 4, 'X', { bold: true })
+    r.insert(0, 4, 'Y')
+    r.syncAll()
+  })
+  script('three replicas edit formatted text', [1, 2, 3], r => {
+    r.insert(0, 0, 'shared formatted text', { bold: true })
+    r.syncAll()
+    r.format(0, 0, 6, { italic: true })
+    r.format(1, 3, 9, { italic: true, bold: null })
+    r.del(2, 7, 5)
+    r.insert(2, 2, '++', { underline: true })
+    r.syncAll()
+    r.format(1, 0, 10, { bold: true })
+    r.embed(0, 5, { image: 'q.png' })
+    r.syncAll()
+  })
+  return out
+}
+
+const genRichConcurrent = () => {
+  const cases = richConcurrentScripts()
+  writeFixture('rich_concurrent', 'tests', cases, mbtRichCases('rich_concurrent_case', 'rich_concurrent_cases', cases))
+}
+
+// Random rich-text scenarios: 2-4 replicas edit one text at nearby positions
+// with random formatting, and exchange their updates (the clean-up updates
+// Yjs emits included) in random order with duplicates. Seeds are fixed.
+
+const RICH_CASES = 300
+const RICH_OBJECT_VALUES = false
+
+const richValue = (rand, key) => {
+  switch (key) {
+    case 'bold': case 'italic': case 'underline': return true
+    case 'color': return ['red', 'blue', 'green'][Math.floor(rand() * 3)]
+    case 'size': return [10, 12, 14][Math.floor(rand() * 3)]
+    default: return RICH_OBJECT_VALUES ? { href: ['a', 'b'][Math.floor(rand() * 2)] } : 'x'
+  }
+}
+
+const RICH_KEYS = ['bold', 'italic', 'underline', 'color', 'size', 'link']
+const RICH_CHUNKS = ['a', 'bc', 'def', 'Z', '中', '😀', 'x y']
+
+// random attributes: 1-3 keys, a value or null (remove)
+const richAttrs = (rand) => {
+  const attrs = {}
+  const n = 1 + Math.floor(rand() * 3)
+  for (let i = 0; i < n; i++) {
+    const key = RICH_KEYS[Math.floor(rand() * RICH_KEYS.length)]
+    attrs[key] = rand() < 0.3 ? null : richValue(rand, key)
+  }
+  return attrs
+}
+
+export const richScenario = (seed) => {
+  const rand = rng(seed * 15485863 + 29)
+  const pick = (arr) => arr[Math.floor(rand() * arr.length)]
+  const n = 2 + Math.floor(rand() * 3)
+  const ids = []
+  while (ids.length < n) {
+    const id = rand() < 0.5 ? 1 + Math.floor(rand() * 5) : Math.floor(rand() * 4294967295)
+    if (!ids.includes(id)) ids.push(id)
+  }
+  const r = richRecorder(`seed ${seed}`, ids)
+  const logsLen = (x) => r.logLength(x)
+  const steps = 12 + Math.floor(rand() * 18)
+  for (let s = 0; s < steps; s++) {
+    const rep = Math.floor(rand() * n)
+    // positions between characters only: Yjs replicas do not agree on the
+    // text when an emoji is split in two (U+FFFD), which is unrelated to
+    // formatting and covered by the edge-case tests
+    const ok = r.boundaries(rep)
+    const len = ok[ok.length - 1]
+    const bias = rand()
+    const pos = bias < 0.2 ? 0 : bias < 0.35 ? len : pick(ok)
+    // a range: a boundary and one a few boundaries further on
+    const range = () => {
+      const i = Math.floor(rand() * (ok.length - 1))
+      const j = Math.min(ok.length - 1, i + 1 + Math.floor(rand() * 5))
+      return [ok[i], ok[j] - ok[i]]
+    }
+    const choice = rand()
+    if (choice < 0.28 || len === 0) {
+      const str = pick(RICH_CHUNKS)
+      if (rand() < 0.5) r.insert(rep, pos, str)
+      else r.insert(rep, pos, str, richAttrs(rand))
+    } else if (choice < 0.32) {
+      r.embed(rep, pos, { image: pick(['p.png', 'q.png']) }, rand() < 0.5 ? undefined : richAttrs(rand))
+    } else if (choice < 0.55) {
+      const [start, flen] = range()
+      r.format(rep, start, flen, richAttrs(rand))
+    } else if (choice < 0.68) {
+      const [start, dlen] = range()
+      r.del(rep, start, dlen)
+    } else if (choice < 0.76) {
+      // a small delta that walks over the text along character boundaries
+      const delta = []
+      let at = 0
+      const k = 1 + Math.floor(rand() * 4)
+      for (let i = 0; i < k; i++) {
+        const t = rand()
+        const next = ok.find(p => p > at)
+        if (t < 0.4 && next !== undefined) {
+          delta.push(rand() < 0.5 ? { retain: next - at } : { retain: next - at, attributes: richAttrs(rand) })
+          at = next
+        } else if (t < 0.6 && next !== undefined) {
+          delta.push({ delete: next - at })
+          at = next
+        } else {
+          delta.push(rand() < 0.5 ? { insert: pick(RICH_CHUNKS) } : { insert: pick(RICH_CHUNKS), attributes: richAttrs(rand) })
+        }
+      }
+      r.applyDelta(rep, delta)
+    } else {
+      const from = Math.floor(rand() * n)
+      const to = (from + 1 + Math.floor(rand() * (n - 1))) % n
+      if (logsLen(from) === 0) continue
+      const k = 1 + Math.floor(rand() * (logsLen(from) + 1))
+      r.deliver(from, to, Array.from({ length: k }, () => Math.floor(rand() * logsLen(from))))
+    }
+  }
+  // exchange everything until nothing new appears: clean-up updates can
+  // themselves cause further clean-ups
+  for (let round = 0; round < 10; round++) {
+    const before = r.totalLogs()
+    r.syncAll()
+    if (r.totalLogs() === before) break
+  }
+  const result = r.finish()
+  if (!result.converged) throw new Error(`rich seed ${seed}: Yjs replicas did not converge`)
+  return result
+}
+
+// Scripts where the receiving replica asks for the text type only after
+// formatted content has arrived, and then edits in ways that depend on the
+// search marker Yjs may still have: insert without attributes and delete.
+const richLateScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids, true); f(r); out.push(r.finish()) }
+  script('insert without attributes in content that was formatted elsewhere', [1, 2], r => {
+    r.insert(0, 0, 'hello world', { bold: true })
+    r.deliver(0, 1, [0])
+    r.insert(1, 3, 'X')
+  })
+  script('delete, then insert, in formatted content that arrived', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { italic: true })
+    r.format(0, 2, 4, { bold: true })
+    r.deliver(0, 1, [0, 1])
+    r.del(1, 1, 3)
+    r.insert(1, 2, 'Q')
+  })
+  script('the first local operation is a format', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.deliver(0, 1, [0])
+    r.format(1, 2, 3, { underline: true })
+    r.insert(1, 3, 'Y')
+    r.insert(1, 7, 'Z')
+  })
+  script('the first local operation is a delta', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.deliver(0, 1, [0])
+    r.applyDelta(1, [{ retain: 3 }, { insert: 'W' }, { delete: 1 }])
+    r.insert(1, 5, 'V')
+  })
+  script('the first local operation is an insert with attributes', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.deliver(0, 1, [0])
+    r.insert(1, 4, 'N', { italic: true })
+    r.insert(1, 8, 'M')
+  })
+  script('formatting written by another client than the text', [1, 2, 3], r => {
+    r.insert(0, 0, 'abcdefghij')
+    r.deliver(0, 1, [0])
+    r.format(1, 2, 5, { bold: true })
+    r.deliver(0, 2, [0])
+    r.deliver(1, 2, [0])
+    r.insert(2, 3, 'X')
+    r.insert(2, 6, 'Y')
+    r.del(2, 4, 2)
+    r.insert(2, 1, 'Z')
+  })
+  script('inserts at the start and at the end', [1, 2], r => {
+    r.insert(0, 0, 'abcdef', { bold: true })
+    r.format(0, 1, 3, { italic: true })
+    r.deliver(0, 1, [0, 1])
+    r.insert(1, 0, 'S')
+    r.insert(1, 7, 'E')
+  })
+  return out
+}
+
+const genRichLateScripts = () => {
+  const cases = richLateScripts()
+  writeFixture('rich_late_scripts', 'tests', cases, mbtRichCases('rich_late_script_case', 'rich_late_script_cases', cases))
+}
+
+// The rich-text example of the README, run on Yjs.
+const genReadmeRich = () => {
+  const d = newDoc(1)
+  const t = d.getText('doc')
+  t.insert(0, 'Hello world')
+  t.format(0, 5, { bold: true })
+  t.insert(11, '!', { italic: true })
+  t.applyDelta([{ retain: 6 }, { insert: 'brave ', attributes: { color: 'red' } }])
+  const delta = JSON.stringify(t.toDelta())
+  writeFixture('readme_rich', 'tests', { delta }, `
+///|
+let readme_rich_delta : String = ${mbtString(delta)}
+`)
+}
+
+const genRichConvergence = () => {
+  const cases = Array.from({ length: RICH_CASES }, (_, i) => richScenario(i + 1))
+  writeFixture('rich_convergence', 'tests', cases, mbtRichCases('rich_convergence_case', 'rich_convergence_cases', cases))
+}
+
+const genRichFormat = () => {
+  const cases = richFormatScripts()
+  writeFixture('rich_format', 'tests', cases, mbtRichCases('rich_format_case', 'rich_format_cases', cases))
+}
+
+const genRichInsert = () => {
+  const cases = richInsertScripts()
+  writeFixture('rich_insert', 'tests', cases, mbtRichCases('rich_insert_case', 'rich_insert_cases', cases))
+}
+
 genLib0()
 genUpdates()
 genInterop()
@@ -980,4 +1650,12 @@ genEdge()
 genPreserve()
 genArrays()
 genProtocol()
+genRichDelta()
+genRichInsert()
+genRichFormat()
+genRichApplyDelta()
+genRichConcurrent()
+genRichConvergence()
+genRichLateScripts()
+genReadmeRich()
 genExportBase()

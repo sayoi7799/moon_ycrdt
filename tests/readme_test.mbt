@@ -74,3 +74,25 @@ test "README: talking to a y-websocket peer" {
   }
   assert_eq(@types.Text::new(server, "doc").to_string(), "> from the server")
 }
+
+///|
+test "README: rich text" {
+  let doc = @doc.Doc::new(1)
+  let text = @types.Text::new(doc, "doc")
+  text.insert(0, "Hello world")
+  // format a range, insert with exactly the given formatting
+  text.format(0, 5, [("bold", Bool(true))])
+  text.insert_with_attributes(11, "!", [("italic", Bool(true))])
+  // a Quill-style delta: skip 6 positions, then insert coloured text
+  text.apply_delta([
+    Retain(6, []),
+    Insert(String("brave "), [("color", String("red"))]),
+  ])
+  // read the formatted text back, as a delta and as JSON
+  let delta = text.to_delta()
+  assert_eq(delta.length(), 5)
+  assert_eq(@types.delta_to_json(delta).stringify(), readme_rich_delta)
+  // and a delta from JSON (for example from a ProseMirror / Quill binding)
+  let parsed = @types.delta_from_json(@json.parse(readme_rich_delta))
+  assert_eq(parsed, delta)
+}

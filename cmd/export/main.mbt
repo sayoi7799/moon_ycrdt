@@ -224,6 +224,14 @@ fn Script::report(self : Script) -> Json {
     for name in self.texts {
       texts[name] = Json::string(@types.Text::new(d, name).to_string())
     }
+    let deltas = Map([])
+    for name in self.texts {
+      deltas[name] = @types.delta_to_json(
+        @types.Text::new(d, name).to_delta() catch {
+          e => abort("to_delta failed: \{e}")
+        },
+      )
+    }
     let maps = Map([])
     for name in self.maps {
       let m = Map([])
@@ -245,6 +253,7 @@ fn Script::report(self : Script) -> Json {
       "stateVector": b64(d.encode_state_vector()),
       "localUpdates": Json::array(self.logs[i].map(b64)),
       "texts": Json::object(texts),
+      "deltas": Json::object(deltas),
       "maps": Json::object(maps),
     }
     json
@@ -385,6 +394,142 @@ fn arrays() -> Script {
 }
 
 ///|
+fn attrs_json(attrs : Array[(String, @lib0.Any)]) -> Json {
+  let m = Map([])
+  for a in attrs {
+    m[a.0] = any_to_json(a.1)
+  }
+  Json::object(m)
+}
+
+///|
+/// Inserts text with exactly the given formatting (`ytext.insert(i, s, attrs)`).
+fn Script::insert_attrs(
+  self : Script,
+  doc : Int32,
+  pos : Int32,
+  text : String,
+  attributes : Array[(String, @lib0.Any)],
+  name~ : String = "t",
+) -> Unit {
+  @types.Text::new(self.docs[doc], name).insert_with_attributes(
+    pos, text, attributes,
+  )
+  self.ops.push({
+    "op": "insert",
+    "doc": Json(doc),
+    "name": Json(name),
+    "pos": Json(pos),
+    "text": Json(text),
+    "attributes": attrs_json(attributes),
+  })
+}
+
+///|
+fn Script::format(
+  self : Script,
+  doc : Int32,
+  pos : Int32,
+  len : Int32,
+  attributes : Array[(String, @lib0.Any)],
+  name~ : String = "t",
+) -> Unit {
+  @types.Text::new(self.docs[doc], name).format(pos, len, attributes)
+  self.ops.push({
+    "op": "format",
+    "doc": Json(doc),
+    "name": Json(name),
+    "pos": Json(pos),
+    "len": Json(len),
+    "attributes": attrs_json(attributes),
+  })
+}
+
+///|
+fn Script::embed(
+  self : Script,
+  doc : Int32,
+  pos : Int32,
+  embed : @lib0.Any,
+  attributes? : Array[(String, @lib0.Any)],
+  name~ : String = "t",
+) -> Unit {
+  let text = @types.Text::new(self.docs[doc], name)
+  match attributes {
+    Some(a) => text.insert_embed(pos, embed, attributes=a)
+    None => text.insert_embed(pos, embed)
+  }
+  let op : Map[String, Json] = Map([])
+  op["op"] = Json("embed")
+  op["doc"] = Json(doc)
+  op["name"] = Json(name)
+  op["pos"] = Json(pos)
+  op["embed"] = any_to_json(embed)
+  if attributes is Some(a) {
+    op["attributes"] = attrs_json(a)
+  }
+  self.ops.push(Json::object(op))
+}
+
+///|
+fn Script::apply_delta(
+  self : Script,
+  doc : Int32,
+  delta : Array[@types.DeltaOp],
+  name~ : String = "t",
+) -> Unit {
+  @types.Text::new(self.docs[doc], name).apply_delta(delta)
+  self.ops.push({
+    "op": "applyDelta",
+    "doc": Json(doc),
+    "name": Json(name),
+    "delta": @types.delta_to_json(delta),
+  })
+}
+
+///|
+/// Rich text: formatting, embeds, deltas, and two replicas formatting the same
+/// range at the same time (which makes both clean up afterwards).
+fn rich_text() -> Script {
+  let s = Script::new("rich_text", [31, 3000000003], texts=["rich"])
+  let bold = [("bold", @lib0.Any::Bool(true))]
+  s.insert_attrs(0, 0, "Hello world", bold, name="rich")
+  s.sync_all()
+  s.format(0, 0, 5, [("italic", Bool(true))], name="rich")
+  s.format(1, 3, 6, [("color", String("red"))], name="rich")
+  s.insert(1, 4, "!", name="rich")
+  s.embed(
+    0,
+    6,
+    Object([("image", String("x.png")), ("width", @lib0.Any::int(100))]),
+    attributes=[("link", Object([("href", String("https://example.com"))]))],
+    name="rich",
+  )
+  s.sync_all()
+  // both replicas underline the same range: redundant formatting is cleaned up
+  s.format(0, 0, 4, [("underline", Bool(true))], name="rich")
+  s.format(1, 0, 4, [("underline", Bool(true))], name="rich")
+  s.sync_all()
+  s.apply_delta(
+    1,
+    [
+      Retain(2, []),
+      Delete(3),
+      Insert(String("é😀"), [
+        ("link", Object([("href", String("https://x.org"))])),
+      ]),
+      Retain(1, [("bold", Null)]),
+    ],
+    name="rich",
+  )
+  s.sync_all()
+  s.delete(0, 1, 4, name="rich")
+  s.insert_attrs(0, 2, "中", [("size", @lib0.Any::int(14))], name="rich")
+  s.sync_all()
+  s
+}
+
+///|
 fn main {
   let cases = [
     text_editing(),
@@ -393,6 +538,7 @@ fn main {
     concurrent_three(),
     preserve_unknown(),
     arrays(),
+    rich_text(),
   ]
   let report : Json = {
     "generator": "moon_ycrdt cmd/export",

@@ -7,6 +7,7 @@ import {
   "sayoi7799/moon_ycrdt/doc",
   "sayoi7799/moon_ycrdt/types",
   "sayoi7799/moon_ycrdt/protocol",
+  "moonbitlang/core/json",
   "moonbitlang/core/quickcheck",
   "moonbitlang/core/cmp",
 } for "test"

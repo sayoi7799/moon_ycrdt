@@ -1,0 +1,695 @@
+[
+  {
+    "name": "build a document from a delta",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "Heading",
+            "attributes": {
+              "bold": true
+            }
+          },
+          {
+            "insert": "\n"
+          },
+          {
+            "insert": "plain text with "
+          },
+          {
+            "insert": "a link",
+            "attributes": {
+              "link": {
+                "href": "https://example.com"
+              }
+            }
+          },
+          {
+            "insert": {
+              "image": "x.png"
+            }
+          },
+          {
+            "insert": "!\n"
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "010901000601017404626f6c6404747275658401000748656164696e6786010704626f6c64046e756c6c840108110a706c61696e2074657874207769746820860119046c696e6b1e7b2268726566223a2268747470733a2f2f6578616d706c652e636f6d227d84011a0661206c696e6b860120046c696e6b046e756c6c850121117b22696d616765223a22782e706e67227d84012202210a00"
+        ],
+        "delta": "[{\"insert\":\"Heading\",\"attributes\":{\"bold\":true}},{\"insert\":\"\\nplain text with \"},{\"insert\":\"a link\",\"attributes\":{\"link\":{\"href\":\"https://example.com\"}}},{\"insert\":{\"image\":\"x.png\"}},{\"insert\":\"!\\n\"}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"Heading\",\"attributes\":{\"bold\":true}},{\"insert\":\"\\nplain text with \"},{\"insert\":\"a link\",\"attributes\":{\"link\":{\"href\":\"https://example.com\"}}},{\"insert\":{\"image\":\"x.png\"}},{\"insert\":\"!\\n\"}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "retain with attributes formats a range",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "hello world"
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "01010100040101740b68656c6c6f20776f726c6400"
+        ],
+        "delta": "[{\"insert\":\"hello world\"}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 6
+          },
+          {
+            "retain": 5,
+            "attributes": {
+              "italic": true
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "0102010bc601050106066974616c6963047472756586010a066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"hello \"},{\"insert\":\"world\",\"attributes\":{\"italic\":true}}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 2
+          },
+          {
+            "retain": 6,
+            "attributes": {
+              "bold": true,
+              "italic": null
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "0103010dc60101010204626f6c640474727565c60107010804626f6c64046e756c6cc6010e0108066974616c696304747275650101010b01"
+        ],
+        "delta": "[{\"insert\":\"he\"},{\"insert\":\"llo wo\",\"attributes\":{\"bold\":true}},{\"insert\":\"rld\",\"attributes\":{\"italic\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"he\"},{\"insert\":\"llo wo\",\"attributes\":{\"bold\":true}},{\"insert\":\"rld\",\"attributes\":{\"italic\":true}}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "retain, delete and insert in one delta",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "abcdefghij",
+            "attributes": {
+              "bold": true
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000a6162636465666768696a86010a04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 2
+          },
+          {
+            "delete": 3
+          },
+          {
+            "insert": "XY",
+            "attributes": {
+              "italic": true,
+              "bold": null
+            }
+          },
+          {
+            "retain": 1
+          },
+          {
+            "delete": 1
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "0105010cc601050106066974616c69630474727565c6010c010604626f6c64046e756c6cc4010d0106025859c6010f0106066974616c6963046e756c6cc60110010604626f6c64047472756501010203030701"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"XY\",\"attributes\":{\"italic\":true}},{\"insert\":\"fhij\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"XY\",\"attributes\":{\"italic\":true}},{\"insert\":\"fhij\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "a second replica applies the delta of the first",
+    "clients": [
+      1,
+      2
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "shared text",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000b736861726564207465787486010b04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"shared text\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 6,
+        "attrs": {
+          "italic": true
+        },
+        "replica": 0,
+        "update": [
+          "0102010dc601020103066974616c69630474727565c601080109066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ared t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "embed",
+        "pos": 4,
+        "embed": {
+          "image": "p.png"
+        },
+        "replica": 0,
+        "update": [
+          "0105010fc60104010504626f6c64046e756c6cc6010f0105066974616c6963046e756c6cc501100105117b22696d616765223a22702e706e67227dc60111010504626f6c640474727565c601120105066974616c6963047472756500"
+        ],
+        "delta": "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "sh",
+            "attributes": {
+              "bold": true
+            }
+          },
+          {
+            "insert": "ar",
+            "attributes": {
+              "bold": true,
+              "italic": true
+            }
+          },
+          {
+            "insert": {
+              "image": "p.png"
+            }
+          },
+          {
+            "insert": "ed t",
+            "attributes": {
+              "bold": true,
+              "italic": true
+            }
+          },
+          {
+            "insert": "ext",
+            "attributes": {
+              "bold": true
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 1,
+        "update": [
+          "011102000601017404626f6c64047472756584020002736886020204626f6c64046e756c6c86020304626f6c640474727565860204066974616c6963047472756584020502617286020704626f6c64046e756c6c860208066974616c6963046e756c6c850209117b22696d616765223a22702e706e67227d86020a04626f6c64047472756586020b066974616c6963047472756584020c046564207486021004626f6c64046e756c6c860211066974616c6963046e756c6c86021204626f6c6404747275658402130365787486021604626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "sync",
+        "from": 1,
+        "to": 0,
+        "indices": [
+          0
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}},{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "sync",
+        "from": 0,
+        "to": 1,
+        "indices": [
+          0,
+          1,
+          2
+        ],
+        "update": [],
+        "delta": "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}},{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}},{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}},{\"insert\":\"sh\",\"attributes\":{\"bold\":true}},{\"insert\":\"ar\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"p.png\"}},{\"insert\":\"ed t\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ext\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "retain and delete beyond the end are cut off",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "abc"
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "01010100040101740361626300"
+        ],
+        "delta": "[{\"insert\":\"abc\"}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 1
+          },
+          {
+            "delete": 10
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "000101010102"
+        ],
+        "delta": "[{\"insert\":\"a\"}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "xyz"
+          },
+          {
+            "retain": 20
+          },
+          {
+            "insert": "!"
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "010201034401000378797a840102140a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a2100"
+        ],
+        "delta": "[{\"insert\":\"xyza\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n!\"}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"xyza\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n!\"}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "a trailing newline is kept unless sanitize is false",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "first line\n"
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "01010100040101740b6669727374206c696e650a00"
+        ],
+        "delta": "[{\"insert\":\"first line\\n\"}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 11
+          },
+          {
+            "insert": "second line\n"
+          }
+        ],
+        "sanitize": false,
+        "replica": 0,
+        "update": [
+          "0101010b84010a0b7365636f6e64206c696e6500"
+        ],
+        "delta": "[{\"insert\":\"first line\\nsecond line\"}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 23
+          },
+          {
+            "insert": "third\n"
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "01010116840115070a74686972640a00"
+        ],
+        "delta": "[{\"insert\":\"first line\\nsecond line\\nthird\\n\"}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"first line\\nsecond line\\nthird\\n\"}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "null attributes remove formatting",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "abcdef",
+            "attributes": {
+              "bold": true,
+              "italic": true
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "010501000601017404626f6c640474727565860100066974616c696304747275658401010661626364656686010704626f6c64046e756c6c860108066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true,\"italic\":true}}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 3,
+            "attributes": {
+              "bold": null
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "0101010ac60104010504626f6c6404747275650101010001"
+        ],
+        "delta": "[{\"insert\":\"abc\",\"attributes\":{\"italic\":true}},{\"insert\":\"def\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 4
+          },
+          {
+            "insert": "X",
+            "attributes": {
+              "italic": null,
+              "bold": null
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "0105010bc601050106066974616c6963046e756c6cc6010b010604626f6c64046e756c6cc4010c01060158c6010d0106066974616c69630474727565c6010e010604626f6c64047472756500"
+        ],
+        "delta": "[{\"insert\":\"abc\",\"attributes\":{\"italic\":true}},{\"insert\":\"d\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"X\"},{\"insert\":\"ef\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"abc\",\"attributes\":{\"italic\":true}},{\"insert\":\"d\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"X\"},{\"insert\":\"ef\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "embeds and unicode",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "你好😀",
+            "attributes": {
+              "color": "#f00"
+            }
+          },
+          {
+            "insert": {
+              "mention": {
+                "id": 7,
+                "name": "Å"
+              }
+            },
+            "attributes": {
+              "bold": true
+            }
+          },
+          {
+            "insert": "🎉"
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "010701000601017405636f6c6f72062223663030228401000ae4bda0e5a5bdf09f988086010405636f6c6f72046e756c6c86010504626f6c640474727565850106207b226d656e74696f6e223a7b226964223a372c226e616d65223a22c385227d7d86010704626f6c64046e756c6c84010804f09f8e8900"
+        ],
+        "delta": "[{\"insert\":\"你好😀\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":{\"mention\":{\"id\":7,\"name\":\"Å\"}},\"attributes\":{\"bold\":true}},{\"insert\":\"🎉\"}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 2
+          },
+          {
+            "insert": {
+              "image": "y.png"
+            }
+          },
+          {
+            "delete": 1
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "0103010bc60102010305636f6c6f72046e756c6cc5010b0103117b22696d616765223a22792e706e67227dc6010c010305636f6c6f72062223663030220101010301"
+        ],
+        "delta": "[{\"insert\":\"你好\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":{\"image\":\"y.png\"}},{\"insert\":\"�\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":{\"mention\":{\"id\":7,\"name\":\"Å\"}},\"attributes\":{\"bold\":true}},{\"insert\":\"🎉\"}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"你好\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":{\"image\":\"y.png\"}},{\"insert\":\"�\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":{\"mention\":{\"id\":7,\"name\":\"Å\"}},\"attributes\":{\"bold\":true}},{\"insert\":\"🎉\"}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "formatting and deleting in one delta",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "abcdefghij",
+            "attributes": {
+              "bold": true
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000a6162636465666768696a86010a04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 10,
+            "attributes": {
+              "italic": true
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "0102010c460100066974616c6963047472756586010b066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "retain": 2
+          },
+          {
+            "delete": 4
+          },
+          {
+            "retain": 2,
+            "attributes": {
+              "underline": true
+            }
+          },
+          {
+            "insert": "X"
+          },
+          {
+            "retain": 1,
+            "attributes": {
+              "bold": null
+            }
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "0109010ec60106010709756e6465726c696e650474727565c60108010909756e6465726c696e65046e756c6cc6010f0109066974616c6963046e756c6cc60110010904626f6c64046e756c6cc4011101090158c601120109066974616c69630474727565c60113010904626f6c640474727565c60114010904626f6c64046e756c6cc60109010a04626f6c6404747275650101010304"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"gh\",\"attributes\":{\"italic\":true,\"bold\":true,\"underline\":true}},{\"insert\":\"X\"},{\"insert\":\"i\",\"attributes\":{\"italic\":true}},{\"insert\":\"j\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"ab\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"gh\",\"attributes\":{\"italic\":true,\"bold\":true,\"underline\":true}},{\"insert\":\"X\"},{\"insert\":\"i\",\"attributes\":{\"italic\":true}},{\"insert\":\"j\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+    ],
+    "converged": true
+  },
+  {
+    "name": "empty and zero length operations",
+    "clients": [
+      1
+    ],
+    "lazy": false,
+    "ops": [
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": "abc"
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [
+          "01010100040101740361626300"
+        ],
+        "delta": "[{\"insert\":\"abc\"}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [
+          {
+            "insert": ""
+          },
+          {
+            "retain": 0
+          },
+          {
+            "delete": 0
+          },
+          {
+            "retain": 1,
+            "attributes": {}
+          }
+        ],
+        "sanitize": true,
+        "replica": 0,
+        "update": [],
+        "delta": "[{\"insert\":\"abc\"}]"
+      },
+      {
+        "op": "applyDelta",
+        "input": [],
+        "sanitize": true,
+        "replica": 0,
+        "update": [],
+        "delta": "[{\"insert\":\"abc\"}]"
+      }
+    ],
+    "finalDeltas": [
+      "[{\"insert\":\"abc\"}]"
+    ],
+    "converged": true
+  }
+]

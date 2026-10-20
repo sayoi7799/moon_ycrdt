@@ -71,22 +71,28 @@ fn Pos::forward(self : Pos) -> Unit {
 
 ///|
 /// Walks to `index` (`findPosition` / `findNextPosition`), splitting the item
-/// that contains the position.
+/// that contains the position, and collects the formatting attributes passed
+/// on the way.
 ///
-/// Yjs starts the walk at a "search marker" for every index > 0 and then only
-/// knows the formatting attributes seen after the marker. Markers are a cache
-/// whose contents depend on the history of the Yjs object; this emulates the
-/// marker a freshly loaded Yjs document creates (`findMarker`): the item
-/// containing `index`, moved left over items of the same client with
-/// consecutive clocks. For text without formatting the result is the same as
-/// walking from the start.
-fn Text::find_position(self : Text, index : Int32) -> Pos {
+/// `use_marker` says whether the Yjs operation looks the position up through
+/// a search marker (insert without attributes, delete) or walks from the start
+/// of the text (insert with attributes, format, applyDelta). The marker is only
+/// there while the type has not seen a formatting item (`markers_enabled`);
+/// walking from the start accumulates the attributes of everything to the left,
+/// a marker starts with none. Markers are a cache that depends on the history of
+/// the Yjs object, so only a single fresh marker is emulated (`findMarker`: the
+/// item containing `index`, moved left over items of the same client with
+/// consecutive clocks). For text without formatting both give the same result.
+fn Text::find_position(self : Text, index : Int32, use_marker : Bool) -> Pos {
   guard index >= 0 && index <= self.ty.length else {
     abort("index \{index} out of range (length \{self.ty.length})")
   }
   let pos = { left: None, right: self.ty.start, attrs: Map([]), }
   let mut count = index
-  if index > 0 && self.ty.start is Some(first) {
+  if use_marker &&
+    self.ty.markers_enabled &&
+    index > 0 &&
+    self.ty.start is Some(first) {
     let mut p = first
     let mut pindex = 0
     while p.right is Some(next) && pindex < index {
@@ -123,20 +129,18 @@ fn Text::find_position(self : Text, index : Int32) -> Pos {
 }
 
 ///|
-/// Inserts `s` at UTF-16 offset `index`.
-pub fn Text::insert(self : Text, index : Int32, s : String) -> Unit {
-  if s.length() == 0 {
-    return
-  }
-  let pos = self.find_position(index)
-  // Like Yjs, inherit the attributes at the position and move right over
-  // deleted items and formats that would not change them
-  // (`minimizeAttributeChanges`). This decides the new item's origin.
-  let attributes = pos.attrs.copy()
+/// Moves right over deleted items and formatting items that already say what
+/// `attributes` ask for (`minimizeAttributeChanges`), so that no redundant
+/// formatting item is written.
+fn minimize_attribute_changes(
+  pos : Pos,
+  attributes : Map[String, String],
+) -> Unit {
   while pos.right is Some(r) {
     let skip = r.deleted ||
       (match r.content {
-        Format(key, value) => attributes.get(key).unwrap_or("null") == value
+        Format(key, value) =>
+          attr_equal(attributes.get(key).unwrap_or("null"), value)
         _ => false
       })
     if !skip {
@@ -144,7 +148,150 @@ pub fn Text::insert(self : Text, index : Int32, s : String) -> Unit {
     }
     pos.forward()
   }
-  self.doc.insert(self.ty, pos.left, pos.right, None, String(s)) |> ignore
+}
+
+///|
+/// Writes a formatting item for every attribute whose current value differs
+/// (`insertAttributes`) and returns the values to restore after the content.
+fn Text::insert_attributes(
+  self : Text,
+  pos : Pos,
+  attributes : Map[String, String],
+) -> Map[String, String] {
+  let negated : Map[String, String] = Map([])
+  for key, value in attributes {
+    let current = pos.attrs.get(key).unwrap_or("null")
+    if !attr_equal(current, value) {
+      negated[key] = current
+      let item = self.doc.insert(
+        self.ty,
+        pos.left,
+        pos.right,
+        None,
+        Format(key, value),
+      )
+      pos.right = Some(item)
+      pos.forward()
+    }
+  }
+  negated
+}
+
+///|
+/// Restores the attributes in `negated` after inserted content
+/// (`insertNegatedAttributes`), reusing formatting items that are already there.
+fn Text::insert_negated_attributes(
+  self : Text,
+  pos : Pos,
+  negated : Map[String, String],
+) -> Unit {
+  while pos.right is Some(r) {
+    let skip = r.deleted ||
+      (match r.content {
+        Format(key, value) => attr_equal_opt(negated.get(key), value)
+        _ => false
+      })
+    if !skip {
+      break
+    }
+    if !r.deleted && r.content is Format(key, _) {
+      negated.remove(key)
+    }
+    pos.forward()
+  }
+  for key, value in negated {
+    let item = self.doc.insert(
+      self.ty,
+      pos.left,
+      pos.right,
+      None,
+      Format(key, value),
+    )
+    pos.right = Some(item)
+    pos.forward()
+  }
+}
+
+///|
+/// `insertText`: inserts `content` at `pos` with exactly the formatting
+/// `attributes` describes. Attributes that are active at the position but
+/// not mentioned are switched off for the new content and restored after it.
+fn Text::insert_content(
+  self : Text,
+  pos : Pos,
+  content : @update.Content,
+  attributes : Map[String, String],
+) -> Unit {
+  for key, _ in pos.attrs {
+    if !attributes.contains(key) {
+      attributes[key] = "null"
+    }
+  }
+  minimize_attribute_changes(pos, attributes)
+  let negated = self.insert_attributes(pos, attributes)
+  let item = self.doc.insert(self.ty, pos.left, pos.right, None, content)
+  pos.right = Some(item)
+  pos.forward()
+  self.insert_negated_attributes(pos, negated)
+}
+
+///|
+fn Text::insert_string(
+  self : Text,
+  index : Int32,
+  s : String,
+  attributes : Map[String, String]?,
+) -> Unit {
+  if s.length() == 0 {
+    return
+  }
+  // Without attributes Yjs uses the search marker and lets the new text
+  // inherit whatever is active at the position.
+  let pos = self.find_position(index, attributes is None)
+  let attrs = match attributes {
+    Some(a) => a
+    None => pos.attrs.copy()
+  }
+  self.insert_content(pos, String(s), attrs)
+  self.doc.commit()
+}
+
+///|
+/// Inserts `s` at UTF-16 offset `index`. The new text gets the formatting
+/// that is active at that position.
+pub fn Text::insert(self : Text, index : Int32, s : String) -> Unit {
+  self.insert_string(index, s, None)
+}
+
+///|
+/// Inserts `s` with exactly the formatting `attributes` describes
+/// (`ytext.insert(index, s, attributes)`). A `Null` value switches an attribute
+/// off; active attributes that are not listed are switched off as well.
+pub fn Text::insert_with_attributes(
+  self : Text,
+  index : Int32,
+  s : String,
+  attributes : Array[(String, @lib0.Any)],
+) -> Unit {
+  self.insert_string(index, s, Some(attrs_to_map(attributes)))
+}
+
+///|
+/// Inserts an embedded object (an image, a mention, ...) that takes up one
+/// position (`ytext.insertEmbed`). Without `attributes` the embed carries no
+/// formatting.
+pub fn Text::insert_embed(
+  self : Text,
+  index : Int32,
+  embed : @lib0.Any,
+  attributes? : Array[(String, @lib0.Any)],
+) -> Unit {
+  let pos = self.find_position(index, attributes is None)
+  let attrs = match attributes {
+    Some(a) => attrs_to_map(a)
+    None => Map([])
+  }
+  self.insert_content(pos, Embed(embed.to_json_string()), attrs)
   self.doc.commit()
 }
 
@@ -157,10 +304,20 @@ pub fn Text::delete(self : Text, index : Int32, len : Int32) -> Unit {
   guard index + len <= self.ty.length else {
     abort("delete range \{index}+\{len} out of range")
   }
-  let pos = self.find_position(index)
+  let pos = self.find_position(index, true)
+  self.delete_content(pos, len)
+  self.doc.commit()
+}
+
+///|
+/// `deleteText`: deletes `length` positions from `pos` on, then removes the
+/// formatting items that became redundant in the gap (`cleanupFormattingGap`).
+/// `pos` ends up after the gap with the attributes corrected for the items
+/// that were removed. A range that reaches past the end is cut off.
+fn Text::delete_content(self : Text, pos : Pos, length : Int32) -> Unit {
   let start = pos.right
   let start_attrs = pos.attrs.copy()
-  let mut remaining = len
+  let mut remaining = length
   while remaining > 0 && pos.right is Some(r) {
     if !r.deleted {
       match r.content {
@@ -177,47 +334,91 @@ pub fn Text::delete(self : Text, index : Int32, len : Int32) -> Unit {
     pos.forward()
   }
   if start is Some(s) {
-    self.cleanup_formatting_gap(s, start_attrs)
+    self.doc.cleanup_formatting_gap(s, pos.right, start_attrs, pos.attrs)
+    |> ignore
   }
-  self.doc.commit()
 }
 
 ///|
-/// JavaScript `===` on two JSON-encoded attribute values: only primitive
-/// values can be identical, objects and arrays never are.
-fn js_identical(a : String, b : String) -> Bool {
-  a == b && !a.has_prefix("{") && !a.has_prefix("[")
-}
-
-///|
-/// After a deletion, removes formatting items that became redundant between
-/// the deleted range and the next visible character (`cleanupFormattingGap`),
-/// so that deleting inside formatted text gives the same result as Yjs.
-fn Text::cleanup_formatting_gap(
+/// `formatText`: applies `attributes` to the next `length` positions starting
+/// at `pos`. Formatting items inside the range that set one of these
+/// attributes are deleted; if they set a different value, that value is
+/// restored after the range. A range that reaches past the end of the text
+/// is padded with newlines, which is what Yjs does for Quill.
+fn Text::format_range(
   self : Text,
-  start : @doc.Item,
-  start_attrs : Map[String, String],
+  pos : Pos,
+  length : Int32,
+  attributes : Map[String, String],
 ) -> Unit {
-  // the formats that are in effect right before the next visible content
-  let end_formats : Map[String, @doc.Item] = Map([])
-  let mut end : @doc.Item? = Some(start)
-  while end is Some(e) && (!e.is_countable() || e.deleted) {
-    if !e.deleted && e.content is Format(key, _) {
-      end_formats[key] = e
-    }
-    end = e.right
-  }
-  let mut cur : @doc.Item? = Some(start)
-  while cur is Some(item) && !(end is Some(e) && physical_equal(e, item)) {
-    if !item.deleted && item.content is Format(key, value) {
-      let start_value = start_attrs.get(key).unwrap_or("null")
-      let is_end_format = end_formats.get(key) is Some(f) &&
-        physical_equal(f, item)
-      // overwritten later, or the attribute was already in effect
-      if !is_end_format || js_identical(start_value, value) {
-        self.doc.delete_item(item)
+  let mut length = length
+  minimize_attribute_changes(pos, attributes)
+  let negated = self.insert_attributes(pos, attributes)
+  // go on until the range is used up; then keep going over formatting items
+  // and deleted items that follow, so no redundant negation is written
+  while pos.right is Some(r) &&
+        (
+          length > 0 ||
+          (negated.length() > 0 && (r.deleted || r.content is Format(_, _)))
+        ) {
+    if !r.deleted {
+      match r.content {
+        Format(key, value) =>
+          if attributes.get(key) is Some(wanted) {
+            if attr_equal(wanted, value) {
+              negated.remove(key)
+            } else {
+              if length == 0 {
+                break
+              }
+              negated[key] = value
+            }
+            self.doc.delete_item(r)
+          }
+        _ => {
+          if length < r.length {
+            self.doc.split(r, length) |> ignore
+          }
+          length -= r.length
+        }
       }
     }
-    cur = item.right
+    pos.forward()
   }
+  if length > 0 {
+    let newlines = StringBuilder()
+    for _ in 0..<length {
+      newlines.write_char('\n')
+    }
+    let item = self.doc.insert(
+      self.ty,
+      pos.left,
+      pos.right,
+      None,
+      String(newlines.to_string()),
+    )
+    pos.right = Some(item)
+    pos.forward()
+  }
+  self.insert_negated_attributes(pos, negated)
+}
+
+///|
+/// Applies `attributes` to `length` positions starting at `index`
+/// (`ytext.format`). A `Null` value removes the attribute from the range.
+pub fn Text::format(
+  self : Text,
+  index : Int32,
+  length : Int32,
+  attributes : Array[(String, @lib0.Any)],
+) -> Unit {
+  if length == 0 {
+    return
+  }
+  let pos = self.find_position(index, false)
+  if pos.right is None {
+    return
+  }
+  self.format_range(pos, length, attrs_to_map(attributes))
+  self.doc.commit()
 }
