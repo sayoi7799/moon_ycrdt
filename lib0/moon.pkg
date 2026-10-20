@@ -2,6 +2,7 @@ import {
   "moonbitlang/core/buffer",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 warnings = "-implicit_impl_as_method"

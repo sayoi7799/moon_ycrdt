@@ -972,6 +972,80 @@ const genExportBase = () => {
   console.log('wrote fixtures/export_base.json and cmd/export/yjs_base_gen.mbt')
 }
 
+// ---------------------------------------------------------------------------
+// Rich text: Yjs documents with formatting, and what Yjs's toDelta() says about
+// them. The delta is compared as JSON text (key order included).
+
+const richDeltaScenarios = () => {
+  const out = []
+  const add = (name, build, clientID = 1) => {
+    const d = newDoc(clientID)
+    const t = d.getText('t')
+    build(t, d)
+    out.push({ name, update: Y.encodeStateAsUpdate(d), delta: JSON.stringify(t.toDelta()), text: t.toString() })
+  }
+  add('empty', () => {})
+  add('plain text', t => t.insert(0, 'hello world'))
+  add('bold range', t => { t.insert(0, 'hello world'); t.format(0, 5, { bold: true }) })
+  add('insert with attributes', t => t.insert(0, 'abc', { bold: true, italic: true }))
+  add('attribute key order', t => t.insert(0, 'abc', { zeta: 1, alpha: 2, mid: 3 }))
+  add('overlapping bold and italic', t => {
+    t.insert(0, 'abcdefghij')
+    t.format(0, 6, { bold: true })
+    t.format(3, 6, { italic: true })
+  })
+  add('remove an attribute with null', t => {
+    t.insert(0, 'abcdefgh', { bold: true })
+    t.format(2, 3, { bold: null })
+  })
+  add('object, array, number and string values', t => {
+    t.insert(0, 'link text', { link: { href: 'https://example.com', rel: 'nofollow' } })
+    t.insert(9, ' and more', { color: '#ff0000', size: 12, tags: ['a', 'b'], ratio: 1.5 })
+  })
+  add('embeds with and without attributes', t => {
+    t.insert(0, 'a')
+    t.insertEmbed(1, { image: 'x.png', width: 100 })
+    t.insertEmbed(2, { video: 'y.mp4' }, { bold: true })
+    t.insert(3, 'b', { italic: true })
+  })
+  add('deleted text inside a formatted run', t => {
+    t.insert(0, 'abcdefghij', { bold: true })
+    t.delete(3, 4)
+    t.insert(3, 'XY')
+  })
+  add('unicode text with attributes', t => {
+    t.insert(0, '你好😀', { bold: true })
+    t.insert(4, 'é🎉', { 'font-size': 14 })
+  })
+  add('format that spans text inserted later', t => {
+    t.insert(0, 'abcdef')
+    t.format(1, 3, { underline: true })
+    t.insert(2, 'ZZ')
+    t.insert(0, 'start ')
+  })
+  add('two clients format concurrently', (t, d) => {
+    t.insert(0, 'shared text here')
+    const d2 = newDoc(2)
+    Y.applyUpdate(d2, Y.encodeStateAsUpdate(d))
+    const t2 = d2.getText('t')
+    t.format(0, 6, { bold: true })
+    t2.format(3, 9, { bold: true, italic: true })
+    t2.insert(0, '>> ', { color: 'red' })
+    Y.applyUpdate(d, Y.encodeStateAsUpdate(d2))
+  })
+  return out
+}
+
+const genRichDelta = () => {
+  const cases = richDeltaScenarios()
+  let mbt = '\n///|\nlet rich_delta_cases : Array[(String, String, String, String)] = [\n'
+  for (const c of cases) {
+    mbt += `  (${mbtString(c.name)}, "${hex(c.update)}", ${mbtString(c.delta)}, ${mbtString(c.text)}),\n`
+  }
+  mbt += ']\n'
+  writeFixture('rich_delta', 'tests', cases.map(c => ({ name: c.name, update: hex(c.update), delta: JSON.parse(c.delta), text: c.text })), mbt)
+}
+
 genLib0()
 genUpdates()
 genInterop()
@@ -980,4 +1054,5 @@ genEdge()
 genPreserve()
 genArrays()
 genProtocol()
+genRichDelta()
 genExportBase()

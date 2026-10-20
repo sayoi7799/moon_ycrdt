@@ -2,15 +2,28 @@
 package "sayoi7799/moon_ycrdt/types"
 
 import {
+  "moonbitlang/core/debug",
   "sayoi7799/moon_ycrdt/doc",
   "sayoi7799/moon_ycrdt/lib0",
 }
 
 // Values
+pub fn delta_from_json(Json) -> Array[DeltaOp] raise @lib0.DecodeError
+
+pub fn delta_to_json(Array[DeltaOp]) -> Json
 
 // Errors
 
 // Types and methods
+pub(all) enum DeltaOp {
+  Insert(@lib0.Any, Array[(String, @lib0.Any)])
+  Retain(Int32, Array[(String, @lib0.Any)])
+  Delete(Int32)
+} derive(Eq, @debug.Debug)
+pub fn DeltaOp::equal(Self, Self) -> Bool
+pub fn DeltaOp::not_equal(Self, Self) -> Bool
+pub impl ToJson for DeltaOp
+
 pub struct Text {
   doc : @doc.Doc
   ty : @doc.YType
@@ -19,6 +32,7 @@ pub fn Text::delete(Self, Int32, Int32) -> Unit
 pub fn Text::insert(Self, Int32, String) -> Unit
 pub fn Text::length(Self) -> Int32
 pub fn Text::new(@doc.Doc, String) -> Self
+pub fn Text::to_delta(Self) -> Array[DeltaOp] raise @lib0.DecodeError
 pub fn Text::to_string(Self) -> String
 pub impl Show for Text
 
