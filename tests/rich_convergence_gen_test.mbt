@@ -5,6 +5,7 @@ fn rich_convergence_case_1() -> RichCase {
   {
     name: "seed 1",
     clients: [5U, 3000169563U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -204,6 +205,7 @@ fn rich_convergence_case_2() -> RichCase {
   {
     name: "seed 2",
     clients: [3155486668U, 3856296529U, 2722817502U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -539,6 +541,7 @@ fn rich_convergence_case_3() -> RichCase {
   {
     name: "seed 3",
     clients: [1U, 4U, 3U, 1323909174U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -782,6 +785,7 @@ fn rich_convergence_case_4() -> RichCase {
   {
     name: "seed 4",
     clients: [3029761128U, 2U, 3U],
+    late_type: false,
     ops: [
       RIns(2, 0, "Z", None, ["0101030004010174015a00"], "[{\"insert\":\"Z\"}]"),
       RIns(
@@ -1034,6 +1038,7 @@ fn rich_convergence_case_5() -> RichCase {
   {
     name: "seed 5",
     clients: [145796705U, 3503544687U, 724157230U, 4U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -1391,6 +1396,7 @@ fn rich_convergence_case_6() -> RichCase {
   {
     name: "seed 6",
     clients: [1U, 1299533839U, 2090642366U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -1603,6 +1609,7 @@ fn rich_convergence_case_7() -> RichCase {
   {
     name: "seed 7",
     clients: [5U, 4U, 808936520U, 774146431U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -2063,6 +2070,7 @@ fn rich_convergence_case_8() -> RichCase {
   {
     name: "seed 8",
     clients: [1243714714U, 3U, 5U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -2272,6 +2280,7 @@ fn rich_convergence_case_9() -> RichCase {
   {
     name: "seed 9",
     clients: [4U, 1U],
+    late_type: false,
     ops: [
       RIns(0, 0, "Z", None, ["0101040004010174015a00"], "[{\"insert\":\"Z\"}]"),
       RIns(0, 1, "Z", None, ["01010401840400015a00"], "[{\"insert\":\"ZZ\"}]"),
@@ -2405,6 +2414,7 @@ fn rich_convergence_case_10() -> RichCase {
   {
     name: "seed 10",
     clients: [4U, 1186446514U, 2936335137U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -2636,6 +2646,7 @@ fn rich_convergence_case_11() -> RichCase {
   {
     name: "seed 11",
     clients: [1U, 3738075846U, 3277325669U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -2937,6 +2948,7 @@ fn rich_convergence_case_12() -> RichCase {
   {
     name: "seed 12",
     clients: [2U, 554503258U, 1335365409U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -3131,6 +3143,7 @@ fn rich_convergence_case_13() -> RichCase {
   {
     name: "seed 13",
     clients: [1495160362U, 1U, 3U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -3555,6 +3568,7 @@ fn rich_convergence_case_14() -> RichCase {
   {
     name: "seed 14",
     clients: [3267929871U, 1440698155U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -3806,6 +3820,7 @@ fn rich_convergence_case_15() -> RichCase {
   {
     name: "seed 15",
     clients: [2U, 5U, 4U, 3U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -4115,6 +4130,7 @@ fn rich_convergence_case_16() -> RichCase {
   {
     name: "seed 16",
     clients: [294394050U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -4275,6 +4291,7 @@ fn rich_convergence_case_17() -> RichCase {
   {
     name: "seed 17",
     clients: [3U, 2313752712U, 5U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -4424,6 +4441,7 @@ fn rich_convergence_case_18() -> RichCase {
   {
     name: "seed 18",
     clients: [3399680708U, 5U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -4717,6 +4735,7 @@ fn rich_convergence_case_19() -> RichCase {
   {
     name: "seed 19",
     clients: [1609283624U, 2703357827U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -4983,6 +5002,7 @@ fn rich_convergence_case_20() -> RichCase {
   {
     name: "seed 20",
     clients: [5U, 880729888U, 3U, 141473716U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -5223,6 +5243,7 @@ fn rich_convergence_case_21() -> RichCase {
   {
     name: "seed 21",
     clients: [5U, 3288614814U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -5422,6 +5443,7 @@ fn rich_convergence_case_22() -> RichCase {
   {
     name: "seed 22",
     clients: [2404930224U, 5U, 2U, 4U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -5640,6 +5662,7 @@ fn rich_convergence_case_23() -> RichCase {
   {
     name: "seed 23",
     clients: [2287931062U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -5904,6 +5927,7 @@ fn rich_convergence_case_24() -> RichCase {
   {
     name: "seed 24",
     clients: [2U, 2217334372U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -6164,6 +6188,7 @@ fn rich_convergence_case_25() -> RichCase {
   {
     name: "seed 25",
     clients: [4281683449U, 1U, 23400017U, 1965384269U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -6409,6 +6434,7 @@ fn rich_convergence_case_26() -> RichCase {
   {
     name: "seed 26",
     clients: [3966522645U, 4U, 1047530930U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -6657,6 +6683,7 @@ fn rich_convergence_case_27() -> RichCase {
   {
     name: "seed 27",
     clients: [551762274U, 1763502912U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -6875,6 +6902,7 @@ fn rich_convergence_case_28() -> RichCase {
   {
     name: "seed 28",
     clients: [1U, 52075034U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -7135,6 +7163,7 @@ fn rich_convergence_case_29() -> RichCase {
   {
     name: "seed 29",
     clients: [3U, 2U, 2489422099U, 1U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -7448,6 +7477,7 @@ fn rich_convergence_case_30() -> RichCase {
   {
     name: "seed 30",
     clients: [1U, 2U, 1524280151U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -7657,6 +7687,7 @@ fn rich_convergence_case_31() -> RichCase {
   {
     name: "seed 31",
     clients: [2344081946U, 1U, 951188814U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -7843,6 +7874,7 @@ fn rich_convergence_case_32() -> RichCase {
   {
     name: "seed 32",
     clients: [442405341U, 3U, 2037821700U, 1385942850U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -8049,6 +8081,7 @@ fn rich_convergence_case_33() -> RichCase {
   {
     name: "seed 33",
     clients: [3U, 621284842U, 756053255U, 2479212196U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -8308,6 +8341,7 @@ fn rich_convergence_case_34() -> RichCase {
   {
     name: "seed 34",
     clients: [3206737516U, 837048855U, 3U, 4U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -8615,6 +8649,7 @@ fn rich_convergence_case_35() -> RichCase {
   {
     name: "seed 35",
     clients: [2U, 5U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -8881,6 +8916,7 @@ fn rich_convergence_case_36() -> RichCase {
   {
     name: "seed 36",
     clients: [1426374750U, 2029284644U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -9145,6 +9181,7 @@ fn rich_convergence_case_37() -> RichCase {
   {
     name: "seed 37",
     clients: [1037951166U, 477762393U, 1539263654U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -9324,6 +9361,7 @@ fn rich_convergence_case_38() -> RichCase {
   {
     name: "seed 38",
     clients: [2211225486U, 4U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -9626,6 +9664,7 @@ fn rich_convergence_case_39() -> RichCase {
   {
     name: "seed 39",
     clients: [147627308U, 2499300091U, 4U, 1U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -9854,6 +9893,7 @@ fn rich_convergence_case_40() -> RichCase {
   {
     name: "seed 40",
     clients: [2U, 3U, 4010411164U, 1077799819U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -10057,6 +10097,7 @@ fn rich_convergence_case_41() -> RichCase {
   {
     name: "seed 41",
     clients: [1U, 3U, 4224879576U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -10321,6 +10362,7 @@ fn rich_convergence_case_42() -> RichCase {
   {
     name: "seed 42",
     clients: [3153257734U, 4178296885U, 3147531056U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -10492,6 +10534,7 @@ fn rich_convergence_case_43() -> RichCase {
   {
     name: "seed 43",
     clients: [3483912528U, 586205753U, 2U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -10799,6 +10842,7 @@ fn rich_convergence_case_44() -> RichCase {
   {
     name: "seed 44",
     clients: [2863730247U, 2252117553U, 151500130U, 3U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -11070,6 +11114,7 @@ fn rich_convergence_case_45() -> RichCase {
   {
     name: "seed 45",
     clients: [4U, 3864882223U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -11284,6 +11329,7 @@ fn rich_convergence_case_46() -> RichCase {
   {
     name: "seed 46",
     clients: [944307226U, 3774911734U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -11527,6 +11573,7 @@ fn rich_convergence_case_47() -> RichCase {
   {
     name: "seed 47",
     clients: [3988922130U, 2U, 705877360U, 4U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -11884,6 +11931,7 @@ fn rich_convergence_case_48() -> RichCase {
   {
     name: "seed 48",
     clients: [5U, 1U],
+    late_type: false,
     ops: [
       RIns(0, 0, "a", None, ["0101050004010174016100"], "[{\"insert\":\"a\"}]"),
       RFmt(0, 0, 1, [("color", @lib0.Any::Null)], [], "[{\"insert\":\"a\"}]"),
@@ -12108,6 +12156,7 @@ fn rich_convergence_case_49() -> RichCase {
   {
     name: "seed 49",
     clients: [4U, 2531161074U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -12272,6 +12321,7 @@ fn rich_convergence_case_50() -> RichCase {
   {
     name: "seed 50",
     clients: [3980190792U, 4U, 598651589U, 3U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -12586,6 +12636,7 @@ fn rich_convergence_case_51() -> RichCase {
   {
     name: "seed 51",
     clients: [4179125248U, 2U, 5U, 1449177901U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -12823,6 +12874,7 @@ fn rich_convergence_case_52() -> RichCase {
   {
     name: "seed 52",
     clients: [4U, 1424213589U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -13057,6 +13109,7 @@ fn rich_convergence_case_53() -> RichCase {
   {
     name: "seed 53",
     clients: [2727506895U, 1997567965U, 975551094U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -13265,6 +13318,7 @@ fn rich_convergence_case_54() -> RichCase {
   {
     name: "seed 54",
     clients: [2056571732U, 1207565329U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -13499,6 +13553,7 @@ fn rich_convergence_case_55() -> RichCase {
   {
     name: "seed 55",
     clients: [3U, 2575897931U, 1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -13888,6 +13943,7 @@ fn rich_convergence_case_56() -> RichCase {
   {
     name: "seed 56",
     clients: [2420269999U, 4U, 4170548093U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -14228,6 +14284,7 @@ fn rich_convergence_case_57() -> RichCase {
   {
     name: "seed 57",
     clients: [5U, 4U, 1U, 1876800859U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -14513,6 +14570,7 @@ fn rich_convergence_case_58() -> RichCase {
   {
     name: "seed 58",
     clients: [4U, 1251189894U, 1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -14782,6 +14840,7 @@ fn rich_convergence_case_59() -> RichCase {
   {
     name: "seed 59",
     clients: [3638285782U, 2487232588U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -15001,6 +15060,7 @@ fn rich_convergence_case_60() -> RichCase {
   {
     name: "seed 60",
     clients: [5U, 2573646022U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -15152,6 +15212,7 @@ fn rich_convergence_case_61() -> RichCase {
   {
     name: "seed 61",
     clients: [1U, 1509317850U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -15448,6 +15509,7 @@ fn rich_convergence_case_62() -> RichCase {
   {
     name: "seed 62",
     clients: [1U, 5U, 1059518533U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -15757,6 +15819,7 @@ fn rich_convergence_case_63() -> RichCase {
   {
     name: "seed 63",
     clients: [5U, 4U, 2059162150U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -16086,6 +16149,7 @@ fn rich_convergence_case_64() -> RichCase {
   {
     name: "seed 64",
     clients: [3169169023U, 602714669U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -16307,6 +16371,7 @@ fn rich_convergence_case_65() -> RichCase {
   {
     name: "seed 65",
     clients: [2612256059U, 1270246889U, 2363072887U, 2019592220U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -16592,6 +16657,7 @@ fn rich_convergence_case_66() -> RichCase {
   {
     name: "seed 66",
     clients: [1545433249U, 864772501U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -16893,6 +16959,7 @@ fn rich_convergence_case_67() -> RichCase {
   {
     name: "seed 67",
     clients: [5U, 3U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -17159,6 +17226,7 @@ fn rich_convergence_case_68() -> RichCase {
   {
     name: "seed 68",
     clients: [3229793208U, 1U, 4U, 3741327781U],
+    late_type: false,
     ops: [
       RIns(1, 0, "Z", None, ["0101010004010174015a00"], "[{\"insert\":\"Z\"}]"),
       RIns(
@@ -17556,6 +17624,7 @@ fn rich_convergence_case_69() -> RichCase {
   {
     name: "seed 69",
     clients: [2U, 3U],
+    late_type: false,
     ops: [
       RIns(0, 0, "a", None, ["0101020004010174016100"], "[{\"insert\":\"a\"}]"),
       RSync(0, 1, [0], [], "[{\"insert\":\"a\"}]"),
@@ -17717,6 +17786,7 @@ fn rich_convergence_case_70() -> RichCase {
   {
     name: "seed 70",
     clients: [4179016032U, 2034749761U, 1062960716U, 497796821U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -18035,6 +18105,7 @@ fn rich_convergence_case_71() -> RichCase {
   {
     name: "seed 71",
     clients: [5U, 3529131478U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -18175,6 +18246,7 @@ fn rich_convergence_case_72() -> RichCase {
   {
     name: "seed 72",
     clients: [5U, 2100361322U, 4U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -18350,6 +18422,7 @@ fn rich_convergence_case_73() -> RichCase {
   {
     name: "seed 73",
     clients: [241216202U, 2710131693U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -18591,6 +18664,7 @@ fn rich_convergence_case_74() -> RichCase {
   {
     name: "seed 74",
     clients: [3U, 1905615025U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -18817,6 +18891,7 @@ fn rich_convergence_case_75() -> RichCase {
   {
     name: "seed 75",
     clients: [598425475U, 4U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -19039,6 +19114,7 @@ fn rich_convergence_case_76() -> RichCase {
   {
     name: "seed 76",
     clients: [5U, 3U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -19240,6 +19316,7 @@ fn rich_convergence_case_77() -> RichCase {
   {
     name: "seed 77",
     clients: [2820655399U, 1536688779U, 823643562U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -19422,6 +19499,7 @@ fn rich_convergence_case_78() -> RichCase {
   {
     name: "seed 78",
     clients: [3257329361U, 4181574173U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -19613,6 +19691,7 @@ fn rich_convergence_case_79() -> RichCase {
   {
     name: "seed 79",
     clients: [2U, 2176868171U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -19782,6 +19861,7 @@ fn rich_convergence_case_80() -> RichCase {
   {
     name: "seed 80",
     clients: [717314989U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -20070,6 +20150,7 @@ fn rich_convergence_case_81() -> RichCase {
   {
     name: "seed 81",
     clients: [59098259U, 2595939123U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -20276,6 +20357,7 @@ fn rich_convergence_case_82() -> RichCase {
   {
     name: "seed 82",
     clients: [5U, 1U, 2321282229U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -20460,6 +20542,7 @@ fn rich_convergence_case_83() -> RichCase {
   {
     name: "seed 83",
     clients: [4U, 3U, 1U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -20721,6 +20804,7 @@ fn rich_convergence_case_84() -> RichCase {
   {
     name: "seed 84",
     clients: [2U, 3U, 739598717U, 1759921211U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -20948,6 +21032,7 @@ fn rich_convergence_case_85() -> RichCase {
   {
     name: "seed 85",
     clients: [1U, 3604846526U],
+    late_type: false,
     ops: [
       RIns(0, 0, "Z", None, ["0101010004010174015a00"], "[{\"insert\":\"Z\"}]"),
       RIns(
@@ -21152,6 +21237,7 @@ fn rich_convergence_case_86() -> RichCase {
   {
     name: "seed 86",
     clients: [3U, 4U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -21436,6 +21522,7 @@ fn rich_convergence_case_87() -> RichCase {
   {
     name: "seed 87",
     clients: [253773141U, 4U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -21723,6 +21810,7 @@ fn rich_convergence_case_88() -> RichCase {
   {
     name: "seed 88",
     clients: [2438167473U, 4U, 2038275961U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -22005,6 +22093,7 @@ fn rich_convergence_case_89() -> RichCase {
   {
     name: "seed 89",
     clients: [1249517250U, 949080844U, 506493819U, 5U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -22228,6 +22317,7 @@ fn rich_convergence_case_90() -> RichCase {
   {
     name: "seed 90",
     clients: [3443685970U, 1719932107U, 2956425707U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -22560,6 +22650,7 @@ fn rich_convergence_case_91() -> RichCase {
   {
     name: "seed 91",
     clients: [3986220658U, 5U, 762378360U, 2022385203U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -22777,6 +22868,7 @@ fn rich_convergence_case_92() -> RichCase {
   {
     name: "seed 92",
     clients: [1U, 4236971264U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -23071,6 +23163,7 @@ fn rich_convergence_case_93() -> RichCase {
   {
     name: "seed 93",
     clients: [1434983140U, 3963350869U, 4U, 3355192615U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -23505,6 +23598,7 @@ fn rich_convergence_case_94() -> RichCase {
   {
     name: "seed 94",
     clients: [301890160U, 228108507U, 3938443237U, 3635496132U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -23778,6 +23872,7 @@ fn rich_convergence_case_95() -> RichCase {
   {
     name: "seed 95",
     clients: [4U, 1073997247U, 1182443356U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -24141,6 +24236,7 @@ fn rich_convergence_case_96() -> RichCase {
   {
     name: "seed 96",
     clients: [620779898U, 2U, 3U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -24419,6 +24515,7 @@ fn rich_convergence_case_97() -> RichCase {
   {
     name: "seed 97",
     clients: [1U, 321255021U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -24626,6 +24723,7 @@ fn rich_convergence_case_98() -> RichCase {
   {
     name: "seed 98",
     clients: [2U, 274807779U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -24778,6 +24876,7 @@ fn rich_convergence_case_99() -> RichCase {
   {
     name: "seed 99",
     clients: [1509735285U, 1391461857U, 4072544143U, 3398546770U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -25089,6 +25188,7 @@ fn rich_convergence_case_100() -> RichCase {
   {
     name: "seed 100",
     clients: [3369132283U, 5U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -25211,6 +25311,7 @@ fn rich_convergence_case_101() -> RichCase {
   {
     name: "seed 101",
     clients: [710135649U, 4U, 4263730236U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -25470,6 +25571,7 @@ fn rich_convergence_case_102() -> RichCase {
   {
     name: "seed 102",
     clients: [1835806940U, 3861108057U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -25627,6 +25729,7 @@ fn rich_convergence_case_103() -> RichCase {
   {
     name: "seed 103",
     clients: [5U, 1U, 3U, 1744429350U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -25881,6 +25984,7 @@ fn rich_convergence_case_104() -> RichCase {
   {
     name: "seed 104",
     clients: [1819705148U, 1073791624U, 5U, 4U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -26296,6 +26400,7 @@ fn rich_convergence_case_105() -> RichCase {
   {
     name: "seed 105",
     clients: [3160769555U, 2807127842U, 561662457U, 3361384746U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -26618,6 +26723,7 @@ fn rich_convergence_case_106() -> RichCase {
   {
     name: "seed 106",
     clients: [3U, 4224063903U, 4U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -26894,6 +27000,7 @@ fn rich_convergence_case_107() -> RichCase {
   {
     name: "seed 107",
     clients: [1589509660U, 3U, 416233657U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -27195,6 +27302,7 @@ fn rich_convergence_case_108() -> RichCase {
   {
     name: "seed 108",
     clients: [1643344373U, 1592577366U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -27450,6 +27558,7 @@ fn rich_convergence_case_109() -> RichCase {
   {
     name: "seed 109",
     clients: [2U, 3813230021U, 3190310666U, 929690018U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -27763,6 +27872,7 @@ fn rich_convergence_case_110() -> RichCase {
   {
     name: "seed 110",
     clients: [3U, 2689514777U, 2766017878U, 3184890489U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -28091,6 +28201,7 @@ fn rich_convergence_case_111() -> RichCase {
   {
     name: "seed 111",
     clients: [2413085026U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -28281,6 +28392,7 @@ fn rich_convergence_case_112() -> RichCase {
   {
     name: "seed 112",
     clients: [1351098071U, 2U, 1518050763U, 4U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -28625,6 +28737,7 @@ fn rich_convergence_case_113() -> RichCase {
   {
     name: "seed 113",
     clients: [1082556796U, 843809593U, 1800510433U, 4075455128U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -28897,6 +29010,7 @@ fn rich_convergence_case_114() -> RichCase {
   {
     name: "seed 114",
     clients: [1U, 1868459016U],
+    late_type: false,
     ops: [
       RIns(0, 0, "Z", None, ["0101010004010174015a00"], "[{\"insert\":\"Z\"}]"),
       RIns(
@@ -29110,6 +29224,7 @@ fn rich_convergence_case_115() -> RichCase {
   {
     name: "seed 115",
     clients: [1U, 4280466437U, 3007449010U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -29451,6 +29566,7 @@ fn rich_convergence_case_116() -> RichCase {
   {
     name: "seed 116",
     clients: [1963241645U, 5U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -29634,6 +29750,7 @@ fn rich_convergence_case_117() -> RichCase {
   {
     name: "seed 117",
     clients: [5U, 951324830U, 3U, 2862046872U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -29928,6 +30045,7 @@ fn rich_convergence_case_118() -> RichCase {
   {
     name: "seed 118",
     clients: [4108038328U, 3U, 3701699274U, 3639550375U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -30187,6 +30305,7 @@ fn rich_convergence_case_119() -> RichCase {
   {
     name: "seed 119",
     clients: [2U, 1657332973U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -30476,6 +30595,7 @@ fn rich_convergence_case_120() -> RichCase {
   {
     name: "seed 120",
     clients: [4245129172U, 1789205718U, 4U, 3U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -30778,6 +30898,7 @@ fn rich_convergence_case_121() -> RichCase {
   {
     name: "seed 121",
     clients: [2U, 3506350728U, 1U, 3U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -31016,6 +31137,7 @@ fn rich_convergence_case_122() -> RichCase {
   {
     name: "seed 122",
     clients: [3428474619U, 3428250508U, 2U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -31326,6 +31448,7 @@ fn rich_convergence_case_123() -> RichCase {
   {
     name: "seed 123",
     clients: [4U, 3U, 1U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -31617,6 +31740,7 @@ fn rich_convergence_case_124() -> RichCase {
   {
     name: "seed 124",
     clients: [4234465695U, 1996827612U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -31955,6 +32079,7 @@ fn rich_convergence_case_125() -> RichCase {
   {
     name: "seed 125",
     clients: [1457381534U, 471360074U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -32115,6 +32240,7 @@ fn rich_convergence_case_126() -> RichCase {
   {
     name: "seed 126",
     clients: [2U, 3653405035U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -32334,6 +32460,7 @@ fn rich_convergence_case_127() -> RichCase {
   {
     name: "seed 127",
     clients: [1955307539U, 2594792274U, 4U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -32562,6 +32689,7 @@ fn rich_convergence_case_128() -> RichCase {
   {
     name: "seed 128",
     clients: [2330045339U, 3U, 3872820892U, 3321604021U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -32893,6 +33021,7 @@ fn rich_convergence_case_129() -> RichCase {
   {
     name: "seed 129",
     clients: [2077405556U, 2010286084U, 2960744337U, 4U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -33342,6 +33471,7 @@ fn rich_convergence_case_130() -> RichCase {
   {
     name: "seed 130",
     clients: [3883524114U, 2833467539U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -33608,6 +33738,7 @@ fn rich_convergence_case_131() -> RichCase {
   {
     name: "seed 131",
     clients: [5U, 1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -33895,6 +34026,7 @@ fn rich_convergence_case_132() -> RichCase {
   {
     name: "seed 132",
     clients: [4282153854U, 4137875621U, 1U, 566044935U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -34203,6 +34335,7 @@ fn rich_convergence_case_133() -> RichCase {
   {
     name: "seed 133",
     clients: [1987744521U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -34455,6 +34588,7 @@ fn rich_convergence_case_134() -> RichCase {
   {
     name: "seed 134",
     clients: [4U, 3841996279U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -34701,6 +34835,7 @@ fn rich_convergence_case_135() -> RichCase {
   {
     name: "seed 135",
     clients: [1974707497U, 2300155617U, 407279653U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -34953,6 +35088,7 @@ fn rich_convergence_case_136() -> RichCase {
   {
     name: "seed 136",
     clients: [3U, 2052851554U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -35175,6 +35311,7 @@ fn rich_convergence_case_137() -> RichCase {
   {
     name: "seed 137",
     clients: [3U, 4U, 1664532322U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -35507,6 +35644,7 @@ fn rich_convergence_case_138() -> RichCase {
   {
     name: "seed 138",
     clients: [2203737874U, 168211832U, 3028427269U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -35803,6 +35941,7 @@ fn rich_convergence_case_139() -> RichCase {
   {
     name: "seed 139",
     clients: [1U, 2U, 2621329311U, 4028886354U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -36105,6 +36244,7 @@ fn rich_convergence_case_140() -> RichCase {
   {
     name: "seed 140",
     clients: [1384450047U, 5U, 3U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -36514,6 +36654,7 @@ fn rich_convergence_case_141() -> RichCase {
   {
     name: "seed 141",
     clients: [2533978774U, 4U, 1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -36717,6 +36858,7 @@ fn rich_convergence_case_142() -> RichCase {
   {
     name: "seed 142",
     clients: [2344567022U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -36858,6 +37000,7 @@ fn rich_convergence_case_143() -> RichCase {
   {
     name: "seed 143",
     clients: [334190241U, 4U, 2603910309U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -37188,6 +37331,7 @@ fn rich_convergence_case_144() -> RichCase {
   {
     name: "seed 144",
     clients: [5U, 4U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -37431,6 +37575,7 @@ fn rich_convergence_case_145() -> RichCase {
   {
     name: "seed 145",
     clients: [3U, 2512013024U, 3498103180U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -37735,6 +37880,7 @@ fn rich_convergence_case_146() -> RichCase {
   {
     name: "seed 146",
     clients: [1426221125U, 1U, 749141969U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -38012,6 +38158,7 @@ fn rich_convergence_case_147() -> RichCase {
   {
     name: "seed 147",
     clients: [2U, 352984673U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -38234,6 +38381,7 @@ fn rich_convergence_case_148() -> RichCase {
   {
     name: "seed 148",
     clients: [2U, 4234076855U, 2149395371U, 1456886368U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -38472,6 +38620,7 @@ fn rich_convergence_case_149() -> RichCase {
   {
     name: "seed 149",
     clients: [3U, 4U, 2567229968U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -38702,6 +38851,7 @@ fn rich_convergence_case_150() -> RichCase {
   {
     name: "seed 150",
     clients: [2966123917U, 3604060608U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -38934,6 +39084,7 @@ fn rich_convergence_case_151() -> RichCase {
   {
     name: "seed 151",
     clients: [3638419312U, 331134352U, 262491798U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -39185,6 +39336,7 @@ fn rich_convergence_case_152() -> RichCase {
   {
     name: "seed 152",
     clients: [2U, 4U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -39369,6 +39521,7 @@ fn rich_convergence_case_153() -> RichCase {
   {
     name: "seed 153",
     clients: [3198103682U, 2412668265U, 3905316336U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -39627,6 +39780,7 @@ fn rich_convergence_case_154() -> RichCase {
   {
     name: "seed 154",
     clients: [647584679U, 1U, 4U],
+    late_type: false,
     ops: [
       RIns(1, 0, "a", None, ["0101010004010174016100"], "[{\"insert\":\"a\"}]"),
       RIns(
@@ -39818,6 +39972,7 @@ fn rich_convergence_case_155() -> RichCase {
   {
     name: "seed 155",
     clients: [2U, 2769697638U, 1U, 3968327699U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -40055,6 +40210,7 @@ fn rich_convergence_case_156() -> RichCase {
   {
     name: "seed 156",
     clients: [2U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -40290,6 +40446,7 @@ fn rich_convergence_case_157() -> RichCase {
   {
     name: "seed 157",
     clients: [645664237U, 5U, 1835927987U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -40611,6 +40768,7 @@ fn rich_convergence_case_158() -> RichCase {
   {
     name: "seed 158",
     clients: [2862598164U, 4U, 254197367U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -40911,6 +41069,7 @@ fn rich_convergence_case_159() -> RichCase {
   {
     name: "seed 159",
     clients: [4225536230U, 3592112027U, 736494172U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -41180,6 +41339,7 @@ fn rich_convergence_case_160() -> RichCase {
   {
     name: "seed 160",
     clients: [3U, 2318928104U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -41413,6 +41573,7 @@ fn rich_convergence_case_161() -> RichCase {
   {
     name: "seed 161",
     clients: [1435863806U, 4041671849U, 3219337767U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -41748,6 +41909,7 @@ fn rich_convergence_case_162() -> RichCase {
   {
     name: "seed 162",
     clients: [4U, 522928867U, 962158342U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -41978,6 +42140,7 @@ fn rich_convergence_case_163() -> RichCase {
   {
     name: "seed 163",
     clients: [3U, 2U, 1U, 2057022656U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -42216,6 +42379,7 @@ fn rich_convergence_case_164() -> RichCase {
   {
     name: "seed 164",
     clients: [1U, 2U, 4U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -42414,6 +42578,7 @@ fn rich_convergence_case_165() -> RichCase {
   {
     name: "seed 165",
     clients: [4014621114U, 5U, 3U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -42757,6 +42922,7 @@ fn rich_convergence_case_166() -> RichCase {
   {
     name: "seed 166",
     clients: [3475962390U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -43031,6 +43197,7 @@ fn rich_convergence_case_167() -> RichCase {
   {
     name: "seed 167",
     clients: [2718938026U, 1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -43156,6 +43323,7 @@ fn rich_convergence_case_168() -> RichCase {
   {
     name: "seed 168",
     clients: [3U, 5U, 3289279939U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -43414,6 +43582,7 @@ fn rich_convergence_case_169() -> RichCase {
   {
     name: "seed 169",
     clients: [4U, 5U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -43631,6 +43800,7 @@ fn rich_convergence_case_170() -> RichCase {
   {
     name: "seed 170",
     clients: [1665096739U, 2354790352U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -43797,6 +43967,7 @@ fn rich_convergence_case_171() -> RichCase {
   {
     name: "seed 171",
     clients: [4U, 1787940659U, 3U, 1193654252U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -44081,6 +44252,7 @@ fn rich_convergence_case_172() -> RichCase {
   {
     name: "seed 172",
     clients: [1U, 2U, 412813400U, 1866527075U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -44554,6 +44726,7 @@ fn rich_convergence_case_173() -> RichCase {
   {
     name: "seed 173",
     clients: [3U, 5U, 926724411U, 1722783524U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -44801,6 +44974,7 @@ fn rich_convergence_case_174() -> RichCase {
   {
     name: "seed 174",
     clients: [2757713575U, 1U, 2858843886U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -45064,6 +45238,7 @@ fn rich_convergence_case_175() -> RichCase {
   {
     name: "seed 175",
     clients: [3U, 2620270637U, 4U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -45379,6 +45554,7 @@ fn rich_convergence_case_176() -> RichCase {
   {
     name: "seed 176",
     clients: [5U, 3U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -45628,6 +45804,7 @@ fn rich_convergence_case_177() -> RichCase {
   {
     name: "seed 177",
     clients: [1U, 3U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -45803,6 +45980,7 @@ fn rich_convergence_case_178() -> RichCase {
   {
     name: "seed 178",
     clients: [3U, 5U, 51897121U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -46115,6 +46293,7 @@ fn rich_convergence_case_179() -> RichCase {
   {
     name: "seed 179",
     clients: [2U, 4U, 2149849556U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -46389,6 +46568,7 @@ fn rich_convergence_case_180() -> RichCase {
   {
     name: "seed 180",
     clients: [2535385299U, 2U, 5U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -46745,6 +46925,7 @@ fn rich_convergence_case_181() -> RichCase {
   {
     name: "seed 181",
     clients: [2291195834U, 2642091717U, 2U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -47066,6 +47247,7 @@ fn rich_convergence_case_182() -> RichCase {
   {
     name: "seed 182",
     clients: [1670153219U, 2753874541U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -47283,6 +47465,7 @@ fn rich_convergence_case_183() -> RichCase {
   {
     name: "seed 183",
     clients: [2376952741U, 3U, 643494616U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -47463,6 +47646,7 @@ fn rich_convergence_case_184() -> RichCase {
   {
     name: "seed 184",
     clients: [3961640066U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -47721,6 +47905,7 @@ fn rich_convergence_case_185() -> RichCase {
   {
     name: "seed 185",
     clients: [2258214736U, 3041442146U, 3771176165U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -47900,6 +48085,7 @@ fn rich_convergence_case_186() -> RichCase {
   {
     name: "seed 186",
     clients: [3U, 122265393U, 4U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -48204,6 +48390,7 @@ fn rich_convergence_case_187() -> RichCase {
   {
     name: "seed 187",
     clients: [4U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -48444,6 +48631,7 @@ fn rich_convergence_case_188() -> RichCase {
   {
     name: "seed 188",
     clients: [4U, 2U, 622610321U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -48642,6 +48830,7 @@ fn rich_convergence_case_189() -> RichCase {
   {
     name: "seed 189",
     clients: [3383293931U, 3170243272U, 4U, 1911139132U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -48919,6 +49108,7 @@ fn rich_convergence_case_190() -> RichCase {
   {
     name: "seed 190",
     clients: [1U, 2531767112U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -49108,6 +49298,7 @@ fn rich_convergence_case_191() -> RichCase {
   {
     name: "seed 191",
     clients: [1U, 1452492988U, 507302517U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -49363,6 +49554,7 @@ fn rich_convergence_case_192() -> RichCase {
   {
     name: "seed 192",
     clients: [1U, 5U, 2262637810U, 2859316520U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -49692,6 +49884,7 @@ fn rich_convergence_case_193() -> RichCase {
   {
     name: "seed 193",
     clients: [4U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -49911,6 +50104,7 @@ fn rich_convergence_case_194() -> RichCase {
   {
     name: "seed 194",
     clients: [2U, 1U, 2652640249U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -50023,6 +50217,7 @@ fn rich_convergence_case_195() -> RichCase {
   {
     name: "seed 195",
     clients: [1811490684U, 5U, 2U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -50274,6 +50469,7 @@ fn rich_convergence_case_196() -> RichCase {
   {
     name: "seed 196",
     clients: [3U, 4U, 2929980193U, 1554461118U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -50596,6 +50792,7 @@ fn rich_convergence_case_197() -> RichCase {
   {
     name: "seed 197",
     clients: [3U, 4U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -50873,6 +51070,7 @@ fn rich_convergence_case_198() -> RichCase {
   {
     name: "seed 198",
     clients: [2171515057U, 1U, 5U, 719222354U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -51221,6 +51419,7 @@ fn rich_convergence_case_199() -> RichCase {
   {
     name: "seed 199",
     clients: [3U, 1147583304U, 2693027007U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -51432,6 +51631,7 @@ fn rich_convergence_case_200() -> RichCase {
   {
     name: "seed 200",
     clients: [3U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -51683,6 +51883,7 @@ fn rich_convergence_case_201() -> RichCase {
   {
     name: "seed 201",
     clients: [218013826U, 2024103512U, 2342852942U, 3U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -51993,6 +52194,7 @@ fn rich_convergence_case_202() -> RichCase {
   {
     name: "seed 202",
     clients: [4U, 848415823U, 212044118U, 441371647U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -52369,6 +52571,7 @@ fn rich_convergence_case_203() -> RichCase {
   {
     name: "seed 203",
     clients: [4U, 3431472653U, 4078834052U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -52609,6 +52812,7 @@ fn rich_convergence_case_204() -> RichCase {
   {
     name: "seed 204",
     clients: [1U, 552636727U, 2U, 4026211881U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -52967,6 +53171,7 @@ fn rich_convergence_case_205() -> RichCase {
   {
     name: "seed 205",
     clients: [1724474372U, 5U, 3U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -53099,6 +53304,7 @@ fn rich_convergence_case_206() -> RichCase {
   {
     name: "seed 206",
     clients: [1U, 4118675315U, 3425219405U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -53301,6 +53507,7 @@ fn rich_convergence_case_207() -> RichCase {
   {
     name: "seed 207",
     clients: [5U, 3U, 2866114078U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -53497,6 +53704,7 @@ fn rich_convergence_case_208() -> RichCase {
   {
     name: "seed 208",
     clients: [4U, 1634689128U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -53643,6 +53851,7 @@ fn rich_convergence_case_209() -> RichCase {
   {
     name: "seed 209",
     clients: [3588667033U, 4U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -53788,6 +53997,7 @@ fn rich_convergence_case_210() -> RichCase {
   {
     name: "seed 210",
     clients: [3U, 681569331U, 1911324788U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -54065,6 +54275,7 @@ fn rich_convergence_case_211() -> RichCase {
   {
     name: "seed 211",
     clients: [1U, 2589239319U, 4U, 481895619U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -54292,6 +54503,7 @@ fn rich_convergence_case_212() -> RichCase {
   {
     name: "seed 212",
     clients: [5U, 2548053473U, 3074525223U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -54502,6 +54714,7 @@ fn rich_convergence_case_213() -> RichCase {
   {
     name: "seed 213",
     clients: [760258677U, 1U, 3U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -54713,6 +54926,7 @@ fn rich_convergence_case_214() -> RichCase {
   {
     name: "seed 214",
     clients: [364155431U, 463390489U, 1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -54952,6 +55166,7 @@ fn rich_convergence_case_215() -> RichCase {
   {
     name: "seed 215",
     clients: [4245579782U, 2332097795U, 3U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -55233,6 +55448,7 @@ fn rich_convergence_case_216() -> RichCase {
   {
     name: "seed 216",
     clients: [2566230219U, 1602447707U, 1U, 1503650708U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -55549,6 +55765,7 @@ fn rich_convergence_case_217() -> RichCase {
   {
     name: "seed 217",
     clients: [897756175U, 2U, 3U, 2790029357U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -55804,6 +56021,7 @@ fn rich_convergence_case_218() -> RichCase {
   {
     name: "seed 218",
     clients: [5U, 1083239365U, 995686845U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -55996,6 +56214,7 @@ fn rich_convergence_case_219() -> RichCase {
   {
     name: "seed 219",
     clients: [4091833263U, 60273961U, 4U, 5U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -56166,6 +56385,7 @@ fn rich_convergence_case_220() -> RichCase {
   {
     name: "seed 220",
     clients: [3U, 1U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -56500,6 +56720,7 @@ fn rich_convergence_case_221() -> RichCase {
   {
     name: "seed 221",
     clients: [3U, 1112453173U, 1372122282U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -56769,6 +56990,7 @@ fn rich_convergence_case_222() -> RichCase {
   {
     name: "seed 222",
     clients: [5U, 4U, 1985578413U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -56963,6 +57185,7 @@ fn rich_convergence_case_223() -> RichCase {
   {
     name: "seed 223",
     clients: [1U, 1176690993U, 5U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -57161,6 +57384,7 @@ fn rich_convergence_case_224() -> RichCase {
   {
     name: "seed 224",
     clients: [1360603000U, 3592876624U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -57335,6 +57559,7 @@ fn rich_convergence_case_225() -> RichCase {
   {
     name: "seed 225",
     clients: [343318332U, 2910777516U, 4U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -57600,6 +57825,7 @@ fn rich_convergence_case_226() -> RichCase {
   {
     name: "seed 226",
     clients: [3U, 2172355967U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -57846,6 +58072,7 @@ fn rich_convergence_case_227() -> RichCase {
   {
     name: "seed 227",
     clients: [3U, 2223293644U, 2269051849U, 1U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -58251,6 +58478,7 @@ fn rich_convergence_case_228() -> RichCase {
   {
     name: "seed 228",
     clients: [2859644053U, 3208840124U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -58541,6 +58769,7 @@ fn rich_convergence_case_229() -> RichCase {
   {
     name: "seed 229",
     clients: [3U, 2459226310U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -58693,6 +58922,7 @@ fn rich_convergence_case_230() -> RichCase {
   {
     name: "seed 230",
     clients: [3345522565U, 1049726058U, 3U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -58829,6 +59059,7 @@ fn rich_convergence_case_231() -> RichCase {
   {
     name: "seed 231",
     clients: [5U, 581686206U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -59082,6 +59313,7 @@ fn rich_convergence_case_232() -> RichCase {
   {
     name: "seed 232",
     clients: [4287849362U, 2U, 3U, 4280725581U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -59488,6 +59720,7 @@ fn rich_convergence_case_233() -> RichCase {
   {
     name: "seed 233",
     clients: [1U, 5U, 4U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -59744,6 +59977,7 @@ fn rich_convergence_case_234() -> RichCase {
   {
     name: "seed 234",
     clients: [4U, 1652892718U, 1103932665U, 1402126669U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -60012,6 +60246,7 @@ fn rich_convergence_case_235() -> RichCase {
   {
     name: "seed 235",
     clients: [1891860732U, 1U, 2U, 3587139489U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -60275,6 +60510,7 @@ fn rich_convergence_case_236() -> RichCase {
   {
     name: "seed 236",
     clients: [1U, 1873243145U, 1665642660U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -60487,6 +60723,7 @@ fn rich_convergence_case_237() -> RichCase {
   {
     name: "seed 237",
     clients: [1749654502U, 3U, 3963149388U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -60766,6 +61003,7 @@ fn rich_convergence_case_238() -> RichCase {
   {
     name: "seed 238",
     clients: [5U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -61010,6 +61248,7 @@ fn rich_convergence_case_239() -> RichCase {
   {
     name: "seed 239",
     clients: [3U, 2U, 3280603412U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -61323,6 +61562,7 @@ fn rich_convergence_case_240() -> RichCase {
   {
     name: "seed 240",
     clients: [5U, 90131143U, 4021304099U, 1U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -61655,6 +61895,7 @@ fn rich_convergence_case_241() -> RichCase {
   {
     name: "seed 241",
     clients: [2U, 3U, 2369558770U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -61832,6 +62073,7 @@ fn rich_convergence_case_242() -> RichCase {
   {
     name: "seed 242",
     clients: [3788784735U, 3513037441U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -61953,6 +62195,7 @@ fn rich_convergence_case_243() -> RichCase {
   {
     name: "seed 243",
     clients: [3567270178U, 3615383347U, 3835648925U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -62122,6 +62365,7 @@ fn rich_convergence_case_244() -> RichCase {
   {
     name: "seed 244",
     clients: [3U, 2009601425U, 2U, 617733589U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -62447,6 +62691,7 @@ fn rich_convergence_case_245() -> RichCase {
   {
     name: "seed 245",
     clients: [2408966260U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -62648,6 +62893,7 @@ fn rich_convergence_case_246() -> RichCase {
   {
     name: "seed 246",
     clients: [807882365U, 2901630720U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -62771,6 +63017,7 @@ fn rich_convergence_case_247() -> RichCase {
   {
     name: "seed 247",
     clients: [3406037475U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -62924,6 +63171,7 @@ fn rich_convergence_case_248() -> RichCase {
   {
     name: "seed 248",
     clients: [1338620191U, 4U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -63128,6 +63376,7 @@ fn rich_convergence_case_249() -> RichCase {
   {
     name: "seed 249",
     clients: [5U, 1871794729U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -63294,6 +63543,7 @@ fn rich_convergence_case_250() -> RichCase {
   {
     name: "seed 250",
     clients: [5U, 2998567991U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -63600,6 +63850,7 @@ fn rich_convergence_case_251() -> RichCase {
   {
     name: "seed 251",
     clients: [3292302421U, 1214287854U, 2058610277U, 4148376537U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -63846,6 +64097,7 @@ fn rich_convergence_case_252() -> RichCase {
   {
     name: "seed 252",
     clients: [3434829418U, 3300746058U, 2U, 5U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -64051,6 +64303,7 @@ fn rich_convergence_case_253() -> RichCase {
   {
     name: "seed 253",
     clients: [1U, 3479179663U, 3115359524U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -64267,6 +64520,7 @@ fn rich_convergence_case_254() -> RichCase {
   {
     name: "seed 254",
     clients: [1184663401U, 3U, 1853353308U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -64512,6 +64766,7 @@ fn rich_convergence_case_255() -> RichCase {
   {
     name: "seed 255",
     clients: [508808548U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -64682,6 +64937,7 @@ fn rich_convergence_case_256() -> RichCase {
   {
     name: "seed 256",
     clients: [3359435263U, 2918613217U, 3599783763U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -64931,6 +65187,7 @@ fn rich_convergence_case_257() -> RichCase {
   {
     name: "seed 257",
     clients: [2U, 4U, 1108831782U, 3597461075U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -65203,6 +65460,7 @@ fn rich_convergence_case_258() -> RichCase {
   {
     name: "seed 258",
     clients: [2U, 1174718502U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -65532,6 +65790,7 @@ fn rich_convergence_case_259() -> RichCase {
   {
     name: "seed 259",
     clients: [1U, 2U, 1080490048U],
+    late_type: false,
     ops: [
       RIns(1, 0, "Z", None, ["0101020004010174015a00"], "[{\"insert\":\"Z\"}]"),
       RIns(
@@ -65743,6 +66002,7 @@ fn rich_convergence_case_260() -> RichCase {
   {
     name: "seed 260",
     clients: [2U, 1U, 4U, 526446164U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -65961,6 +66221,7 @@ fn rich_convergence_case_261() -> RichCase {
   {
     name: "seed 261",
     clients: [2U, 3U, 891702536U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -66326,6 +66587,7 @@ fn rich_convergence_case_262() -> RichCase {
   {
     name: "seed 262",
     clients: [1U, 1753478981U],
+    late_type: false,
     ops: [
       RIns(0, 0, "a", None, ["0101010004010174016100"], "[{\"insert\":\"a\"}]"),
       RApply(
@@ -66554,6 +66816,7 @@ fn rich_convergence_case_263() -> RichCase {
   {
     name: "seed 263",
     clients: [1U, 4U, 2U, 3670043483U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -66817,6 +67080,7 @@ fn rich_convergence_case_264() -> RichCase {
   {
     name: "seed 264",
     clients: [1707443741U, 2U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -67068,6 +67332,7 @@ fn rich_convergence_case_265() -> RichCase {
   {
     name: "seed 265",
     clients: [2437869599U, 3U, 2612571123U, 1389910607U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -67400,6 +67665,7 @@ fn rich_convergence_case_266() -> RichCase {
   {
     name: "seed 266",
     clients: [3U, 2734661435U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -67644,6 +67910,7 @@ fn rich_convergence_case_267() -> RichCase {
   {
     name: "seed 267",
     clients: [2511827542U, 5U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -67839,6 +68106,7 @@ fn rich_convergence_case_268() -> RichCase {
   {
     name: "seed 268",
     clients: [2998738356U, 4212531291U, 2535878463U, 1190759540U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -68144,6 +68412,7 @@ fn rich_convergence_case_269() -> RichCase {
   {
     name: "seed 269",
     clients: [5U, 1466073208U, 298101736U, 1894446820U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -68440,6 +68709,7 @@ fn rich_convergence_case_270() -> RichCase {
   {
     name: "seed 270",
     clients: [1452897010U, 5U, 1537727925U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -68639,6 +68909,7 @@ fn rich_convergence_case_271() -> RichCase {
   {
     name: "seed 271",
     clients: [5U, 4U, 2U, 1U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -68916,6 +69187,7 @@ fn rich_convergence_case_272() -> RichCase {
   {
     name: "seed 272",
     clients: [2332740015U, 2U, 4U, 5U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -69331,6 +69603,7 @@ fn rich_convergence_case_273() -> RichCase {
   {
     name: "seed 273",
     clients: [2U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -69447,6 +69720,7 @@ fn rich_convergence_case_274() -> RichCase {
   {
     name: "seed 274",
     clients: [3U, 547549273U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -69608,6 +69882,7 @@ fn rich_convergence_case_275() -> RichCase {
   {
     name: "seed 275",
     clients: [1U, 3U, 816867107U, 5U],
+    late_type: false,
     ops: [
       RIns(0, 0, "a", None, ["0101010004010174016100"], "[{\"insert\":\"a\"}]"),
       RIns(
@@ -69908,6 +70183,7 @@ fn rich_convergence_case_276() -> RichCase {
   {
     name: "seed 276",
     clients: [2U, 1139912407U, 4U, 1U],
+    late_type: false,
     ops: [
       RIns(3, 0, "a", None, ["0101010004010174016100"], "[{\"insert\":\"a\"}]"),
       RIns(
@@ -70094,6 +70370,7 @@ fn rich_convergence_case_277() -> RichCase {
   {
     name: "seed 277",
     clients: [3U, 3600375120U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -70396,6 +70673,7 @@ fn rich_convergence_case_278() -> RichCase {
   {
     name: "seed 278",
     clients: [5U, 3U, 3059917385U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -70670,6 +70948,7 @@ fn rich_convergence_case_279() -> RichCase {
   {
     name: "seed 279",
     clients: [2U, 434583206U],
+    late_type: false,
     ops: [
       RIns(0, 0, "Z", None, ["0101020004010174015a00"], "[{\"insert\":\"Z\"}]"),
       RIns(
@@ -70792,6 +71071,7 @@ fn rich_convergence_case_280() -> RichCase {
   {
     name: "seed 280",
     clients: [2577684163U, 1212617369U, 354811962U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -70905,6 +71185,7 @@ fn rich_convergence_case_281() -> RichCase {
   {
     name: "seed 281",
     clients: [3716685223U, 1920148539U, 2U, 4U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -71133,6 +71414,7 @@ fn rich_convergence_case_282() -> RichCase {
   {
     name: "seed 282",
     clients: [3611612471U, 4U, 3U, 4010652161U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -71575,6 +71857,7 @@ fn rich_convergence_case_283() -> RichCase {
   {
     name: "seed 283",
     clients: [2U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -71817,6 +72100,7 @@ fn rich_convergence_case_284() -> RichCase {
   {
     name: "seed 284",
     clients: [5U, 4U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -72068,6 +72352,7 @@ fn rich_convergence_case_285() -> RichCase {
   {
     name: "seed 285",
     clients: [4U, 3U, 5U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -72279,6 +72564,7 @@ fn rich_convergence_case_286() -> RichCase {
   {
     name: "seed 286",
     clients: [1U, 2596215602U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -72453,6 +72739,7 @@ fn rich_convergence_case_287() -> RichCase {
   {
     name: "seed 287",
     clients: [3016544889U, 5U, 3U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -72785,6 +73072,7 @@ fn rich_convergence_case_288() -> RichCase {
   {
     name: "seed 288",
     clients: [590336655U, 1862970838U, 1721692449U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -72968,6 +73256,7 @@ fn rich_convergence_case_289() -> RichCase {
   {
     name: "seed 289",
     clients: [4U, 5U, 525689878U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -73135,6 +73424,7 @@ fn rich_convergence_case_290() -> RichCase {
   {
     name: "seed 290",
     clients: [3829043723U, 1U, 2U, 3U],
+    late_type: false,
     ops: [
       RIns(3, 0, "a", None, ["0101030004010174016100"], "[{\"insert\":\"a\"}]"),
       RIns(
@@ -73528,6 +73818,7 @@ fn rich_convergence_case_291() -> RichCase {
   {
     name: "seed 291",
     clients: [2500431643U, 4U, 3640482651U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -73842,6 +74133,7 @@ fn rich_convergence_case_292() -> RichCase {
   {
     name: "seed 292",
     clients: [4U, 1U, 2U],
+    late_type: false,
     ops: [
       RIns(0, 0, "a", None, ["0101040004010174016100"], "[{\"insert\":\"a\"}]"),
       RIns(
@@ -74162,6 +74454,7 @@ fn rich_convergence_case_293() -> RichCase {
   {
     name: "seed 293",
     clients: [749285423U, 3706141925U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -74327,6 +74620,7 @@ fn rich_convergence_case_294() -> RichCase {
   {
     name: "seed 294",
     clients: [3793991125U, 4U, 2423471057U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -74601,6 +74895,7 @@ fn rich_convergence_case_295() -> RichCase {
   {
     name: "seed 295",
     clients: [1U, 344849877U],
+    late_type: false,
     ops: [
       RIns(
         1,
@@ -74842,6 +75137,7 @@ fn rich_convergence_case_296() -> RichCase {
   {
     name: "seed 296",
     clients: [2972860101U, 2750238799U, 2198425119U],
+    late_type: false,
     ops: [
       RIns(
         2,
@@ -75024,6 +75320,7 @@ fn rich_convergence_case_297() -> RichCase {
   {
     name: "seed 297",
     clients: [326332136U, 4003327737U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -75193,6 +75490,7 @@ fn rich_convergence_case_298() -> RichCase {
   {
     name: "seed 298",
     clients: [4U, 1356545644U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -75344,6 +75642,7 @@ fn rich_convergence_case_299() -> RichCase {
   {
     name: "seed 299",
     clients: [2U, 1397863427U, 3203990393U, 2869988521U],
+    late_type: false,
     ops: [
       RIns(
         3,
@@ -75758,6 +76057,7 @@ fn rich_convergence_case_300() -> RichCase {
   {
     name: "seed 300",
     clients: [2U, 1U, 461661322U],
+    late_type: false,
     ops: [
       RIns(
         1,

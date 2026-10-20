@@ -5,6 +5,7 @@
       1,
       2
     ],
+    "lazy": false,
     "ops": [
       {
         "op": "insert",
@@ -91,6 +92,7 @@
       1,
       2
     ],
+    "lazy": false,
     "ops": [
       {
         "op": "insert",
@@ -221,6 +223,7 @@
       1,
       2
     ],
+    "lazy": false,
     "ops": [
       {
         "op": "insert",
@@ -348,6 +351,7 @@
       1,
       2
     ],
+    "lazy": false,
     "ops": [
       {
         "op": "insert",
@@ -478,6 +482,7 @@
       1,
       2
     ],
+    "lazy": false,
     "ops": [
       {
         "op": "insert",
@@ -611,6 +616,7 @@
       2,
       3
     ],
+    "lazy": false,
     "ops": [
       {
         "op": "insert",

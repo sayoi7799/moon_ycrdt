@@ -5,6 +5,7 @@ fn rich_apply_delta_case_1() -> RichCase {
   {
     name: "build a document from a delta",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,
@@ -27,6 +28,7 @@ fn rich_apply_delta_case_2() -> RichCase {
   {
     name: "retain with attributes formats a range",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,
@@ -65,6 +67,7 @@ fn rich_apply_delta_case_3() -> RichCase {
   {
     name: "retain, delete and insert in one delta",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,
@@ -96,6 +99,7 @@ fn rich_apply_delta_case_4() -> RichCase {
   {
     name: "a second replica applies the delta of the first",
     clients: [1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -163,6 +167,7 @@ fn rich_apply_delta_case_5() -> RichCase {
   {
     name: "retain and delete beyond the end are cut off",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,
@@ -199,6 +204,7 @@ fn rich_apply_delta_case_6() -> RichCase {
   {
     name: "a trailing newline is kept unless sanitize is false",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,
@@ -231,6 +237,7 @@ fn rich_apply_delta_case_7() -> RichCase {
   {
     name: "null attributes remove formatting",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,
@@ -269,6 +276,7 @@ fn rich_apply_delta_case_8() -> RichCase {
   {
     name: "embeds and unicode",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,
@@ -300,6 +308,7 @@ fn rich_apply_delta_case_9() -> RichCase {
   {
     name: "formatting and deleting in one delta",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,
@@ -340,6 +349,7 @@ fn rich_apply_delta_case_10() -> RichCase {
   {
     name: "empty and zero length operations",
     clients: [1U],
+    late_type: false,
     ops: [
       RApply(
         0,

@@ -60,3 +60,13 @@ test "300 random rich-text scenarios converge exactly like Yjs" {
   }
   assert_true(steps > 8000)
 }
+
+///|
+test "a text type requested after formatted content arrived behaves like Yjs" {
+  let cases = rich_late_script_cases()
+  assert_true(cases.length() >= 6)
+  for c in cases {
+    assert_true(c.late_type)
+    replay_rich(c) |> ignore
+  }
+}

@@ -5,6 +5,7 @@ fn rich_insert_case_1() -> RichCase {
   {
     name: "new text inherits the formatting at the position",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -52,6 +53,7 @@ fn rich_insert_case_2() -> RichCase {
   {
     name: "explicit attributes replace the inherited ones",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -110,6 +112,7 @@ fn rich_insert_case_3() -> RichCase {
   {
     name: "null switches an attribute off",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -153,6 +156,7 @@ fn rich_insert_case_4() -> RichCase {
   {
     name: "an unchanged value reuses the formatting items",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -210,6 +214,7 @@ fn rich_insert_case_5() -> RichCase {
   {
     name: "object values are compared one level deep",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -307,6 +312,7 @@ fn rich_insert_case_6() -> RichCase {
   {
     name: "embeds inside formatted text",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -366,6 +372,7 @@ fn rich_insert_case_7() -> RichCase {
   {
     name: "inserting after deletions",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -423,6 +430,7 @@ fn rich_insert_case_8() -> RichCase {
   {
     name: "attribute order follows the object keys",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -478,6 +486,7 @@ fn rich_insert_case_9() -> RichCase {
   {
     name: "unicode text",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -534,6 +543,7 @@ fn rich_insert_case_10() -> RichCase {
   {
     name: "text after unformatted text",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -583,6 +593,7 @@ fn rich_insert_case_11() -> RichCase {
   {
     name: "two replicas insert into the same formatted run",
     clients: [1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,

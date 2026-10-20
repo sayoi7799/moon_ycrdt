@@ -1052,15 +1052,15 @@ const genRichDelta = () => {
 // the recorder stores the bytes of the local updates Yjs emitted — including
 // the clean-up transactions Yjs runs after remote changes — and toDelta().
 
-const richRecorder = (name, ids) => {
+const richRecorder = (name, ids, lazy = false) => {
   const docs = ids.map(id => newDoc(id))
   const logs = docs.map(() => [])
   docs.forEach((d, i) => d.on('update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
   const text = (r) => docs[r].getText('t')
   // Request the type before anything arrives, the way editor bindings do. A
   // type that is requested after content has been applied is a different
-  // object in Yjs (see richConvertedScripts).
-  docs.forEach((_, r) => text(r))
+  // object in Yjs (see richLateScripts).
+  if (!lazy) docs.forEach((_, r) => text(r))
   const ops = []
   const step = (r, op, f) => {
     const before = logs[r].length
@@ -1117,7 +1117,7 @@ const richRecorder = (name, ids) => {
       // Yjs does not always converge on the delta; the end state of every
       // replica is recorded as Yjs left it
       const finalDeltas = docs.map((_, r) => JSON.stringify(text(r).toDelta()))
-      return { name, clients: ids, ops, finalDeltas, converged: finalDeltas.every(d => d === finalDeltas[0]) }
+      return { name, clients: ids, lazy, ops, finalDeltas, converged: finalDeltas.every(d => d === finalDeltas[0]) }
     }
   }
 }
@@ -1142,7 +1142,7 @@ const mbtRichOp = (o) => {
 const mbtRichCases = (prefix, listName, cases) => {
   let mbt = ''
   cases.forEach((c, i) => {
-    mbt += `\n///|\nfn ${prefix}_${i + 1}() -> RichCase {\n  {\n    name: ${mbtString(c.name)},\n    clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n    ops: [\n`
+    mbt += `\n///|\nfn ${prefix}_${i + 1}() -> RichCase {\n  {\n    name: ${mbtString(c.name)},\n    clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n    late_type: ${c.lazy},\n    ops: [\n`
     mbt += c.ops.map(o => `      ${mbtRichOp(o)},`).join('\n')
     mbt += `\n    ],\n    final_deltas: [${c.finalDeltas.map(mbtString).join(', ')}],\n  }\n}\n`
   })
@@ -1549,6 +1549,69 @@ export const richScenario = (seed) => {
   return result
 }
 
+// Scripts where the receiving replica asks for the text type only after
+// formatted content has arrived, and then edits in ways that depend on the
+// search marker Yjs may still have: insert without attributes and delete.
+const richLateScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids, true); f(r); out.push(r.finish()) }
+  script('insert without attributes in content that was formatted elsewhere', [1, 2], r => {
+    r.insert(0, 0, 'hello world', { bold: true })
+    r.deliver(0, 1, [0])
+    r.insert(1, 3, 'X')
+  })
+  script('delete, then insert, in formatted content that arrived', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { italic: true })
+    r.format(0, 2, 4, { bold: true })
+    r.deliver(0, 1, [0, 1])
+    r.del(1, 1, 3)
+    r.insert(1, 2, 'Q')
+  })
+  script('the first local operation is a format', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.deliver(0, 1, [0])
+    r.format(1, 2, 3, { underline: true })
+    r.insert(1, 3, 'Y')
+    r.insert(1, 7, 'Z')
+  })
+  script('the first local operation is a delta', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.deliver(0, 1, [0])
+    r.applyDelta(1, [{ retain: 3 }, { insert: 'W' }, { delete: 1 }])
+    r.insert(1, 5, 'V')
+  })
+  script('the first local operation is an insert with attributes', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.deliver(0, 1, [0])
+    r.insert(1, 4, 'N', { italic: true })
+    r.insert(1, 8, 'M')
+  })
+  script('formatting written by another client than the text', [1, 2, 3], r => {
+    r.insert(0, 0, 'abcdefghij')
+    r.deliver(0, 1, [0])
+    r.format(1, 2, 5, { bold: true })
+    r.deliver(0, 2, [0])
+    r.deliver(1, 2, [0])
+    r.insert(2, 3, 'X')
+    r.insert(2, 6, 'Y')
+    r.del(2, 4, 2)
+    r.insert(2, 1, 'Z')
+  })
+  script('inserts at the start and at the end', [1, 2], r => {
+    r.insert(0, 0, 'abcdef', { bold: true })
+    r.format(0, 1, 3, { italic: true })
+    r.deliver(0, 1, [0, 1])
+    r.insert(1, 0, 'S')
+    r.insert(1, 7, 'E')
+  })
+  return out
+}
+
+const genRichLateScripts = () => {
+  const cases = richLateScripts()
+  writeFixture('rich_late_scripts', 'tests', cases, mbtRichCases('rich_late_script_case', 'rich_late_script_cases', cases))
+}
+
 const genRichConvergence = () => {
   const cases = Array.from({ length: RICH_CASES }, (_, i) => richScenario(i + 1))
   writeFixture('rich_convergence', 'tests', cases, mbtRichCases('rich_convergence_case', 'rich_convergence_cases', cases))
@@ -1578,4 +1641,5 @@ genRichFormat()
 genRichApplyDelta()
 genRichConcurrent()
 genRichConvergence()
+genRichLateScripts()
 genExportBase()

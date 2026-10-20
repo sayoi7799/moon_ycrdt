@@ -5,6 +5,7 @@ fn rich_concurrent_case_1() -> RichCase {
   {
     name: "both replicas bold the same range",
     clients: [1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -58,6 +59,7 @@ fn rich_concurrent_case_2() -> RichCase {
   {
     name: "both replicas format overlapping ranges",
     clients: [1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -143,6 +145,7 @@ fn rich_concurrent_case_3() -> RichCase {
   {
     name: "one replica formats while the other deletes",
     clients: [1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -234,6 +237,7 @@ fn rich_concurrent_case_4() -> RichCase {
   {
     name: "different values for the same attribute",
     clients: [1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -319,6 +323,7 @@ fn rich_concurrent_case_5() -> RichCase {
   {
     name: "remove and apply the same attribute concurrently",
     clients: [1U, 2U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -414,6 +419,7 @@ fn rich_concurrent_case_6() -> RichCase {
   {
     name: "three replicas edit formatted text",
     clients: [1U, 2U, 3U],
+    late_type: false,
     ops: [
       RIns(
         0,

@@ -5,6 +5,7 @@ fn rich_format_case_1() -> RichCase {
   {
     name: "format ranges of plain text",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -54,6 +55,7 @@ fn rich_format_case_2() -> RichCase {
   {
     name: "null removes an attribute from part of a range",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -105,6 +107,7 @@ fn rich_format_case_3() -> RichCase {
   {
     name: "overwriting a value and restoring the old one",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -164,6 +167,7 @@ fn rich_format_case_4() -> RichCase {
   {
     name: "formatting that changes nothing",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -209,6 +213,7 @@ fn rich_format_case_5() -> RichCase {
   {
     name: "several attributes at once keep their key order",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -259,6 +264,7 @@ fn rich_format_case_6() -> RichCase {
   {
     name: "ranges across embeds and deleted text",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -313,6 +319,7 @@ fn rich_format_case_7() -> RichCase {
   {
     name: "a range that reaches past the end is padded with newlines",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -344,6 +351,7 @@ fn rich_format_case_8() -> RichCase {
   {
     name: "object values",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -399,6 +407,7 @@ fn rich_format_case_9() -> RichCase {
   {
     name: "inserting at the edges of a formatted range",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -464,6 +473,7 @@ fn rich_format_case_10() -> RichCase {
   {
     name: "formatting after deleting",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
@@ -521,6 +531,7 @@ fn rich_format_case_11() -> RichCase {
   {
     name: "unicode ranges",
     clients: [1U],
+    late_type: false,
     ops: [
       RIns(
         0,
