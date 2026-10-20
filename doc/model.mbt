@@ -95,6 +95,14 @@ pub struct YType {
   map : Map[String, Item]
   /// Sum of the lengths of countable, non-deleted sequence items.
   mut length : Int32
+  /// Whether a formatting item was integrated since this type object was
+  /// created (`YText._hasFormatting`). Yjs only cleans up redundant formatting
+  /// after remote changes when this is set.
+  mut has_formatting : Bool
+  /// Whether Yjs would still use search markers to find positions in this type
+  /// (`YText._searchMarker !== null`). Integrating a formatting item turns
+  /// them off for good; a type created from a placeholder starts with them on.
+  mut markers_enabled : Bool
 }
 
 ///|
@@ -104,7 +112,17 @@ fn YType::new(
   root_name~ : String? = None,
   item~ : Item? = None,
 ) -> YType {
-  { type_ref, name, root_name, item, start: None, map: {}, length: 0, }
+  {
+    type_ref,
+    name,
+    root_name,
+    item,
+    start: None,
+    map: {},
+    length: 0,
+    has_formatting: false,
+    markers_enabled: true,
+  }
 }
 
 ///|

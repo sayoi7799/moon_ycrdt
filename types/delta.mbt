@@ -161,3 +161,6 @@ pub fn Text::to_delta(self : Text) -> Array[DeltaOp] raise @lib0.DecodeError {
   pack()
   ops
 }
+
+///|
+pub extend DeltaOp with ToJson::{to_json}

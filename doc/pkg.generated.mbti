@@ -75,6 +75,8 @@ pub struct YType {
   mut start : Item?
   map : Map[String, Item]
   mut length : Int32
+  mut has_formatting : Bool
+  mut markers_enabled : Bool
 }
 
 // Type aliases

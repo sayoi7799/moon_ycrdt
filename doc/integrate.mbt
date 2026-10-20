@@ -97,6 +97,11 @@ fn Doc::integrate_item(self : Doc, item : Item) -> Unit {
     }
     Type(type_ref, name) =>
       item.nested = Some(YType::new(type_ref, name~, item=Some(item)))
+    Format(_, _) => {
+      // `ContentFormat.integrate` in Yjs
+      parent.markers_enabled = false
+      parent.has_formatting = true
+    }
     _ => ()
   }
   let parent_deleted = match parent.item {

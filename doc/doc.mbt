@@ -61,6 +61,11 @@ pub fn Doc::get_root(self : Doc, name : String, type_ref : Int32) -> YType {
   let t = self.root_type(name)
   if t.type_ref == TYPE_REF_UNKNOWN {
     t.type_ref = type_ref
+    // Yjs builds a brand-new type object here (`Doc.get` replacing the
+    // placeholder): its search markers are on and it has not seen a
+    // formatting item, even if the content already holds some.
+    t.markers_enabled = true
+    t.has_formatting = false
   } else if t.type_ref != type_ref {
     abort(
       "type \"\{name}\" was already defined with type ref \{t.type_ref}, not \{type_ref}",

@@ -56,3 +56,6 @@ pub fn any_from_json_string(s : String) -> Any raise DecodeError {
     e => raise Malformed("invalid JSON: \{e}")
   }
 }
+
+///|
+pub extend Any with ToJson::{to_json}

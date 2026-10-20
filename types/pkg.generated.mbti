@@ -22,6 +22,7 @@ pub(all) enum DeltaOp {
 } derive(Eq, @debug.Debug)
 pub fn DeltaOp::equal(Self, Self) -> Bool
 pub fn DeltaOp::not_equal(Self, Self) -> Bool
+pub fn DeltaOp::to_json(Self) -> Json
 pub impl ToJson for DeltaOp
 
 pub struct Text {
@@ -30,6 +31,8 @@ pub struct Text {
 }
 pub fn Text::delete(Self, Int32, Int32) -> Unit
 pub fn Text::insert(Self, Int32, String) -> Unit
+pub fn Text::insert_embed(Self, Int32, @lib0.Any, attributes? : Array[(String, @lib0.Any)]) -> Unit
+pub fn Text::insert_with_attributes(Self, Int32, String, Array[(String, @lib0.Any)]) -> Unit
 pub fn Text::length(Self) -> Int32
 pub fn Text::new(@doc.Doc, String) -> Self
 pub fn Text::to_delta(Self) -> Array[DeltaOp] raise @lib0.DecodeError
