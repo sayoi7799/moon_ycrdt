@@ -105,6 +105,32 @@ bob.apply_update(diff)
 
 `apply_update` 遇到格式错误的输入会抛出 `@lib0.DecodeError`，并且不会修改文档。
 
+### 富文本
+
+`Text` 支持格式属性和 Quill 风格的 delta（`toDelta` / `applyDelta`），代码与
+`tests/readme_test.mbt` 中的测试一致，期望值由 Yjs 运行同样的步骤得到：
+
+```moonbit
+let doc = @doc.Doc::new(1)
+let text = @types.Text::new(doc, "doc")
+text.insert(0, "Hello world")
+// format a range, insert with exactly the given formatting
+text.format(0, 5, [("bold", Bool(true))])
+text.insert_with_attributes(11, "!", [("italic", Bool(true))])
+// a Quill-style delta: skip 6 positions, then insert coloured text
+text.apply_delta([Retain(6, []), Insert(String("brave "), [("color", String("red"))])])
+// read the formatted text back, as a delta and as JSON
+let delta = text.to_delta()
+let json = @types.delta_to_json(delta).stringify()
+// [{"insert":"Hello","attributes":{"bold":true}},{"insert":" "},
+//  {"insert":"brave ","attributes":{"color":"red"}},{"insert":"world"},
+//  {"insert":"!","attributes":{"italic":true}}]
+let parsed = @types.delta_from_json(@json.parse(json))
+```
+
+属性是有序的 `(键, Any)` 列表，值为 `Null` 表示取消该属性。`insert` 不带属性时新文本继承所在位置的格式，
+`insert_with_attributes` 则**只**使用给定的格式（没有列出的当前属性会被关掉，插入之后再恢复）。
+
 ## 对接 y-websocket
 
 `protocol` 包实现了 y-protocols 的同步消息和 y-websocket 的外层封装。连接建立后的流程
@@ -178,7 +204,7 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | 包 | 主要 API |
 |---|---|
 | `doc` | `Doc::new(client_id)`、`apply_update(bytes)`、`encode_state_as_update(sv?)`、`encode_state_vector()`、`state_vector()`、`on_update((update, is_local) => ...)`、`has_pending()`、`root_names()`；函数形式 `@doc.apply_update`、`@doc.encode_state_as_update(doc, target_state_vector?)`、`@doc.encode_state_vector` |
-| `types` | `Text::new(doc, name)`：`insert`、`delete`、`to_string`、`length`<br>`YMap::new(doc, name)`：`set`、`get`、`has`、`delete`、`keys`、`entries`、`size`<br>`YArray::new(doc, name)`：`insert`、`push`、`delete`、`get`、`to_array`、`length` |
+| `types` | `Text::new(doc, name)`：`insert`、`insert_with_attributes`、`insert_embed`、`format`、`delete`、`to_string`、`length`、`to_delta`、`apply_delta`；`DeltaOp`（`Insert` / `Retain` / `Delete`）、`delta_to_json` / `delta_from_json`<br>`YMap::new(doc, name)`：`set`、`get`、`has`、`delete`、`keys`、`entries`、`size`<br>`YArray::new(doc, name)`：`insert`、`push`、`delete`、`get`、`to_array`、`length` |
 | `protocol` | `SyncMessage`（`SyncStep1` / `SyncStep2` / `Update`）的 `encode` / `decode_sync_message`；`sync_step1`、`sync_step2`、`update_message`、`handle_sync_message`；y-websocket：`WsMessage`、`decode_ws_message`、`handle_ws_message` |
 | `lib0` | `Encoder` / `Decoder`（`write_var_uint`、`write_var_int`、`write_var_string`、`write_any` 等）、`Any`、`encode_any` / `decode_any`、`to_hex` / `from_hex`、`DecodeError` |
 | `update` | `decode_update` / `Update::encode`、`StructRef`、`ItemRef`、`Content`、`DeleteSet`、`encode_state_vector` / `decode_state_vector` |
@@ -198,13 +224,15 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | 依赖缺失的更新（pending） | ✅ | 依赖到齐自动应用；`encode_state_as_update` 会带上 pending 数据（中间以 Skip 填补），中继不丢数据 |
 | `encode_state_as_update(doc, 状态向量?)` / `apply_update` | ✅ | |
 | 事务级增量更新事件 | ✅ | `Doc::on_update`，字节与 Yjs 的 `update` 事件一致 |
-| Y.Text 插入 / 删除 / 读取 | ✅ | UTF-16 码元下标；切开代理对时与 Yjs 一样替换为 U+FFFD；删除时与 Yjs 一样清理多余的格式标记 |
+| Y.Text 插入 / 删除 / 读取 | ✅ | UTF-16 码元下标；切开代理对时与 Yjs 一样替换为 U+FFFD |
+| Y.Text 富文本：带属性插入、`format`、embed、`to_delta`、`apply_delta` | ✅ | 每一步的 delta 和本地更新的字节都与 Yjs 一致；值可以是任意 JSON（对象、数组、数字、字符串、布尔） |
+| Y.Text 格式清理 | ✅ | 本地删除后的 `cleanupFormattingGap`，以及远端更新后 Yjs 另开一个事务做的清理（`cleanupYTextAfterTransaction`，产生只含删除的更新）都与 Yjs 一致 |
 | Y.Map set / get / delete（`Any` 值、字节数组） | ✅ | |
 | Y.Array insert / push / delete / get | ✅ | 定位、值的打包（连续普通值合成一个 Item、字节数组单独成 Item）和 push 的语义都与 Yjs 一致；嵌套类型读作 `Undefined` |
 | y-protocols 同步消息与 y-websocket 外层封装 | ✅ | 与 `y-protocols@1.0.7` 逐字节对照；awareness 消息原样透传，不解析 |
-| 不支持的 content（Format、Embed、XML 类型、子文档、数组中的嵌套类型） | ✅ 保留 | 原样存储并在编码时写回；Yjs 在这些类型内部继续编辑，MoonBit 也能正确合并 |
-| 文本格式属性的读写 API（`format`、`toDelta`） | ❌ | 数据会保留，但没有 API |
-| Y.Xml* 的 API | ❌ | 数据会保留 |
+| 不支持的 content（XML 类型、子文档、数组中的嵌套类型） | ✅ 保留 | 原样存储并在编码时写回；Yjs 在这些类型内部继续编辑，MoonBit 也能正确合并 |
+| Y.Xml* 的 API（包括 y-prosemirror / Tiptap 使用的 `XmlFragment`、`XmlElement`、`XmlText`） | ❌ | 数据会保留。`XmlText` 的格式逻辑与 `Text` 相同，下一步可以复用 |
+| 快照、`ychange` 属性 | ❌ | `to_delta` 不支持 snapshot 参数 |
 | update v2 | ❌ | |
 | 子文档加载、UndoManager、awareness 状态、相对位置、快照 | ❌ | |
 | 垃圾回收 | ❌ | 本地文档相当于 `gc: false`，但能解码对方发来的 GC 结构和 ContentDeleted |
@@ -212,10 +240,29 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 
 已知限制：
 
-- **带格式文本里的编辑**：Yjs 定位时使用内部的 search marker 缓存，所以在带格式的文本里，
-  它清理多余格式标记的结果取决于这个 JS 对象之前的操作历史。本库模拟的是新加载的 Yjs
-  文档的行为。纯文本完全一致；带格式时文字内容和各副本之间的收敛不受影响，
-  个别情况下多余格式标记的取舍可能和某个具体的 Yjs 客户端不同。
+- **Yjs 的定位缓存（search marker）与带格式的文本**：Yjs 用 search marker 加速定位。不带属性的 `insert` 和
+  `delete` 会用它，带属性的 `insert`、`format` 和 `applyDelta` 不用。marker 从目标位置附近开始，看不到它左边的
+  格式项，所以带格式的文本里"新文本继承什么格式"取决于 marker 在不在。marker 属于某一个 JS 对象，规律是：
+  1. **一个 `YText` 对象一旦整合过任何格式项**（本地的或远端更新里的），marker 就被**永久关闭**，之后所有定位都从头
+     累积属性，结果是确定的。先调用 `getText` 再同步更新（编辑器绑定的通常用法）就是这种情形，本库与 Yjs 逐字节一致
+     （300 组随机并发场景和各组脚本）。
+  2. **例外：根类型在内容到达之后才调用 `getText`。** Yjs 此时用一个新对象替换占位类型：marker 是开着的，而且这个
+     对象还没有"含格式"标志，所以不带属性的 `insert` 和 `delete` 看不到 marker 左边的格式；远端更新后的格式清理
+     也要等到整合第一个新的格式项才开始。本库按源码实现了这两点，并用一个全新的 marker 模拟 `findMarker`，
+     7 个专门设计的场景与 Yjs 一致。但 Yjs 的 marker 会在多次操作之间累积（最多 80 个，位置还随编辑平移），
+     本库没有实现，所以连续多次依赖 marker 的操作序列没有被证明一致；"没有含格式标志所以不清理"这一条
+     也没有测试覆盖。
+- **对象或数组形式的属性值**：Yjs 在格式清理里用 `===` 比较解码出的值。同一个 JS 对象被两个格式项共用时
+  （例如 `format` 为恢复旧值会重用已有格式项的值对象）它们被认为相同；编码后的数据里看不出共用，本库把对象和数组
+  视为恒不相同。这只影响清理时多余格式项的取舍，不影响文本和格式的收敛。布尔、数字、字符串和 `null` 完全一致；
+  "属性是否已经生效"的判断（`equalAttrs`）按 Yjs 的规则只比较一层。
+- **属性的键顺序**：属性按给定的顺序写入，和 JS 对象一致，只是 JS 会把整数形式的键（如 `"1"`）排在最前面按数值
+  升序，本库没有模拟。
+- **delta 里的嵌套类型**：文本里嵌入的共享类型在 `to_delta` 里读作 `Insert(Undefined, …)`；`to_delta` 不支持
+  snapshot 和 `ychange`。
+- **Yjs 自身的行为**：并发编辑把一个 emoji 切成两半时，各个 Yjs 副本看到的文本可能不一致（一边保留 emoji，另一边是
+  两个 U+FFFD），与格式无关。我们在随机测试里观察到过（最初的 300 组里有 14 组），本库不试图修正它。富文本随机测试
+  因此把位置限制在字符边界上；代理对被切开的情形由边界情况测试覆盖。
 - Yjs 的数组不接受 `undefined` 和 bigint；本库照常把它们编码进数组（Yjs 能解码）。
 - 不检测 client id 冲突（Yjs 会在冲突时换 id）。每个副本应使用随机的 32 位 client id，
   `examples/roundtrip` 演示了用 `@env.rand` 生成。
@@ -241,6 +288,13 @@ Item 链，最右边的是当前值。
 
 **本地编辑与 Yjs 一致**：插入的定位规则（例如 Text 会越过右侧已删除的 Item、Array 不会，`push` 接在最后一个
 Item 后面）决定了新 Item 的 origin，这些细节都照 Yjs 实现，所以本地更新与 Yjs 逐字节相同。
+
+**富文本**：格式不是"范围标记"，而是和文本放在同一条链表里的 Item（`Format(key, value)`，长度 1，不计入文本长度），
+某个位置的属性等于它左边所有格式项依次作用的结果，值为 `null` 表示取消。`insert` 带属性时，先在位置处写入与当前值不同的
+格式项，再插入内容，最后写入"恢复旧值"的格式项；已经说了同样的话的格式项会被复用，避免产生冗余。`format` 在范围内
+删掉同 key 的旧格式项，范围末尾恢复被覆盖的旧值。冗余的格式项在两个时机被清理：本地 `delete` 之后清理删除区间里的间隙；
+远端更新之后，Yjs 会另开一个事务做清理（只含删除的更新，副本之间照常同步），本库照做，所以 MoonBit 副本中继出去的
+字节与 Yjs 副本相同。属性值以 JSON 文本保存，和 Yjs 写入线上的格式一样。
 
 ## 性能
 
@@ -277,14 +331,17 @@ moon bench -p sayoi7799/moon_ycrdt/benchmarks --target native --release
 | lib0 编码 | 每种编码的字节对照，含 0、127、128、负数、2^31 以上、2^53−1、空串、中文、emoji、BOM、−0、Infinity、bigint、孤立代理项 | `lib0/lib0_test.mbt` |
 | 解码层 | 12 个 Yjs 生成的更新（gc / 非 gc 文本、Unicode、各种 Map 值、格式与 embed、嵌套与 XML 类型、子文档、GC 结构、多 client、差量、从 Item 中间开始的差量、含 Skip 的合并更新、旧版 ContentJSON）：解码结果与 `Y.decodeUpdate` 一致，再编码**逐字节相同** | `update/update_test.mbt` |
 | Yjs → MoonBit | 15 个场景（含乱序、重复投递）：文本、Map、状态向量与 Yjs 一致，MoonBit 重新编码的整体状态与 Yjs 的**逐字节相同**；幂等；差量同步 | `tests/interop_test.mbt` |
-| MoonBit → Yjs | `cmd/export` 导出 6 组编辑脚本（Unicode 文本、全部 Any 类型、2 / 3 副本并发、编辑含格式 / embed / XML / 子文档的 Yjs 文档、Y.Array 并发编辑）；`scripts/verify_moonbit.mjs` 用 Yjs 验证：完整状态读回一致、打乱顺序应用增量更新后收敛、在 Yjs 上用相同 client id 重放同样的操作得到**逐字节相同**的状态、不支持的内容仍在（共 51 项检查） | `cmd/export`、`scripts/verify_moonbit.mjs` |
+| MoonBit → Yjs | `cmd/export` 导出 7 组编辑脚本（Unicode 文本、全部 Any 类型、2 / 3 副本并发、编辑含格式 / embed / XML / 子文档的 Yjs 文档、Y.Array 并发编辑、富文本格式与 delta）；`scripts/verify_moonbit.mjs` 用 Yjs 验证：完整状态读回一致、打乱顺序应用增量更新后收敛、在 Yjs 上用相同 client id 重放同样的操作得到**逐字节相同**的状态、不支持的内容仍在（共 60 项检查） | `cmd/export`、`scripts/verify_moonbit.mjs` |
 | 边界情况 | 55 个场景：在含 emoji、ZWJ 序列、组合字符的字符串里的**每个** UTF-16 位置插入、删除 1 / 2 个码元（会切开代理对），空插入、删光再写、末尾连续输入、client id 0 与 2^32−1、两个副本切开同一个代理对；空文档、空更新；截断与损坏的输入必须报错且不改动文档 | `tests/edge_test.mbt` |
 | 不支持内容的保留 | 5 类（格式与 embed、XML、含嵌套类型的数组、子文档、gc 产生的 GC 结构）：MoonBit 加载 Yjs 文档、编辑自己支持的部分、再接收 Yjs 在不支持类型内部的编辑，本地更新与最终状态都与 Yjs **逐字节相同** | `tests/preserve_test.mbt` |
 | 并发收敛 | 300 组随机场景（种子 1–300），2–4 个副本、同位置并发插入删除、对同一组键并发写入和删除 Map、随机抽取（有重复）乱序交换：**每一步**的文本和 Map 都与 Yjs 一致，每个本地更新的字节都与 Yjs 发出的一致（共 10914 步） | `tests/convergence_test.mbt` |
 | Y.Array | 100 组随机场景（种子 1–100），2–3 个副本并发 insert / push / delete、乱序重复同步：每一步数组内容与每个本地更新的字节都与 Yjs 一致；读取 Yjs 写的嵌套内容 | `tests/array_test.mbt` |
 | y-protocols | 镜像一次 Yjs 会话中的一方：SyncStep1、SyncStep2、Update 以及 y-websocket 帧都与 y-protocols **逐字节相同**；两个 MoonBit 副本只靠协议消息收敛 | `protocol/protocol_test.mbt` |
 | 属性测试 | quickcheck，每条 300 例：任意交换顺序收敛；重复应用幂等；缺依赖的更新进入 pending，补齐后自动应用（pending 数据经编码中继不丢失） | `tests/property_test.mbt` |
-| README 示例 | 快速上手与 y-websocket 流程的代码 | `tests/readme_test.mbt` |
+| 富文本：delta 读取 | 13 个 Yjs 文档（加粗、重叠、`null` 取消、对象 / 数组 / 数字 / 字符串值、embed、删除、Unicode、并发格式、属性键顺序）：`to_delta()` 的 JSON 文本与 Yjs 的 `JSON.stringify(toDelta())` 逐字符相同 | `tests/rich_delta_test.mbt` |
+| 富文本：编辑脚本 | 由 Yjs 逐步记录：带 / 不带属性插入和 embed（11 组 53 步）、`format`（11 组 47 步）、`applyDelta`（10 组 29 步）、并发格式化（6 组 67 步）、类型晚取（7 组 35 步）。每一步比较 delta 和本地更新的字节，远端更新后 Yjs 产生的清理更新也要一致 | `tests/rich_scripts_test.mbt` |
+| 富文本：随机并发 | 300 组固定种子（1–300），2–4 个副本，带属性的插入、embed、`format`（含 `null`）、删除、`applyDelta`，乱序重复同步直到不再产生新更新；共 8734 步，其中 149 次是 Yjs 的清理更新，每一步的 delta 和更新字节都与 Yjs 一致，最终所有副本一致 | `tests/rich_scripts_test.mbt` |
+| README 示例 | 快速上手、富文本与 y-websocket 流程的代码 | `tests/readme_test.mbt` |
 
 ## 开发
 
@@ -328,7 +385,8 @@ node scripts/verify_moonbit.mjs fixtures/moonbit_out.json
 - 输出：`fixtures/*.json`（可读的记录），以及内嵌同样数据的 MoonBit 文件
   `lib0/lib0_gen_test.mbt`、`update/updates_gen_test.mbt`、`protocol/protocol_gen_test.mbt`、
   `tests/interop_gen_test.mbt`、`tests/convergence_gen_test.mbt`、`tests/edge_gen_test.mbt`、
-  `tests/preserve_gen_test.mbt`、`tests/arrays_gen_test.mbt`、`cmd/export/yjs_base_gen.mbt`
+  `tests/preserve_gen_test.mbt`、`tests/arrays_gen_test.mbt`、`tests/rich_*_gen_test.mbt`、
+  `tests/readme_rich_gen_test.mbt`、`cmd/export/yjs_base_gen.mbt`
   （wasm-gc 后端的测试读不了文件，所以数据生成为代码）
 
 ```bash

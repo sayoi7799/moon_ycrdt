@@ -3,6 +3,32 @@
 本文件按 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 的格式记录每个版本的变化，
 版本号遵循[语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased]
+
+### 新增
+
+**Y.Text 富文本**（issue #2）
+- `Text::insert_with_attributes`、`Text::insert_embed`、`Text::format`、`Text::to_delta`、`Text::apply_delta`；
+  `DeltaOp`（`Insert` / `Retain` / `Delete`，属性为有序的 `(String, Any)` 列表）、`delta_to_json` / `delta_from_json`。
+  `Text::insert` 不带属性时继承所在位置的格式。
+- `lib0`：`Any` 与 JSON 互转（`ToJson for Any`、`Any::from_json`、`Any::to_json_string`、`any_from_json_string`）。
+- 格式清理与 Yjs 一致：本地删除后的 `cleanupFormattingGap`（完整移植，含对当前属性的修正），以及远端更新之后
+  另开一个事务做的清理（`cleanupYTextAfterTransaction`），后者产生只含删除的本地更新。
+- 测试（期望值全部由 `yjs@13.6.33` 生成）：13 个文档的 `toDelta()` 对照；带属性插入、`format`、`applyDelta`、并发格式化
+  和类型晚取的逐步脚本（共 231 步）；300 组富文本随机并发场景（8734 步，含 149 次清理更新）；`cmd/export` 的
+  `rich_text` 场景交给 Node 端 Yjs 验证（现在共 60 项检查）；README 的富文本示例。
+
+### 修复
+
+- 带格式文本里不带属性的 `insert` 和 `delete` 现在按 Yjs 的规则定位：整合过格式项的类型不再使用 search marker，
+  从头累积属性。之前总是模拟一个全新的 marker，会丢掉位置左边的格式，只在根类型晚于内容取得时才正确。
+- 适配 MoonBit 0.1.20261016：`x.to_json()` 改为 `Json(x)`，`moon fmt` 迁移了语法（`Int` → `Int32` 等），
+  行为不变。
+
+### 变更
+
+- README“已知限制”改写为具体的规律（见该节）：marker 何时被关闭、根类型晚取的例外、对象属性值的比较方式等。
+
 ## [0.1.0] - 待发布
 
 首个版本：用 MoonBit 读写 Yjs 更新格式 v1，并与官方 Yjs 逐字节互通。

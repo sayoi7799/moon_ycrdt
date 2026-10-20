@@ -1612,6 +1612,21 @@ const genRichLateScripts = () => {
   writeFixture('rich_late_scripts', 'tests', cases, mbtRichCases('rich_late_script_case', 'rich_late_script_cases', cases))
 }
 
+// The rich-text example of the README, run on Yjs.
+const genReadmeRich = () => {
+  const d = newDoc(1)
+  const t = d.getText('doc')
+  t.insert(0, 'Hello world')
+  t.format(0, 5, { bold: true })
+  t.insert(11, '!', { italic: true })
+  t.applyDelta([{ retain: 6 }, { insert: 'brave ', attributes: { color: 'red' } }])
+  const delta = JSON.stringify(t.toDelta())
+  writeFixture('readme_rich', 'tests', { delta }, `
+///|
+let readme_rich_delta : String = ${mbtString(delta)}
+`)
+}
+
 const genRichConvergence = () => {
   const cases = Array.from({ length: RICH_CASES }, (_, i) => richScenario(i + 1))
   writeFixture('rich_convergence', 'tests', cases, mbtRichCases('rich_convergence_case', 'rich_convergence_cases', cases))
@@ -1642,4 +1657,5 @@ genRichApplyDelta()
 genRichConcurrent()
 genRichConvergence()
 genRichLateScripts()
+genReadmeRich()
 genExportBase()

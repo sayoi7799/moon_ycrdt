@@ -1,0 +1,3 @@
+{
+  "delta": "[{\"insert\":\"Hello\",\"attributes\":{\"bold\":true}},{\"insert\":\" \"},{\"insert\":\"brave \",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"world\"},{\"insert\":\"!\",\"attributes\":{\"italic\":true}}]"
+}
