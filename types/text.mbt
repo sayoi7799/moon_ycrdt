@@ -368,3 +368,87 @@ fn Text::cleanup_formatting_gap(
     cur = item.right
   }
 }
+
+///|
+/// `formatText`: applies `attributes` to the next `length` positions starting
+/// at `pos`. Formatting items inside the range that set one of these
+/// attributes are deleted; if they set a different value, that value is
+/// restored after the range. A range that reaches past the end of the text
+/// is padded with newlines, which is what Yjs does for Quill.
+fn Text::format_range(
+  self : Text,
+  pos : Pos,
+  length : Int32,
+  attributes : Map[String, String],
+) -> Unit {
+  let mut length = length
+  minimize_attribute_changes(pos, attributes)
+  let negated = self.insert_attributes(pos, attributes)
+  // go on until the range is used up; then keep going over formatting items
+  // and deleted items that follow, so no redundant negation is written
+  while pos.right is Some(r) &&
+        (
+          length > 0 ||
+          (negated.length() > 0 && (r.deleted || r.content is Format(_, _)))
+        ) {
+    if !r.deleted {
+      match r.content {
+        Format(key, value) =>
+          if attributes.get(key) is Some(wanted) {
+            if attr_equal(wanted, value) {
+              negated.remove(key)
+            } else {
+              if length == 0 {
+                break
+              }
+              negated[key] = value
+            }
+            self.doc.delete_item(r)
+          }
+        _ => {
+          if length < r.length {
+            self.doc.split(r, length) |> ignore
+          }
+          length -= r.length
+        }
+      }
+    }
+    pos.forward()
+  }
+  if length > 0 {
+    let newlines = StringBuilder()
+    for _ in 0..<length {
+      newlines.write_char('\n')
+    }
+    let item = self.doc.insert(
+      self.ty,
+      pos.left,
+      pos.right,
+      None,
+      String(newlines.to_string()),
+    )
+    pos.right = Some(item)
+    pos.forward()
+  }
+  self.insert_negated_attributes(pos, negated)
+}
+
+///|
+/// Applies `attributes` to `length` positions starting at `index`
+/// (`ytext.format`). A `Null` value removes the attribute from the range.
+pub fn Text::format(
+  self : Text,
+  index : Int32,
+  length : Int32,
+  attributes : Array[(String, @lib0.Any)],
+) -> Unit {
+  if length == 0 {
+    return
+  }
+  let pos = self.find_position(index, false)
+  if pos.right is None {
+    return
+  }
+  self.format_range(pos, length, attrs_to_map(attributes))
+  self.doc.commit()
+}

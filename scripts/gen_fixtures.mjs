@@ -1066,6 +1066,7 @@ const richRecorder = (name, ids) => {
   return {
     insert: (r, pos, str, attrs) => step(r, { op: 'insert', pos, str, attrs }, () => attrs === undefined ? text(r).insert(pos, str) : text(r).insert(pos, str, attrs)),
     embed: (r, pos, embed, attrs) => step(r, { op: 'embed', pos, embed, attrs }, () => attrs === undefined ? text(r).insertEmbed(pos, embed) : text(r).insertEmbed(pos, embed, attrs)),
+    format: (r, pos, len, attrs) => step(r, { op: 'format', pos, len, attrs }, () => text(r).format(pos, len, attrs)),
     del: (r, pos, len) => step(r, { op: 'delete', pos, len }, () => text(r).delete(pos, len)),
     length: (r) => text(r).length,
     syncAll: () => {
@@ -1097,6 +1098,7 @@ const mbtRichOp = (o) => {
   switch (o.op) {
     case 'insert': return `RIns(${o.replica}, ${o.pos}, ${mbtString(o.str)}, ${mbtOptAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
     case 'embed': return `REmbed(${o.replica}, ${o.pos}, ${mbtAny(o.embed)}, ${mbtOptAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
+    case 'format': return `RFmt(${o.replica}, ${o.pos}, ${o.len}, ${mbtAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
     case 'delete': return `RDel(${o.replica}, ${o.pos}, ${o.len}, ${ups}, ${mbtString(o.delta)})`
     case 'sync': return `RSync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${ups}, ${mbtString(o.delta)})`
     default: throw new Error(`unknown rich op ${o.op}`)
@@ -1194,6 +1196,86 @@ const richInsertScripts = () => {
   return out
 }
 
+const richFormatScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids); f(r); out.push(r.finish()) }
+  script('format ranges of plain text', [1], r => {
+    r.insert(0, 0, 'hello world')
+    r.format(0, 0, 0 + 5, { bold: true })
+    r.format(0, 6, 5, { italic: true })
+    r.format(0, 3, 5, { underline: true })
+  })
+  script('null removes an attribute from part of a range', [1], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.format(0, 2, 3, { bold: null })
+    r.format(0, 0, 10, { bold: true })
+    r.format(0, 4, 2, { bold: null, italic: true })
+  })
+  script('overwriting a value and restoring the old one', [1], r => {
+    r.insert(0, 0, 'abcdefghij')
+    r.format(0, 0, 8, { color: 'red' })
+    r.format(0, 2, 3, { color: 'blue' })
+    r.format(0, 6, 4, { color: 'green' })
+    r.format(0, 0, 10, { color: 'red' })
+  })
+  script('formatting that changes nothing', [1], r => {
+    r.insert(0, 0, 'abcdef', { bold: true })
+    r.format(0, 0, 6, { bold: true })
+    r.format(0, 1, 3, { bold: true })
+    r.format(0, 0, 6, { italic: null })
+  })
+  script('several attributes at once keep their key order', [1], r => {
+    r.insert(0, 0, 'abcdef')
+    r.format(0, 1, 4, { zeta: 1, alpha: 2 })
+    r.format(0, 2, 2, { mid: true, zeta: null })
+  })
+  script('ranges across embeds and deleted text', [1], r => {
+    r.insert(0, 0, 'abcdefghij')
+    r.embed(0, 3, { image: 'x.png' })
+    r.del(0, 6, 2)
+    r.format(0, 1, 8, { bold: true })
+    r.format(0, 0, 12, { italic: true })
+  })
+  script('a range that reaches past the end is padded with newlines', [1], r => {
+    r.insert(0, 0, 'abc')
+    r.format(0, 1, 5, { bold: true })
+  })
+  script('object values', [1], r => {
+    r.insert(0, 0, 'abcdefgh')
+    r.format(0, 0, 4, { link: { href: 'a' } })
+    r.format(0, 2, 4, { link: { href: 'a' } })
+    r.format(0, 1, 2, { link: { href: 'b' } })
+    r.format(0, 0, 8, { link: null })
+  })
+  script('inserting at the edges of a formatted range', [1], r => {
+    r.insert(0, 0, 'abcdef')
+    r.format(0, 2, 2, { bold: true })
+    r.insert(0, 2, 'X')
+    r.insert(0, 5, 'Y')
+    r.insert(0, 7, 'Z')
+    r.insert(0, 4, 'W', { bold: false })
+  })
+  script('formatting after deleting', [1], r => {
+    r.insert(0, 0, 'abcdefghij', { bold: true })
+    r.format(0, 0, 10, { italic: true })
+    r.del(0, 3, 4)
+    r.format(0, 2, 3, { bold: null })
+    r.del(0, 0, 3)
+  })
+  script('unicode ranges', [1], r => {
+    r.insert(0, 0, '你好😀世界🎉')
+    r.format(0, 1, 3, { bold: true })
+    r.format(0, 0, 2, { color: '#f00' })
+    r.format(0, 4, 3, { italic: true })
+  })
+  return out
+}
+
+const genRichFormat = () => {
+  const cases = richFormatScripts()
+  writeFixture('rich_format', 'tests', cases, mbtRichCases('rich_format_case', 'rich_format_cases', cases))
+}
+
 const genRichInsert = () => {
   const cases = richInsertScripts()
   writeFixture('rich_insert', 'tests', cases, mbtRichCases('rich_insert_case', 'rich_insert_cases', cases))
@@ -1209,4 +1291,5 @@ genArrays()
 genProtocol()
 genRichDelta()
 genRichInsert()
+genRichFormat()
 genExportBase()

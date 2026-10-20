@@ -30,6 +30,7 @@ pub struct Text {
   ty : @doc.YType
 }
 pub fn Text::delete(Self, Int32, Int32) -> Unit
+pub fn Text::format(Self, Int32, Int32, Array[(String, @lib0.Any)]) -> Unit
 pub fn Text::insert(Self, Int32, String) -> Unit
 pub fn Text::insert_embed(Self, Int32, @lib0.Any, attributes? : Array[(String, @lib0.Any)]) -> Unit
 pub fn Text::insert_with_attributes(Self, Int32, String, Array[(String, @lib0.Any)]) -> Unit

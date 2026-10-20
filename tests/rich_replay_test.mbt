@@ -16,6 +16,8 @@ enum RichOp {
     Array[String],
     String
   )
+  /// replica, index, length, attributes, Yjs' local updates, delta after
+  RFmt(Int32, Int32, Int32, Array[(String, @lib0.Any)], Array[String], String)
   /// replica, index, length, Yjs' local updates, delta after
   RDel(Int32, Int32, Int32, Array[String], String)
   /// from, to, indices into the sender's log, local updates the receiver
@@ -61,6 +63,10 @@ fn replay_rich(c : RichCase) -> Int32 raise {
           Some(a) => texts[r].insert_embed(index, embed, attributes=a)
           None => texts[r].insert_embed(index, embed)
         }
+        (r, updates, delta)
+      }
+      RFmt(r, index, len, attrs, updates, delta) => {
+        texts[r].format(index, len, attrs)
         (r, updates, delta)
       }
       RDel(r, index, len, updates, delta) => {

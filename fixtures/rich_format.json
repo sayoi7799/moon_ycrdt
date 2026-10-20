@@ -1,0 +1,672 @@
+[
+  {
+    "name": "format ranges of plain text",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "hello world",
+        "replica": 0,
+        "update": [
+          "01010100040101740b68656c6c6f20776f726c6400"
+        ],
+        "delta": "[{\"insert\":\"hello world\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 5,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "0102010b46010004626f6c640474727565c60104010504626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"hello\",\"attributes\":{\"bold\":true}},{\"insert\":\" world\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 6,
+        "len": 5,
+        "attrs": {
+          "italic": true
+        },
+        "replica": 0,
+        "update": [
+          "0102010dc601050106066974616c6963047472756586010a066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"hello\",\"attributes\":{\"bold\":true}},{\"insert\":\" \"},{\"insert\":\"world\",\"attributes\":{\"italic\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 3,
+        "len": 5,
+        "attrs": {
+          "underline": true
+        },
+        "replica": 0,
+        "update": [
+          "0102010fc60102010309756e6465726c696e650474727565c60107010809756e6465726c696e65046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"hel\",\"attributes\":{\"bold\":true}},{\"insert\":\"lo\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\" \",\"attributes\":{\"underline\":true}},{\"insert\":\"wo\",\"attributes\":{\"underline\":true,\"italic\":true}},{\"insert\":\"rld\",\"attributes\":{\"italic\":true}}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"hel\",\"attributes\":{\"bold\":true}},{\"insert\":\"lo\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\" \",\"attributes\":{\"underline\":true}},{\"insert\":\"wo\",\"attributes\":{\"underline\":true,\"italic\":true}},{\"insert\":\"rld\",\"attributes\":{\"italic\":true}}]"
+  },
+  {
+    "name": "null removes an attribute from part of a range",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000a6162636465666768696a86010a04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 3,
+        "attrs": {
+          "bold": null
+        },
+        "replica": 0,
+        "update": [
+          "0102010cc60102010304626f6c64046e756c6cc60105010604626f6c64047472756500"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cde\"},{\"insert\":\"fghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 10,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "000101010c02"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 4,
+        "len": 2,
+        "attrs": {
+          "bold": null,
+          "italic": true
+        },
+        "replica": 0,
+        "update": [
+          "0104010ec60104010504626f6c64046e756c6cc6010e0105066974616c69630474727565c60106010704626f6c640474727565c601100107066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcd\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"ghij\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"abcd\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"ghij\",\"attributes\":{\"bold\":true}}]"
+  },
+  {
+    "name": "overwriting a value and restoring the old one",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "replica": 0,
+        "update": [
+          "01010100040101740a6162636465666768696a00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 8,
+        "attrs": {
+          "color": "red"
+        },
+        "replica": 0,
+        "update": [
+          "0102010a46010005636f6c6f72052272656422c60107010805636f6c6f72046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefgh\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"ij\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 3,
+        "attrs": {
+          "color": "blue"
+        },
+        "replica": 0,
+        "update": [
+          "0102010cc60101010205636f6c6f720622626c756522c60104010505636f6c6f7205227265642200"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"cde\",\"attributes\":{\"color\":\"blue\"}},{\"insert\":\"fgh\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"ij\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 6,
+        "len": 4,
+        "attrs": {
+          "color": "green"
+        },
+        "replica": 0,
+        "update": [
+          "0102010ec60105010605636f6c6f720722677265656e2286010905636f6c6f72046e756c6c0101010b01"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"cde\",\"attributes\":{\"color\":\"blue\"}},{\"insert\":\"f\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"ghij\",\"attributes\":{\"color\":\"green\"}}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 10,
+        "attrs": {
+          "color": "red"
+        },
+        "replica": 0,
+        "update": [
+          "01010110c60109010f05636f6c6f720722677265656e220101010c03"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"color\":\"red\"}}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"color\":\"red\"}}]"
+  },
+  {
+    "name": "formatting that changes nothing",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdef",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000661626364656686010604626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 6,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [],
+        "delta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 1,
+        "len": 3,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [],
+        "delta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 6,
+        "attrs": {
+          "italic": null
+        },
+        "replica": 0,
+        "update": [],
+        "delta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
+  },
+  {
+    "name": "several attributes at once keep their key order",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdef",
+        "replica": 0,
+        "update": [
+          "01010100040101740661626364656600"
+        ],
+        "delta": "[{\"insert\":\"abcdef\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 1,
+        "len": 4,
+        "attrs": {
+          "zeta": 1,
+          "alpha": 2
+        },
+        "replica": 0,
+        "update": [
+          "01040106c601000101047a6574610131c60106010105616c7068610132c601040105047a657461046e756c6cc60108010505616c706861046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"a\"},{\"insert\":\"bcde\",\"attributes\":{\"zeta\":1,\"alpha\":2}},{\"insert\":\"f\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 2,
+        "attrs": {
+          "mid": true,
+          "zeta": null
+        },
+        "replica": 0,
+        "update": [
+          "0104010ac601010102036d69640474727565c6010a0102047a657461046e756c6cc601030104036d6964046e756c6cc6010c0104047a657461013100"
+        ],
+        "delta": "[{\"insert\":\"a\"},{\"insert\":\"b\",\"attributes\":{\"zeta\":1,\"alpha\":2}},{\"insert\":\"cd\",\"attributes\":{\"alpha\":2,\"mid\":true}},{\"insert\":\"e\",\"attributes\":{\"alpha\":2,\"zeta\":1}},{\"insert\":\"f\"}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"a\"},{\"insert\":\"b\",\"attributes\":{\"zeta\":1,\"alpha\":2}},{\"insert\":\"cd\",\"attributes\":{\"alpha\":2,\"mid\":true}},{\"insert\":\"e\",\"attributes\":{\"alpha\":2,\"zeta\":1}},{\"insert\":\"f\"}]"
+  },
+  {
+    "name": "ranges across embeds and deleted text",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "replica": 0,
+        "update": [
+          "01010100040101740a6162636465666768696a00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\"}]"
+      },
+      {
+        "op": "embed",
+        "pos": 3,
+        "embed": {
+          "image": "x.png"
+        },
+        "replica": 0,
+        "update": [
+          "0101010ac501020103117b22696d616765223a22782e706e67227d00"
+        ],
+        "delta": "[{\"insert\":\"abc\"},{\"insert\":{\"image\":\"x.png\"}},{\"insert\":\"defghij\"}]"
+      },
+      {
+        "op": "delete",
+        "pos": 6,
+        "len": 2,
+        "replica": 0,
+        "update": [
+          "000101010502"
+        ],
+        "delta": "[{\"insert\":\"abc\"},{\"insert\":{\"image\":\"x.png\"}},{\"insert\":\"dehij\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 1,
+        "len": 8,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "0102010bc60100010104626f6c64047472756586010904626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"a\"},{\"insert\":\"bc\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"x.png\"},\"attributes\":{\"bold\":true}},{\"insert\":\"dehij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 12,
+        "attrs": {
+          "italic": true
+        },
+        "replica": 0,
+        "update": [
+          "0103010d460100066974616c6963047472756584010c030a0a0a860110066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"a\",\"attributes\":{\"italic\":true}},{\"insert\":\"bc\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":{\"image\":\"x.png\"},\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"dehij\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"\\n\\n\\n\",\"attributes\":{\"italic\":true}}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"a\",\"attributes\":{\"italic\":true}},{\"insert\":\"bc\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":{\"image\":\"x.png\"},\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"dehij\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"\\n\\n\\n\",\"attributes\":{\"italic\":true}}]"
+  },
+  {
+    "name": "a range that reaches past the end is padded with newlines",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abc",
+        "replica": 0,
+        "update": [
+          "01010100040101740361626300"
+        ],
+        "delta": "[{\"insert\":\"abc\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 1,
+        "len": 5,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "01030103c60100010104626f6c640474727565840102030a0a0a86010604626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"a\"},{\"insert\":\"bc\\n\\n\\n\",\"attributes\":{\"bold\":true}}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"a\"},{\"insert\":\"bc\\n\\n\\n\",\"attributes\":{\"bold\":true}}]"
+  },
+  {
+    "name": "object values",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefgh",
+        "replica": 0,
+        "update": [
+          "010101000401017408616263646566676800"
+        ],
+        "delta": "[{\"insert\":\"abcdefgh\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 4,
+        "attrs": {
+          "link": {
+            "href": "a"
+          }
+        },
+        "replica": 0,
+        "update": [
+          "01020108460100046c696e6b0c7b2268726566223a2261227dc601030104046c696e6b046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcd\",\"attributes\":{\"link\":{\"href\":\"a\"}}},{\"insert\":\"efgh\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 4,
+        "attrs": {
+          "link": {
+            "href": "a"
+          }
+        },
+        "replica": 0,
+        "update": [
+          "0101010ac601050106046c696e6b046e756c6c0101010901"
+        ],
+        "delta": "[{\"insert\":\"abcdef\",\"attributes\":{\"link\":{\"href\":\"a\"}}},{\"insert\":\"gh\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 1,
+        "len": 2,
+        "attrs": {
+          "link": {
+            "href": "b"
+          }
+        },
+        "replica": 0,
+        "update": [
+          "0102010bc601000101046c696e6b0c7b2268726566223a2262227dc601020103046c696e6b0c7b2268726566223a2261227d00"
+        ],
+        "delta": "[{\"insert\":\"a\",\"attributes\":{\"link\":{\"href\":\"a\"}}},{\"insert\":\"bc\",\"attributes\":{\"link\":{\"href\":\"b\"}}},{\"insert\":\"def\",\"attributes\":{\"link\":{\"href\":\"a\"}}},{\"insert\":\"gh\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 8,
+        "attrs": {
+          "link": null
+        },
+        "replica": 0,
+        "update": [
+          "0001010208010a03"
+        ],
+        "delta": "[{\"insert\":\"abcdefgh\"}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"abcdefgh\"}]"
+  },
+  {
+    "name": "inserting at the edges of a formatted range",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdef",
+        "replica": 0,
+        "update": [
+          "01010100040101740661626364656600"
+        ],
+        "delta": "[{\"insert\":\"abcdef\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 2,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "01020106c60101010204626f6c640474727565c60103010404626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"ab\"},{\"insert\":\"cd\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\"}]"
+      },
+      {
+        "op": "insert",
+        "pos": 2,
+        "str": "X",
+        "replica": 0,
+        "update": [
+          "01010108c401010106015800"
+        ],
+        "delta": "[{\"insert\":\"abX\"},{\"insert\":\"cd\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\"}]"
+      },
+      {
+        "op": "insert",
+        "pos": 5,
+        "str": "Y",
+        "replica": 0,
+        "update": [
+          "01010109c401030107015900"
+        ],
+        "delta": "[{\"insert\":\"abX\"},{\"insert\":\"cdY\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\"}]"
+      },
+      {
+        "op": "insert",
+        "pos": 7,
+        "str": "Z",
+        "replica": 0,
+        "update": [
+          "0101010ac401040105015a00"
+        ],
+        "delta": "[{\"insert\":\"abX\"},{\"insert\":\"cdY\",\"attributes\":{\"bold\":true}},{\"insert\":\"eZf\"}]"
+      },
+      {
+        "op": "insert",
+        "pos": 4,
+        "str": "W",
+        "attrs": {
+          "bold": false
+        },
+        "replica": 0,
+        "update": [
+          "0103010bc60102010304626f6c640566616c7365c4010b01030157c6010c010304626f6c64047472756500"
+        ],
+        "delta": "[{\"insert\":\"abX\"},{\"insert\":\"c\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\",\"attributes\":{\"bold\":false}},{\"insert\":\"dY\",\"attributes\":{\"bold\":true}},{\"insert\":\"eZf\"}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"abX\"},{\"insert\":\"c\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\",\"attributes\":{\"bold\":false}},{\"insert\":\"dY\",\"attributes\":{\"bold\":true}},{\"insert\":\"eZf\"}]"
+  },
+  {
+    "name": "formatting after deleting",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "abcdefghij",
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "010301000601017404626f6c6404747275658401000a6162636465666768696a86010a04626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 10,
+        "attrs": {
+          "italic": true
+        },
+        "replica": 0,
+        "update": [
+          "0102010c460100066974616c6963047472756586010b066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+      },
+      {
+        "op": "delete",
+        "pos": 3,
+        "len": 4,
+        "replica": 0,
+        "update": [
+          "000101010404"
+        ],
+        "delta": "[{\"insert\":\"abchij\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+      },
+      {
+        "op": "format",
+        "pos": 2,
+        "len": 3,
+        "attrs": {
+          "bold": null
+        },
+        "replica": 0,
+        "update": [
+          "0102010ec60102010304626f6c64046e756c6cc60109010a04626f6c64047472756500"
+        ],
+        "delta": "[{\"insert\":\"ab\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"chi\",\"attributes\":{\"italic\":true}},{\"insert\":\"j\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+      },
+      {
+        "op": "delete",
+        "pos": 0,
+        "len": 3,
+        "replica": 0,
+        "update": [
+          "0001010200040e01"
+        ],
+        "delta": "[{\"insert\":\"hi\",\"attributes\":{\"italic\":true}},{\"insert\":\"j\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"hi\",\"attributes\":{\"italic\":true}},{\"insert\":\"j\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+  },
+  {
+    "name": "unicode ranges",
+    "clients": [
+      1
+    ],
+    "ops": [
+      {
+        "op": "insert",
+        "pos": 0,
+        "str": "你好😀世界🎉",
+        "replica": 0,
+        "update": [
+          "010101000401017414e4bda0e5a5bdf09f9880e4b896e7958cf09f8e8900"
+        ],
+        "delta": "[{\"insert\":\"你好😀世界🎉\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 1,
+        "len": 3,
+        "attrs": {
+          "bold": true
+        },
+        "replica": 0,
+        "update": [
+          "01020108c60100010104626f6c640474727565c60103010404626f6c64046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"你\"},{\"insert\":\"好😀\",\"attributes\":{\"bold\":true}},{\"insert\":\"世界🎉\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 0,
+        "len": 2,
+        "attrs": {
+          "color": "#f00"
+        },
+        "replica": 0,
+        "update": [
+          "0102010a46010005636f6c6f7206222366303022c60101010205636f6c6f72046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"你\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":\"好\",\"attributes\":{\"color\":\"#f00\",\"bold\":true}},{\"insert\":\"😀\",\"attributes\":{\"bold\":true}},{\"insert\":\"世界🎉\"}]"
+      },
+      {
+        "op": "format",
+        "pos": 4,
+        "len": 3,
+        "attrs": {
+          "italic": true
+        },
+        "replica": 0,
+        "update": [
+          "0102010cc601090104066974616c69630474727565c601060107066974616c6963046e756c6c00"
+        ],
+        "delta": "[{\"insert\":\"你\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":\"好\",\"attributes\":{\"color\":\"#f00\",\"bold\":true}},{\"insert\":\"😀\",\"attributes\":{\"bold\":true}},{\"insert\":\"世界�\",\"attributes\":{\"italic\":true}},{\"insert\":\"�\"}]"
+      }
+    ],
+    "finalDelta": "[{\"insert\":\"你\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":\"好\",\"attributes\":{\"color\":\"#f00\",\"bold\":true}},{\"insert\":\"😀\",\"attributes\":{\"bold\":true}},{\"insert\":\"世界�\",\"attributes\":{\"italic\":true}},{\"insert\":\"�\"}]"
+  }
+]
