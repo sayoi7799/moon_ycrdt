@@ -305,9 +305,19 @@ pub fn Text::delete(self : Text, index : Int32, len : Int32) -> Unit {
     abort("delete range \{index}+\{len} out of range")
   }
   let pos = self.find_position(index, true)
+  self.delete_content(pos, len)
+  self.doc.commit()
+}
+
+///|
+/// `deleteText`: deletes `length` positions from `pos` on, then removes the
+/// formatting items that became redundant in the gap (`cleanupFormattingGap`).
+/// `pos` ends up after the gap with the attributes corrected for the items
+/// that were removed. A range that reaches past the end is cut off.
+fn Text::delete_content(self : Text, pos : Pos, length : Int32) -> Unit {
   let start = pos.right
   let start_attrs = pos.attrs.copy()
-  let mut remaining = len
+  let mut remaining = length
   while remaining > 0 && pos.right is Some(r) {
     if !r.deleted {
       match r.content {
@@ -324,48 +334,8 @@ pub fn Text::delete(self : Text, index : Int32, len : Int32) -> Unit {
     pos.forward()
   }
   if start is Some(s) {
-    self.cleanup_formatting_gap(s, start_attrs)
-  }
-  self.doc.commit()
-}
-
-///|
-/// JavaScript `===` on two JSON-encoded attribute values: only primitive
-/// values can be identical, objects and arrays never are.
-fn js_identical(a : String, b : String) -> Bool {
-  a == b && !a.has_prefix("{") && !a.has_prefix("[")
-}
-
-///|
-/// After a deletion, removes formatting items that became redundant between
-/// the deleted range and the next visible character (`cleanupFormattingGap`),
-/// so that deleting inside formatted text gives the same result as Yjs.
-fn Text::cleanup_formatting_gap(
-  self : Text,
-  start : @doc.Item,
-  start_attrs : Map[String, String],
-) -> Unit {
-  // the formats that are in effect right before the next visible content
-  let end_formats : Map[String, @doc.Item] = Map([])
-  let mut end : @doc.Item? = Some(start)
-  while end is Some(e) && (!e.is_countable() || e.deleted) {
-    if !e.deleted && e.content is Format(key, _) {
-      end_formats[key] = e
-    }
-    end = e.right
-  }
-  let mut cur : @doc.Item? = Some(start)
-  while cur is Some(item) && !(end is Some(e) && physical_equal(e, item)) {
-    if !item.deleted && item.content is Format(key, value) {
-      let start_value = start_attrs.get(key).unwrap_or("null")
-      let is_end_format = end_formats.get(key) is Some(f) &&
-        physical_equal(f, item)
-      // overwritten later, or the attribute was already in effect
-      if !is_end_format || js_identical(start_value, value) {
-        self.doc.delete_item(item)
-      }
-    }
-    cur = item.right
+    self.doc.cleanup_formatting_gap(s, pos.right, start_attrs, pos.attrs)
+    |> ignore
   }
 }
 

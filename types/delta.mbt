@@ -164,3 +164,50 @@ pub fn Text::to_delta(self : Text) -> Array[DeltaOp] raise @lib0.DecodeError {
 
 ///|
 pub extend DeltaOp with ToJson::{to_json}
+
+///|
+/// Applies a delta to the text (`ytext.applyDelta`), all in one transaction.
+/// `Retain` skips positions (and formats them when it carries attributes),
+/// `Delete` removes positions, `Insert` adds a string or an embed with exactly
+/// the given attributes.
+///
+/// Like Yjs, a `Retain` or `Delete` that reaches past the end of the text is
+/// cut off. `sanitize` is a faithful port of the option of the same name: it
+/// only has an effect when it is `false`, in which case a newline at the very
+/// end of the last inserted string is dropped (Quill always ends its content
+/// with one).
+pub fn Text::apply_delta(
+  self : Text,
+  delta : Array[DeltaOp],
+  sanitize~ : Bool = true,
+) -> Unit {
+  let pos = Pos::{ left: None, right: self.ty.start, attrs: Map([]), }
+  for i, op in delta {
+    match op {
+      Insert(value, attrs) => {
+        let attributes = attrs_to_map(attrs)
+        match value {
+          String(s) => {
+            let strip = !sanitize &&
+              i == delta.length() - 1 &&
+              pos.right is None &&
+              s.has_suffix("\n")
+            let ins = if strip {
+              s.unsafe_substring(start=0, end=s.length() - 1)
+            } else {
+              s
+            }
+            if ins.length() > 0 {
+              self.insert_content(pos, String(ins), attributes)
+            }
+          }
+          _ =>
+            self.insert_content(pos, Embed(value.to_json_string()), attributes)
+        }
+      }
+      Retain(n, attrs) => self.format_range(pos, n, attrs_to_map(attrs))
+      Delete(n) => self.delete_content(pos, n)
+    }
+  }
+  self.doc.commit()
+}

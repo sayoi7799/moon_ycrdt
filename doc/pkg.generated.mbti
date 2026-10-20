@@ -15,6 +15,10 @@ pub fn encode_state_as_update(Doc, target_state_vector? : Bytes) -> Bytes raise 
 
 pub fn encode_state_vector(Doc) -> Bytes
 
+pub fn js_identical(String, String) -> Bool
+
+pub fn update_attrs(Map[String, String], String, String) -> Unit
+
 // Errors
 
 // Types and methods
@@ -23,6 +27,7 @@ pub struct Doc {
   // private fields
 }
 pub fn Doc::apply_update(Self, Bytes) -> Unit raise @lib0.DecodeError
+pub fn Doc::cleanup_formatting_gap(Self, Item, Item?, Map[String, String], Map[String, String]) -> Int32
 pub fn Doc::commit(Self) -> Unit
 pub fn Doc::delete_item(Self, Item) -> Unit
 pub fn Doc::encode_state_as_update(Self, sv? : Map[UInt32, Int32]) -> Bytes

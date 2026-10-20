@@ -29,6 +29,7 @@ pub struct Text {
   doc : @doc.Doc
   ty : @doc.YType
 }
+pub fn Text::apply_delta(Self, Array[DeltaOp], sanitize? : Bool) -> Unit
 pub fn Text::delete(Self, Int32, Int32) -> Unit
 pub fn Text::format(Self, Int32, Int32, Array[(String, @lib0.Any)]) -> Unit
 pub fn Text::insert(Self, Int32, String) -> Unit

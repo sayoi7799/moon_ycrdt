@@ -1068,6 +1068,8 @@ const richRecorder = (name, ids) => {
     embed: (r, pos, embed, attrs) => step(r, { op: 'embed', pos, embed, attrs }, () => attrs === undefined ? text(r).insertEmbed(pos, embed) : text(r).insertEmbed(pos, embed, attrs)),
     format: (r, pos, len, attrs) => step(r, { op: 'format', pos, len, attrs }, () => text(r).format(pos, len, attrs)),
     del: (r, pos, len) => step(r, { op: 'delete', pos, len }, () => text(r).delete(pos, len)),
+    applyDelta: (r, delta, opts) => step(r, { op: 'applyDelta', input: delta, sanitize: opts === undefined ? true : opts.sanitize }, () => opts === undefined ? text(r).applyDelta(delta) : text(r).applyDelta(delta, opts)),
+    delta: (r) => JSON.parse(JSON.stringify(text(r).toDelta())),
     length: (r) => text(r).length,
     syncAll: () => {
       for (let to = 0; to < docs.length; to++) {
@@ -1099,6 +1101,7 @@ const mbtRichOp = (o) => {
     case 'insert': return `RIns(${o.replica}, ${o.pos}, ${mbtString(o.str)}, ${mbtOptAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
     case 'embed': return `REmbed(${o.replica}, ${o.pos}, ${mbtAny(o.embed)}, ${mbtOptAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
     case 'format': return `RFmt(${o.replica}, ${o.pos}, ${o.len}, ${mbtAttrs(o.attrs)}, ${ups}, ${mbtString(o.delta)})`
+    case 'applyDelta': return `RApply(${o.replica}, ${mbtString(JSON.stringify(o.input))}, ${o.sanitize}, ${ups}, ${mbtString(o.delta)})`
     case 'delete': return `RDel(${o.replica}, ${o.pos}, ${o.len}, ${ups}, ${mbtString(o.delta)})`
     case 'sync': return `RSync(${o.from}, ${o.to}, [${o.indices.join(', ')}], ${ups}, ${mbtString(o.delta)})`
     default: throw new Error(`unknown rich op ${o.op}`)
@@ -1271,6 +1274,72 @@ const richFormatScripts = () => {
   return out
 }
 
+const richApplyDeltaScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids); f(r); out.push(r.finish()) }
+  script('build a document from a delta', [1], r => {
+    r.applyDelta(0, [
+      { insert: 'Heading', attributes: { bold: true } },
+      { insert: '\n' },
+      { insert: 'plain text with ' },
+      { insert: 'a link', attributes: { link: { href: 'https://example.com' } } },
+      { insert: { image: 'x.png' } },
+      { insert: '!\n' }
+    ])
+  })
+  script('retain with attributes formats a range', [1], r => {
+    r.applyDelta(0, [{ insert: 'hello world' }])
+    r.applyDelta(0, [{ retain: 6 }, { retain: 5, attributes: { italic: true } }])
+    r.applyDelta(0, [{ retain: 2 }, { retain: 6, attributes: { bold: true, italic: null } }])
+  })
+  script('retain, delete and insert in one delta', [1], r => {
+    r.applyDelta(0, [{ insert: 'abcdefghij', attributes: { bold: true } }])
+    r.applyDelta(0, [{ retain: 2 }, { delete: 3 }, { insert: 'XY', attributes: { italic: true } }, { retain: 1 }, { delete: 1 }])
+  })
+  script('a second replica applies the delta of the first', [1, 2], r => {
+    r.insert(0, 0, 'shared text', { bold: true })
+    r.format(0, 2, 6, { italic: true })
+    r.embed(0, 4, { image: 'p.png' })
+    r.applyDelta(1, r.delta(0))
+    r.syncAll()
+  })
+  script('retain and delete beyond the end are cut off', [1], r => {
+    r.applyDelta(0, [{ insert: 'abc' }])
+    r.applyDelta(0, [{ retain: 1 }, { delete: 10 }])
+    r.applyDelta(0, [{ insert: 'xyz' }, { retain: 20 }, { insert: '!' }])
+  })
+  script('a trailing newline is kept unless sanitize is false', [1], r => {
+    r.applyDelta(0, [{ insert: 'first line\n' }])
+    r.applyDelta(0, [{ retain: 11 }, { insert: 'second line\n' }], { sanitize: false })
+    r.applyDelta(0, [{ retain: 23 }, { insert: 'third\n' }])
+  })
+  script('null attributes remove formatting', [1], r => {
+    r.applyDelta(0, [{ insert: 'abcdef', attributes: { bold: true, italic: true } }])
+    r.applyDelta(0, [{ retain: 3, attributes: { bold: null } }])
+    r.applyDelta(0, [{ retain: 4 }, { insert: 'X', attributes: { italic: null } }])
+  })
+  script('embeds and unicode', [1], r => {
+    r.applyDelta(0, [{ insert: '你好😀', attributes: { color: '#f00' } }, { insert: { mention: { id: 7, name: 'Å' } }, attributes: { bold: true } }, { insert: '🎉' }])
+    r.applyDelta(0, [{ retain: 2 }, { insert: { image: 'y.png' } }, { delete: 1 }])
+  })
+  script('formatting and deleting in one delta', [1], r => {
+    r.applyDelta(0, [{ insert: 'abcdefghij', attributes: { bold: true } }])
+    r.applyDelta(0, [{ retain: 10, attributes: { italic: true } }])
+    r.applyDelta(0, [{ retain: 2 }, { delete: 4 }, { retain: 2, attributes: { underline: true } }, { insert: 'X' }, { retain: 1, attributes: { bold: null } }])
+  })
+  script('empty and zero length operations', [1], r => {
+    r.applyDelta(0, [{ insert: 'abc' }])
+    r.applyDelta(0, [{ insert: '' }, { retain: 0 }, { delete: 0 }, { retain: 1, attributes: {} }])
+    r.applyDelta(0, [])
+  })
+  return out
+}
+
+const genRichApplyDelta = () => {
+  const cases = richApplyDeltaScripts()
+  writeFixture('rich_apply_delta', 'tests', cases, mbtRichCases('rich_apply_delta_case', 'rich_apply_delta_cases', cases))
+}
+
 const genRichFormat = () => {
   const cases = richFormatScripts()
   writeFixture('rich_format', 'tests', cases, mbtRichCases('rich_format_case', 'rich_format_cases', cases))
@@ -1292,4 +1361,5 @@ genProtocol()
 genRichDelta()
 genRichInsert()
 genRichFormat()
+genRichApplyDelta()
 genExportBase()

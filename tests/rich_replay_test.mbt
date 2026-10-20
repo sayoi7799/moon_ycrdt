@@ -18,6 +18,8 @@ enum RichOp {
   )
   /// replica, index, length, attributes, Yjs' local updates, delta after
   RFmt(Int32, Int32, Int32, Array[(String, @lib0.Any)], Array[String], String)
+  /// replica, delta (JSON text), sanitize, Yjs' local updates, delta after
+  RApply(Int32, String, Bool, Array[String], String)
   /// replica, index, length, Yjs' local updates, delta after
   RDel(Int32, Int32, Int32, Array[String], String)
   /// from, to, indices into the sender's log, local updates the receiver
@@ -67,6 +69,13 @@ fn replay_rich(c : RichCase) -> Int32 raise {
       }
       RFmt(r, index, len, attrs, updates, delta) => {
         texts[r].format(index, len, attrs)
+        (r, updates, delta)
+      }
+      RApply(r, input, sanitize, updates, delta) => {
+        texts[r].apply_delta(
+          @types.delta_from_json(@json.parse(input)),
+          sanitize~,
+        )
         (r, updates, delta)
       }
       RDel(r, index, len, updates, delta) => {

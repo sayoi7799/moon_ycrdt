@@ -1,5 +1,5 @@
-// Inserting text and embeds with and without attributes, against Yjs
-// (rich_insert_gen_test.mbt).
+// Rich-text editing against Yjs: insert (with attributes), embeds, format and
+// applyDelta, replayed from the scripts recorded in rich_*_gen_test.mbt.
 
 ///|
 test "insert, insert_with_attributes and insert_embed match Yjs step by step" {
@@ -21,4 +21,15 @@ test "format matches Yjs step by step" {
     steps += replay_rich(c)
   }
   assert_true(steps >= 40)
+}
+
+///|
+test "apply_delta matches Yjs step by step" {
+  let cases = rich_apply_delta_cases()
+  assert_true(cases.length() >= 10)
+  let mut steps = 0
+  for c in cases {
+    steps += replay_rich(c)
+  }
+  assert_true(steps >= 20)
 }
