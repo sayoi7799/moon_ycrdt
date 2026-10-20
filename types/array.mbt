@@ -14,7 +14,7 @@ pub fn YArray::new(doc : @doc.Doc, name : String) -> YArray {
 }
 
 ///|
-pub fn YArray::length(self : YArray) -> Int {
+pub fn YArray::length(self : YArray) -> Int32 {
   self.ty.length
 }
 
@@ -25,7 +25,7 @@ pub fn YArray::length(self : YArray) -> Int {
 /// as plain values here and Yjs decodes them fine.)
 pub fn YArray::insert(
   self : YArray,
-  index : Int,
+  index : Int32,
   values : Array[@lib0.Any],
 ) -> Unit {
   guard index >= 0 && index <= self.ty.length else {
@@ -107,7 +107,7 @@ pub fn YArray::push(self : YArray, values : Array[@lib0.Any]) -> Unit {
 
 ///|
 /// Deletes `len` elements starting at `index` (`typeListDelete`).
-pub fn YArray::delete(self : YArray, index : Int, len : Int) -> Unit {
+pub fn YArray::delete(self : YArray, index : Int32, len : Int32) -> Unit {
   if len <= 0 {
     return
   }
@@ -177,7 +177,7 @@ fn json_to_any(s : String) -> @lib0.Any {
 
 ///|
 /// The element at `index`, or None when out of range.
-pub fn YArray::get(self : YArray, index : Int) -> @lib0.Any? {
+pub fn YArray::get(self : YArray, index : Int32) -> @lib0.Any? {
   if index < 0 {
     return None
   }

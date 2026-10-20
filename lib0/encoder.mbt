@@ -16,13 +16,13 @@ pub fn Encoder::to_bytes(self : Encoder) -> Bytes {
 }
 
 ///|
-pub fn Encoder::length(self : Encoder) -> Int {
+pub fn Encoder::length(self : Encoder) -> Int32 {
   self.buf.length()
 }
 
 ///|
 /// Writes one byte; only the low 8 bits of `b` are used.
-pub fn Encoder::write_u8(self : Encoder, b : Int) -> Unit {
+pub fn Encoder::write_u8(self : Encoder, b : Int32) -> Unit {
   self.buf.write_byte((b & 0xFF).to_byte())
 }
 
@@ -46,14 +46,14 @@ pub fn Encoder::write_var_uint64(self : Encoder, n : UInt64) -> Unit {
 
 ///|
 /// `write_var_uint64` for non-negative `Int`s (lengths, clocks).
-pub fn Encoder::write_var_uint(self : Encoder, n : Int) -> Unit {
+pub fn Encoder::write_var_uint(self : Encoder, n : Int32) -> Unit {
   guard n >= 0 else { abort("write_var_uint: negative value \{n}") }
   self.write_var_uint64(n.to_uint64())
 }
 
 ///|
 /// Client ids are 32-bit unsigned integers.
-pub fn Encoder::write_var_uint32(self : Encoder, n : UInt) -> Unit {
+pub fn Encoder::write_var_uint32(self : Encoder, n : UInt32) -> Unit {
   self.write_var_uint64(n.to_uint64())
 }
 

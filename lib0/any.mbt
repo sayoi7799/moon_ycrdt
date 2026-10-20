@@ -22,47 +22,47 @@ pub(all) enum Any {
 
 ///|
 /// Convenience constructor for integer numbers.
-pub fn Any::int(n : Int) -> Any {
+pub fn Any::int(n : Int32) -> Any {
   Number(n.to_double())
 }
 
 // Wire tags, see lib0/encoding.js `writeAny`.
 
 ///|
-const TAG_UNDEFINED : Int = 127
+const TAG_UNDEFINED : Int32 = 127
 
 ///|
-const TAG_NULL : Int = 126
+const TAG_NULL : Int32 = 126
 
 ///|
-const TAG_INTEGER : Int = 125
+const TAG_INTEGER : Int32 = 125
 
 ///|
-const TAG_FLOAT32 : Int = 124
+const TAG_FLOAT32 : Int32 = 124
 
 ///|
-const TAG_FLOAT64 : Int = 123
+const TAG_FLOAT64 : Int32 = 123
 
 ///|
-const TAG_BIGINT : Int = 122
+const TAG_BIGINT : Int32 = 122
 
 ///|
-const TAG_FALSE : Int = 121
+const TAG_FALSE : Int32 = 121
 
 ///|
-const TAG_TRUE : Int = 120
+const TAG_TRUE : Int32 = 120
 
 ///|
-const TAG_STRING : Int = 119
+const TAG_STRING : Int32 = 119
 
 ///|
-const TAG_OBJECT : Int = 118
+const TAG_OBJECT : Int32 = 118
 
 ///|
-const TAG_ARRAY : Int = 117
+const TAG_ARRAY : Int32 = 117
 
 ///|
-const TAG_BYTES : Int = 116
+const TAG_BYTES : Int32 = 116
 
 ///|
 /// 2^31 - 1, the largest magnitude lib0 writes as a varInt inside `Any`.

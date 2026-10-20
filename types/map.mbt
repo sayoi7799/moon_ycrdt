@@ -60,7 +60,7 @@ pub fn YMap::delete(self : YMap, key : String) -> Unit {
 
 ///|
 /// Lexicographic UTF-16 code unit order, like JavaScript's default sort.
-fn compare_utf16(a : String, b : String) -> Int {
+fn compare_utf16(a : String, b : String) -> Int32 {
   let ua = a.code_units()
   let ub = b.code_units()
   let n = if ua.length() < ub.length() { ua.length() } else { ub.length() }
@@ -99,6 +99,6 @@ pub fn YMap::entries(self : YMap) -> Array[(String, @lib0.Any)] {
 }
 
 ///|
-pub fn YMap::size(self : YMap) -> Int {
+pub fn YMap::size(self : YMap) -> Int32 {
   self.keys().length()
 }

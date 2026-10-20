@@ -4,22 +4,22 @@
 // untouched so that an application can handle or ignore them.
 
 ///|
-pub const MESSAGE_SYNC : Int = 0
+pub const MESSAGE_SYNC : Int32 = 0
 
 ///|
-pub const MESSAGE_AWARENESS : Int = 1
+pub const MESSAGE_AWARENESS : Int32 = 1
 
 ///|
-pub const MESSAGE_AUTH : Int = 2
+pub const MESSAGE_AUTH : Int32 = 2
 
 ///|
-pub const MESSAGE_QUERY_AWARENESS : Int = 3
+pub const MESSAGE_QUERY_AWARENESS : Int32 = 3
 
 ///|
 pub(all) enum WsMessage {
   Sync(SyncMessage)
   /// Any other message kind with the rest of the frame as raw bytes.
-  Other(Int, Bytes)
+  Other(Int32, Bytes)
 } derive(Eq, Debug)
 
 ///|

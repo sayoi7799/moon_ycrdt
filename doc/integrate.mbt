@@ -173,7 +173,7 @@ fn Doc::has_dependencies(self : Doc, s : @update.ItemRef) -> Bool {
 fn Doc::integrate_remote(
   self : Doc,
   s : @update.StructRef,
-  offset : Int,
+  offset : Int32,
 ) -> Unit {
   match s {
     Skip(_, _) => ()

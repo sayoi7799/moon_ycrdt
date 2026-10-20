@@ -21,7 +21,7 @@ pub(all) suberror DecodeError {
   UnexpectedEnd
   IntegerOutOfRange
   InvalidUtf8
-  UnknownAnyTag(Int)
+  UnknownAnyTag(Int32)
   TrailingBytes
   Malformed(String)
 } derive(Eq, @debug.Debug)
@@ -45,7 +45,7 @@ pub(all) enum Any {
   Bytes(Bytes)
 } derive(Eq, @debug.Debug)
 pub fn Any::equal(Self, Self) -> Bool
-pub fn Any::int(Int) -> Self
+pub fn Any::int(Int32) -> Self
 pub fn Any::not_equal(Self, Self) -> Bool
 pub fn Any::output(Self, &Logger) -> Unit
 pub fn Any::to_repr(Self) -> @debug.Repr
@@ -53,7 +53,7 @@ pub fn Any::to_string(Self) -> String
 pub impl Show for Any
 
 pub struct Decoder {
-  mut pos : Int
+  mut pos : Int32
   // private fields
 }
 pub fn Decoder::has_content(Self) -> Bool
@@ -62,20 +62,20 @@ pub fn Decoder::read_any(Self) -> Any raise DecodeError
 pub fn Decoder::read_bigint64(Self) -> Int64 raise DecodeError
 pub fn Decoder::read_float32(Self) -> Float raise DecodeError
 pub fn Decoder::read_float64(Self) -> Double raise DecodeError
-pub fn Decoder::read_raw_bytes(Self, Int) -> Bytes raise DecodeError
-pub fn Decoder::read_u8(Self) -> Int raise DecodeError
+pub fn Decoder::read_raw_bytes(Self, Int32) -> Bytes raise DecodeError
+pub fn Decoder::read_u8(Self) -> Int32 raise DecodeError
 pub fn Decoder::read_var_bytes(Self) -> Bytes raise DecodeError
 pub fn Decoder::read_var_int(Self) -> Int64 raise DecodeError
 pub fn Decoder::read_var_string(Self) -> String raise DecodeError
-pub fn Decoder::read_var_uint(Self) -> Int raise DecodeError
-pub fn Decoder::read_var_uint32(Self) -> UInt raise DecodeError
+pub fn Decoder::read_var_uint(Self) -> Int32 raise DecodeError
+pub fn Decoder::read_var_uint32(Self) -> UInt32 raise DecodeError
 pub fn Decoder::read_var_uint64(Self) -> UInt64 raise DecodeError
-pub fn Decoder::remaining(Self) -> Int
+pub fn Decoder::remaining(Self) -> Int32
 
 pub struct Encoder {
   // private fields
 }
-pub fn Encoder::length(Self) -> Int
+pub fn Encoder::length(Self) -> Int32
 pub fn Encoder::new() -> Self
 pub fn Encoder::to_bytes(Self) -> Bytes
 pub fn Encoder::write_any(Self, Any) -> Unit
@@ -83,12 +83,12 @@ pub fn Encoder::write_bigint64(Self, Int64) -> Unit
 pub fn Encoder::write_float32(Self, Float) -> Unit
 pub fn Encoder::write_float64(Self, Double) -> Unit
 pub fn Encoder::write_raw_bytes(Self, BytesView) -> Unit
-pub fn Encoder::write_u8(Self, Int) -> Unit
+pub fn Encoder::write_u8(Self, Int32) -> Unit
 pub fn Encoder::write_var_bytes(Self, BytesView) -> Unit
 pub fn Encoder::write_var_int(Self, Int64) -> Unit
 pub fn Encoder::write_var_string(Self, String) -> Unit
-pub fn Encoder::write_var_uint(Self, Int) -> Unit
-pub fn Encoder::write_var_uint32(Self, UInt) -> Unit
+pub fn Encoder::write_var_uint(Self, Int32) -> Unit
+pub fn Encoder::write_var_uint32(Self, UInt32) -> Unit
 pub fn Encoder::write_var_uint64(Self, UInt64) -> Unit
 
 // Type aliases

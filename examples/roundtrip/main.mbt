@@ -19,7 +19,7 @@ let sample_input : String = "AQSSIQAEAQNkb2MVV3JpdHRlbiBpbiBZanMg4pyN77iPKAEEbWV
 ///|
 /// A random 32-bit client id like Yjs uses, when the platform provides
 /// randomness; a fixed id otherwise.
-fn random_client_id(fallback : UInt) -> UInt {
+fn random_client_id(fallback : UInt32) -> UInt32 {
   match @env.rand(4) {
     Some(b) if b.length() == 4 =>
       (b[0].to_uint() << 24) |

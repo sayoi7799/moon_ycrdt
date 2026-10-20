@@ -3,7 +3,7 @@
 
 ///|
 /// Next expected clock of `client` (0 if nothing is known).
-pub fn Doc::get_state(self : Doc, client : UInt) -> Int {
+pub fn Doc::get_state(self : Doc, client : UInt32) -> Int32 {
   match self.clients.get(client) {
     Some(structs) if structs.length() > 0 => {
       let last = structs[structs.length() - 1]
@@ -15,7 +15,7 @@ pub fn Doc::get_state(self : Doc, client : UInt) -> Int {
 
 ///|
 /// Index of the struct containing `clock` (binary search).
-fn find_index(structs : Array[Struct], clock : Int) -> Int {
+fn find_index(structs : Array[Struct], clock : Int32) -> Int32 {
   let mut lo = 0
   let mut hi = structs.length() - 1
   while lo <= hi {
@@ -34,7 +34,7 @@ fn find_index(structs : Array[Struct], clock : Int) -> Int {
 }
 
 ///|
-fn Doc::structs_of(self : Doc, client : UInt) -> Array[Struct] {
+fn Doc::structs_of(self : Doc, client : UInt32) -> Array[Struct] {
   match self.clients.get(client) {
     Some(s) => s
     None => abort("unknown client \{client}")
@@ -73,7 +73,7 @@ fn Doc::add_struct(self : Doc, s : Struct) -> Unit {
 
 ///|
 /// Records that the struct starting at `clock` changed in this transaction.
-fn Doc::touch(self : Doc, client : UInt, clock : Int) -> Unit {
+fn Doc::touch(self : Doc, client : UInt32, clock : Int32) -> Unit {
   match self.touched.get(client) {
     Some(clocks) => clocks.push(clock)
     None => self.touched[client] = [clock]
@@ -84,7 +84,7 @@ fn Doc::touch(self : Doc, client : UInt, clock : Int) -> Unit {
 /// Splits `left` so that it keeps `diff` clocks, links the new right part
 /// after it and returns the right part (`splitItem`). The caller inserts the
 /// right part into the store.
-fn Doc::split_item(self : Doc, left : Item, diff : Int) -> Item {
+fn Doc::split_item(self : Doc, left : Item, diff : Int32) -> Item {
   let (lc, rc) = left.content.split(diff)
   let client = left.id.client
   let clock = left.id.clock
@@ -146,7 +146,7 @@ fn Doc::get_item_clean_end(self : Doc, id : @update.ID) -> Struct {
 
 ///|
 /// Splits `item` after `diff` clocks and returns the right part.
-pub fn Doc::split(self : Doc, item : Item, diff : Int) -> Item {
+pub fn Doc::split(self : Doc, item : Item, diff : Int32) -> Item {
   guard diff > 0 && diff < item.length else {
     abort("split offset \{diff} out of range")
   }

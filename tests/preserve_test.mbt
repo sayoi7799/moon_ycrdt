@@ -8,9 +8,9 @@
 ///|
 enum PreserveOp {
   /// text name, position, string, Yjs' local update(s)
-  TextIns(String, Int, String, Array[String])
+  TextIns(String, Int32, String, Array[String])
   /// text name, position, length, Yjs' local update(s)
-  TextDel(String, Int, Int, Array[String])
+  TextDel(String, Int32, Int32, Array[String])
   /// map name, key, value, Yjs' local update(s)
   MapSet(String, String, @lib0.Any, Array[String])
 }

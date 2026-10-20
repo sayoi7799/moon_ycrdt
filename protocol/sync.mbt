@@ -10,13 +10,13 @@
 // Wire format: varUint(message type) followed by varUint8Array(payload).
 
 ///|
-pub const MESSAGE_SYNC_STEP1 : Int = 0
+pub const MESSAGE_SYNC_STEP1 : Int32 = 0
 
 ///|
-pub const MESSAGE_SYNC_STEP2 : Int = 1
+pub const MESSAGE_SYNC_STEP2 : Int32 = 1
 
 ///|
-pub const MESSAGE_UPDATE : Int = 2
+pub const MESSAGE_UPDATE : Int32 = 2
 
 ///|
 pub(all) enum SyncMessage {
@@ -32,7 +32,7 @@ pub(all) enum SyncMessage {
 pub extend SyncMessage with Eq::{equal, not_equal}
 
 ///|
-pub fn SyncMessage::message_type(self : SyncMessage) -> Int {
+pub fn SyncMessage::message_type(self : SyncMessage) -> Int32 {
   match self {
     SyncStep1(_) => MESSAGE_SYNC_STEP1
     SyncStep2(_) => MESSAGE_SYNC_STEP2

@@ -14,11 +14,11 @@ pub fn to_hex(b : BytesView) -> String {
 ///|
 /// Parses a hexadecimal string (upper or lower case, even length).
 pub fn from_hex(s : String) -> Bytes raise DecodeError {
-  fn nibble(c : Char) -> Int raise DecodeError {
+  fn nibble(c : Char) -> Int32 raise DecodeError {
     match c {
-      '0'..='9' => c.to_int() - '0'.to_int()
-      'a'..='f' => c.to_int() - 'a'.to_int() + 10
-      'A'..='F' => c.to_int() - 'A'.to_int() + 10
+      '0'..<='9' => c.to_int() - '0'.to_int()
+      'a'..<='f' => c.to_int() - 'a'.to_int() + 10
+      'A'..<='F' => c.to_int() - 'A'.to_int() + 10
       _ => raise Malformed("invalid hex digit '\{c}'")
     }
   }

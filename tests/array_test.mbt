@@ -6,19 +6,19 @@
 ///|
 enum ArrOp {
   /// replica, index, values, Yjs' local update(s), array after
-  AIns(Int, Int, Array[@lib0.Any], Array[String], String)
+  AIns(Int32, Int32, Array[@lib0.Any], Array[String], String)
   /// replica, values, Yjs' local update(s), array after
-  APush(Int, Array[@lib0.Any], Array[String], String)
+  APush(Int32, Array[@lib0.Any], Array[String], String)
   /// replica, index, length, Yjs' local update(s), array after
-  ADel(Int, Int, Int, Array[String], String)
+  ADel(Int32, Int32, Int32, Array[String], String)
   /// from, to, indices into the sender's log of local updates, array after
-  ASync(Int, Int, Array[Int], String)
+  ASync(Int32, Int32, Array[Int32], String)
 }
 
 ///|
 struct ArrayCase {
-  seed : Int
-  clients : Array[UInt]
+  seed : Int32
+  clients : Array[UInt32]
   ops : Array[ArrOp]
   final_state : String
 }

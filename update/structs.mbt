@@ -34,9 +34,9 @@ pub extend ItemRef with Eq::{equal, not_equal}
 ///|
 pub(all) enum StructRef {
   /// Garbage-collected range: the content is gone, only the clocks remain.
-  GC(ID, Int)
+  GC(ID, Int32)
   /// Gap in a merged update: these clocks are not part of this update.
-  Skip(ID, Int)
+  Skip(ID, Int32)
   Item(ItemRef)
 } derive(Eq, Debug)
 
@@ -52,7 +52,7 @@ pub fn StructRef::id(self : StructRef) -> ID {
 }
 
 ///|
-pub fn StructRef::length(self : StructRef) -> Int {
+pub fn StructRef::length(self : StructRef) -> Int32 {
   match self {
     GC(_, len) | Skip(_, len) => len
     Item(item) => item.content.length()
@@ -62,22 +62,22 @@ pub fn StructRef::length(self : StructRef) -> Int {
 // Bit layout of the info byte.
 
 ///|
-pub const BIT_ORIGIN : Int = 0x80
+pub const BIT_ORIGIN : Int32 = 0x80
 
 ///|
-pub const BIT_RIGHT_ORIGIN : Int = 0x40
+pub const BIT_RIGHT_ORIGIN : Int32 = 0x40
 
 ///|
-pub const BIT_PARENT_SUB : Int = 0x20
+pub const BIT_PARENT_SUB : Int32 = 0x20
 
 ///|
-pub const BITS_CONTENT_REF : Int = 0x1F
+pub const BITS_CONTENT_REF : Int32 = 0x1F
 
 ///|
-const REF_GC : Int = 0
+const REF_GC : Int32 = 0
 
 ///|
-const REF_SKIP : Int = 10
+const REF_SKIP : Int32 = 10
 
 ///|
 /// Writes one struct. A non-zero `offset` writes only the clocks from
@@ -86,7 +86,7 @@ const REF_SKIP : Int = 10
 pub fn StructRef::write(
   self : StructRef,
   e : @lib0.Encoder,
-  offset : Int,
+  offset : Int32,
 ) -> Unit {
   match self {
     GC(_, len) => {
@@ -191,7 +191,7 @@ pub fn read_struct(
 /// The struct without its first `offset` clocks. For items the origin
 /// becomes the preceding clock of the same item and the content is split
 /// like `Content::split` (which yields the same bytes as Yjs' offset write).
-pub fn StructRef::slice(self : StructRef, offset : Int) -> StructRef {
+pub fn StructRef::slice(self : StructRef, offset : Int32) -> StructRef {
   guard offset > 0 else { return self }
   match self {
     GC(id, len) => GC(ID::new(id.client, id.clock + offset), len - offset)
