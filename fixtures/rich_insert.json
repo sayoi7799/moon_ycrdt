@@ -49,7 +49,10 @@
         "delta": "[{\"insert\":\"S\"},{\"insert\":\"heXlloE\",\"attributes\":{\"bold\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"S\"},{\"insert\":\"heXlloE\",\"attributes\":{\"bold\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"S\"},{\"insert\":\"heXlloE\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "explicit attributes replace the inherited ones",
@@ -114,7 +117,10 @@
         "delta": "[{\"insert\":\"Q\",\"attributes\":{\"bold\":true}},{\"insert\":\"abc\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"Z\"},{\"insert\":\"Y\",\"attributes\":{\"underline\":true}},{\"insert\":\"def\",\"attributes\":{\"bold\":true,\"italic\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"Q\",\"attributes\":{\"bold\":true}},{\"insert\":\"abc\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"Z\"},{\"insert\":\"Y\",\"attributes\":{\"underline\":true}},{\"insert\":\"def\",\"attributes\":{\"bold\":true,\"italic\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"Q\",\"attributes\":{\"bold\":true}},{\"insert\":\"abc\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"Z\"},{\"insert\":\"Y\",\"attributes\":{\"underline\":true}},{\"insert\":\"def\",\"attributes\":{\"bold\":true,\"italic\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "null switches an attribute off",
@@ -163,7 +169,10 @@
         "delta": "[{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\",\"attributes\":{\"italic\":true}},{\"insert\":\"X\"},{\"insert\":\"bc\",\"attributes\":{\"bold\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\",\"attributes\":{\"italic\":true}},{\"insert\":\"X\"},{\"insert\":\"bc\",\"attributes\":{\"bold\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\",\"attributes\":{\"italic\":true}},{\"insert\":\"X\"},{\"insert\":\"bc\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "an unchanged value reuses the formatting items",
@@ -237,7 +246,10 @@
         "delta": "[{\"insert\":\"abc\",\"attributes\":{\"bold\":true}},{\"insert\":\"de\",\"attributes\":{\"bold\":false}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"abc\",\"attributes\":{\"bold\":true}},{\"insert\":\"de\",\"attributes\":{\"bold\":false}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"abc\",\"attributes\":{\"bold\":true}},{\"insert\":\"de\",\"attributes\":{\"bold\":false}}]"
+    ],
+    "converged": true
   },
   {
     "name": "object values are compared one level deep",
@@ -327,7 +339,10 @@
         "delta": "[{\"insert\":\"onetwo\",\"attributes\":{\"link\":{\"href\":\"a\"}}},{\"insert\":\"three\",\"attributes\":{\"link\":{\"href\":\"b\"}}},{\"insert\":\"four\",\"attributes\":{\"link\":{\"href\":\"b\",\"meta\":{\"x\":1}}}},{\"insert\":\"five\",\"attributes\":{\"link\":{\"href\":\"b\",\"meta\":{\"x\":1}}}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"onetwo\",\"attributes\":{\"link\":{\"href\":\"a\"}}},{\"insert\":\"three\",\"attributes\":{\"link\":{\"href\":\"b\"}}},{\"insert\":\"four\",\"attributes\":{\"link\":{\"href\":\"b\",\"meta\":{\"x\":1}}}},{\"insert\":\"five\",\"attributes\":{\"link\":{\"href\":\"b\",\"meta\":{\"x\":1}}}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"onetwo\",\"attributes\":{\"link\":{\"href\":\"a\"}}},{\"insert\":\"three\",\"attributes\":{\"link\":{\"href\":\"b\"}}},{\"insert\":\"four\",\"attributes\":{\"link\":{\"href\":\"b\",\"meta\":{\"x\":1}}}},{\"insert\":\"five\",\"attributes\":{\"link\":{\"href\":\"b\",\"meta\":{\"x\":1}}}}]"
+    ],
+    "converged": true
   },
   {
     "name": "embeds inside formatted text",
@@ -404,7 +419,10 @@
         "delta": "[{\"insert\":{\"mention\":\"me\"}},{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"x.png\"}},{\"insert\":\"b\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"y.png\"},\"attributes\":{\"bold\":true}},{\"insert\":\"c\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"z.png\"},\"attributes\":{\"italic\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":{\"mention\":\"me\"}},{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"x.png\"}},{\"insert\":\"b\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"y.png\"},\"attributes\":{\"bold\":true}},{\"insert\":\"c\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"z.png\"},\"attributes\":{\"italic\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":{\"mention\":\"me\"}},{\"insert\":\"a\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"x.png\"}},{\"insert\":\"b\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"y.png\"},\"attributes\":{\"bold\":true}},{\"insert\":\"c\",\"attributes\":{\"bold\":true}},{\"insert\":{\"image\":\"z.png\"},\"attributes\":{\"italic\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "inserting after deletions",
@@ -479,7 +497,10 @@
         "delta": "[{\"insert\":\"bold again\",\"attributes\":{\"bold\":true}},{\"insert\":\"fresh\"}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"bold again\",\"attributes\":{\"bold\":true}},{\"insert\":\"fresh\"}]"
+    "finalDeltas": [
+      "[{\"insert\":\"bold again\",\"attributes\":{\"bold\":true}},{\"insert\":\"fresh\"}]"
+    ],
+    "converged": true
   },
   {
     "name": "attribute order follows the object keys",
@@ -533,7 +554,10 @@
         "delta": "[{\"insert\":\"abc\",\"attributes\":{\"b\":1,\"a\":2}},{\"insert\":\"def\",\"attributes\":{\"b\":1,\"a\":3,\"c\":4}},{\"insert\":\"ghi\",\"attributes\":{\"c\":4,\"z\":0}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"abc\",\"attributes\":{\"b\":1,\"a\":2}},{\"insert\":\"def\",\"attributes\":{\"b\":1,\"a\":3,\"c\":4}},{\"insert\":\"ghi\",\"attributes\":{\"c\":4,\"z\":0}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"abc\",\"attributes\":{\"b\":1,\"a\":2}},{\"insert\":\"def\",\"attributes\":{\"b\":1,\"a\":3,\"c\":4}},{\"insert\":\"ghi\",\"attributes\":{\"c\":4,\"z\":0}}]"
+    ],
+    "converged": true
   },
   {
     "name": "unicode text",
@@ -599,7 +623,10 @@
         "delta": "[{\"insert\":\"你éx�\",\"attributes\":{\"bold\":true}},{\"insert\":\"🎉\",\"attributes\":{\"color\":\"#f00\"}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"你éx�\",\"attributes\":{\"bold\":true}},{\"insert\":\"🎉\",\"attributes\":{\"color\":\"#f00\"}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"你éx�\",\"attributes\":{\"bold\":true}},{\"insert\":\"🎉\",\"attributes\":{\"color\":\"#f00\"}}]"
+    ],
+    "converged": true
   },
   {
     "name": "text after unformatted text",
@@ -654,7 +681,10 @@
         "delta": "[{\"insert\":\"a\"},{\"insert\":\"f\",\"attributes\":{\"bold\":true}},{\"insert\":\"bc\"},{\"insert\":\"de\",\"attributes\":{\"bold\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"a\"},{\"insert\":\"f\",\"attributes\":{\"bold\":true}},{\"insert\":\"bc\"},{\"insert\":\"de\",\"attributes\":{\"bold\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"a\"},{\"insert\":\"f\",\"attributes\":{\"bold\":true}},{\"insert\":\"bc\"},{\"insert\":\"de\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "two replicas insert into the same formatted run",
@@ -764,6 +794,10 @@
         "delta": "[{\"insert\":\"start \"},{\"insert\":\"shared -one-\",\"attributes\":{\"bold\":true}},{\"insert\":\"-two-\",\"attributes\":{\"italic\":true}},{\"insert\":\"bold text\",\"attributes\":{\"bold\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"start \"},{\"insert\":\"shared -one-\",\"attributes\":{\"bold\":true}},{\"insert\":\"-two-\",\"attributes\":{\"italic\":true}},{\"insert\":\"bold text\",\"attributes\":{\"bold\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"start \"},{\"insert\":\"shared -one-\",\"attributes\":{\"bold\":true}},{\"insert\":\"-two-\",\"attributes\":{\"italic\":true}},{\"insert\":\"bold text\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"start \"},{\"insert\":\"shared -one-\",\"attributes\":{\"bold\":true}},{\"insert\":\"-two-\",\"attributes\":{\"italic\":true}},{\"insert\":\"bold text\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
   }
 ]

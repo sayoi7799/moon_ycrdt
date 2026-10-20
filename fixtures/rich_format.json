@@ -55,7 +55,10 @@
         "delta": "[{\"insert\":\"hel\",\"attributes\":{\"bold\":true}},{\"insert\":\"lo\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\" \",\"attributes\":{\"underline\":true}},{\"insert\":\"wo\",\"attributes\":{\"underline\":true,\"italic\":true}},{\"insert\":\"rld\",\"attributes\":{\"italic\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"hel\",\"attributes\":{\"bold\":true}},{\"insert\":\"lo\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\" \",\"attributes\":{\"underline\":true}},{\"insert\":\"wo\",\"attributes\":{\"underline\":true,\"italic\":true}},{\"insert\":\"rld\",\"attributes\":{\"italic\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"hel\",\"attributes\":{\"bold\":true}},{\"insert\":\"lo\",\"attributes\":{\"bold\":true,\"underline\":true}},{\"insert\":\" \",\"attributes\":{\"underline\":true}},{\"insert\":\"wo\",\"attributes\":{\"underline\":true,\"italic\":true}},{\"insert\":\"rld\",\"attributes\":{\"italic\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "null removes an attribute from part of a range",
@@ -117,7 +120,10 @@
         "delta": "[{\"insert\":\"abcd\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"ghij\",\"attributes\":{\"bold\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"abcd\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"ghij\",\"attributes\":{\"bold\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"abcd\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"ghij\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "overwriting a value and restoring the old one",
@@ -188,7 +194,10 @@
         "delta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"color\":\"red\"}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"abcdefghij\",\"attributes\":{\"color\":\"red\"}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"abcdefghij\",\"attributes\":{\"color\":\"red\"}}]"
+    ],
+    "converged": true
   },
   {
     "name": "formatting that changes nothing",
@@ -243,7 +252,10 @@
         "delta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"abcdef\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "several attributes at once keep their key order",
@@ -290,7 +302,10 @@
         "delta": "[{\"insert\":\"a\"},{\"insert\":\"b\",\"attributes\":{\"zeta\":1,\"alpha\":2}},{\"insert\":\"cd\",\"attributes\":{\"alpha\":2,\"mid\":true}},{\"insert\":\"e\",\"attributes\":{\"alpha\":2,\"zeta\":1}},{\"insert\":\"f\"}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"a\"},{\"insert\":\"b\",\"attributes\":{\"zeta\":1,\"alpha\":2}},{\"insert\":\"cd\",\"attributes\":{\"alpha\":2,\"mid\":true}},{\"insert\":\"e\",\"attributes\":{\"alpha\":2,\"zeta\":1}},{\"insert\":\"f\"}]"
+    "finalDeltas": [
+      "[{\"insert\":\"a\"},{\"insert\":\"b\",\"attributes\":{\"zeta\":1,\"alpha\":2}},{\"insert\":\"cd\",\"attributes\":{\"alpha\":2,\"mid\":true}},{\"insert\":\"e\",\"attributes\":{\"alpha\":2,\"zeta\":1}},{\"insert\":\"f\"}]"
+    ],
+    "converged": true
   },
   {
     "name": "ranges across embeds and deleted text",
@@ -357,7 +372,10 @@
         "delta": "[{\"insert\":\"a\",\"attributes\":{\"italic\":true}},{\"insert\":\"bc\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":{\"image\":\"x.png\"},\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"dehij\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"\\n\\n\\n\",\"attributes\":{\"italic\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"a\",\"attributes\":{\"italic\":true}},{\"insert\":\"bc\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":{\"image\":\"x.png\"},\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"dehij\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"\\n\\n\\n\",\"attributes\":{\"italic\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"a\",\"attributes\":{\"italic\":true}},{\"insert\":\"bc\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":{\"image\":\"x.png\"},\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"dehij\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\"\\n\\n\\n\",\"attributes\":{\"italic\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "a range that reaches past the end is padded with newlines",
@@ -389,7 +407,10 @@
         "delta": "[{\"insert\":\"a\"},{\"insert\":\"bc\\n\\n\\n\",\"attributes\":{\"bold\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"a\"},{\"insert\":\"bc\\n\\n\\n\",\"attributes\":{\"bold\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"a\"},{\"insert\":\"bc\\n\\n\\n\",\"attributes\":{\"bold\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "object values",
@@ -466,7 +487,10 @@
         "delta": "[{\"insert\":\"abcdefgh\"}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"abcdefgh\"}]"
+    "finalDeltas": [
+      "[{\"insert\":\"abcdefgh\"}]"
+    ],
+    "converged": true
   },
   {
     "name": "inserting at the edges of a formatted range",
@@ -541,7 +565,10 @@
         "delta": "[{\"insert\":\"abX\"},{\"insert\":\"c\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\",\"attributes\":{\"bold\":false}},{\"insert\":\"dY\",\"attributes\":{\"bold\":true}},{\"insert\":\"eZf\"}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"abX\"},{\"insert\":\"c\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\",\"attributes\":{\"bold\":false}},{\"insert\":\"dY\",\"attributes\":{\"bold\":true}},{\"insert\":\"eZf\"}]"
+    "finalDeltas": [
+      "[{\"insert\":\"abX\"},{\"insert\":\"c\",\"attributes\":{\"bold\":true}},{\"insert\":\"W\",\"attributes\":{\"bold\":false}},{\"insert\":\"dY\",\"attributes\":{\"bold\":true}},{\"insert\":\"eZf\"}]"
+    ],
+    "converged": true
   },
   {
     "name": "formatting after deleting",
@@ -609,7 +636,10 @@
         "delta": "[{\"insert\":\"hi\",\"attributes\":{\"italic\":true}},{\"insert\":\"j\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"hi\",\"attributes\":{\"italic\":true}},{\"insert\":\"j\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+    "finalDeltas": [
+      "[{\"insert\":\"hi\",\"attributes\":{\"italic\":true}},{\"insert\":\"j\",\"attributes\":{\"italic\":true,\"bold\":true}}]"
+    ],
+    "converged": true
   },
   {
     "name": "unicode ranges",
@@ -667,6 +697,9 @@
         "delta": "[{\"insert\":\"你\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":\"好\",\"attributes\":{\"color\":\"#f00\",\"bold\":true}},{\"insert\":\"😀\",\"attributes\":{\"bold\":true}},{\"insert\":\"世界�\",\"attributes\":{\"italic\":true}},{\"insert\":\"�\"}]"
       }
     ],
-    "finalDelta": "[{\"insert\":\"你\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":\"好\",\"attributes\":{\"color\":\"#f00\",\"bold\":true}},{\"insert\":\"😀\",\"attributes\":{\"bold\":true}},{\"insert\":\"世界�\",\"attributes\":{\"italic\":true}},{\"insert\":\"�\"}]"
+    "finalDeltas": [
+      "[{\"insert\":\"你\",\"attributes\":{\"color\":\"#f00\"}},{\"insert\":\"好\",\"attributes\":{\"color\":\"#f00\",\"bold\":true}},{\"insert\":\"😀\",\"attributes\":{\"bold\":true}},{\"insert\":\"世界�\",\"attributes\":{\"italic\":true}},{\"insert\":\"�\"}]"
+    ],
+    "converged": true
   }
 ]

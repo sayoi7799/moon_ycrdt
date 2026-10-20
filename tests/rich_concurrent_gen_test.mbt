@@ -46,7 +46,10 @@ fn rich_concurrent_case_1() -> RichCase {
         "[{\"insert\":\"hello\",\"attributes\":{\"bold\":true}},{\"insert\":\" world\"}]",
       ),
     ],
-    final_delta: "[{\"insert\":\"hello\",\"attributes\":{\"bold\":true}},{\"insert\":\" world\"}]",
+    final_deltas: [
+      "[{\"insert\":\"hello\",\"attributes\":{\"bold\":true}},{\"insert\":\" world\"}]",
+      "[{\"insert\":\"hello\",\"attributes\":{\"bold\":true}},{\"insert\":\" world\"}]",
+    ],
   }
 }
 
@@ -128,7 +131,10 @@ fn rich_concurrent_case_2() -> RichCase {
         "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cdefghij\"}]",
       ),
     ],
-    final_delta: "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cdefghij\"}]",
+    final_deltas: [
+      "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cdefghij\"}]",
+      "[{\"insert\":\"ab\",\"attributes\":{\"bold\":true}},{\"insert\":\"cdefghij\"}]",
+    ],
   }
 }
 
@@ -216,7 +222,10 @@ fn rich_concurrent_case_3() -> RichCase {
         "[{\"insert\":\"h\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ij\",\"attributes\":{\"italic\":true}}]",
       ),
     ],
-    final_delta: "[{\"insert\":\"h\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ij\",\"attributes\":{\"italic\":true}}]",
+    final_deltas: [
+      "[{\"insert\":\"h\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ij\",\"attributes\":{\"italic\":true}}]",
+      "[{\"insert\":\"h\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"ij\",\"attributes\":{\"italic\":true}}]",
+    ],
   }
 }
 
@@ -298,7 +307,10 @@ fn rich_concurrent_case_4() -> RichCase {
         "[{\"insert\":\"abcd\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"efgh\",\"attributes\":{\"color\":\"green\"}}]",
       ),
     ],
-    final_delta: "[{\"insert\":\"abcd\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"efgh\",\"attributes\":{\"color\":\"green\"}}]",
+    final_deltas: [
+      "[{\"insert\":\"abcd\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"efgh\",\"attributes\":{\"color\":\"green\"}}]",
+      "[{\"insert\":\"abcd\",\"attributes\":{\"color\":\"red\"}},{\"insert\":\"efgh\",\"attributes\":{\"color\":\"green\"}}]",
+    ],
   }
 }
 
@@ -390,7 +402,10 @@ fn rich_concurrent_case_5() -> RichCase {
         "[{\"insert\":\"ab\"},{\"insert\":\"cdY\",\"attributes\":{\"italic\":true}},{\"insert\":\"X\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"gh\"}]",
       ),
     ],
-    final_delta: "[{\"insert\":\"ab\"},{\"insert\":\"cdY\",\"attributes\":{\"italic\":true}},{\"insert\":\"X\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"gh\"}]",
+    final_deltas: [
+      "[{\"insert\":\"ab\"},{\"insert\":\"cdY\",\"attributes\":{\"italic\":true}},{\"insert\":\"X\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"gh\"}]",
+      "[{\"insert\":\"ab\"},{\"insert\":\"cdY\",\"attributes\":{\"italic\":true}},{\"insert\":\"X\",\"attributes\":{\"bold\":true}},{\"insert\":\"ef\",\"attributes\":{\"italic\":true}},{\"insert\":\"gh\"}]",
+    ],
   }
 }
 
@@ -564,7 +579,11 @@ fn rich_concurrent_case_6() -> RichCase {
         "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"++\",\"attributes\":{\"bold\":true,\"italic\":true,\"underline\":true}},{\"insert\":\"a\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"q.png\"}},{\"insert\":\"red\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\" \",\"attributes\":{\"bold\":true}},{\"insert\":\"tted text\",\"attributes\":{\"bold\":true}}]",
       ),
     ],
-    final_delta: "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"++\",\"attributes\":{\"bold\":true,\"italic\":true,\"underline\":true}},{\"insert\":\"a\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"q.png\"}},{\"insert\":\"red\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\" \",\"attributes\":{\"bold\":true}},{\"insert\":\"tted text\",\"attributes\":{\"bold\":true}}]",
+    final_deltas: [
+      "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"++\",\"attributes\":{\"bold\":true,\"italic\":true,\"underline\":true}},{\"insert\":\"a\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"q.png\"}},{\"insert\":\"red\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\" \",\"attributes\":{\"bold\":true}},{\"insert\":\"tted text\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"++\",\"attributes\":{\"bold\":true,\"italic\":true,\"underline\":true}},{\"insert\":\"a\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"q.png\"}},{\"insert\":\"red\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\" \",\"attributes\":{\"bold\":true}},{\"insert\":\"tted text\",\"attributes\":{\"bold\":true}}]",
+      "[{\"insert\":\"sh\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":\"++\",\"attributes\":{\"bold\":true,\"italic\":true,\"underline\":true}},{\"insert\":\"a\",\"attributes\":{\"bold\":true,\"italic\":true}},{\"insert\":{\"image\":\"q.png\"}},{\"insert\":\"red\",\"attributes\":{\"italic\":true,\"bold\":true}},{\"insert\":\" \",\"attributes\":{\"bold\":true}},{\"insert\":\"tted text\",\"attributes\":{\"bold\":true}}]",
+    ],
   }
 }
 

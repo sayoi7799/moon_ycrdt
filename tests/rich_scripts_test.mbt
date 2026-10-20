@@ -44,3 +44,19 @@ test "concurrent formatting matches Yjs, including its clean-up updates" {
   }
   assert_true(steps >= 40)
 }
+
+///|
+test "300 random rich-text scenarios converge exactly like Yjs" {
+  let cases = rich_convergence_cases()
+  assert_eq(cases.length(), 300)
+  let mut steps = 0
+  for c in cases {
+    steps += replay_rich(c)
+    // Yjs converged on all of them, so every MoonBit replica must have, too
+    assert_true(
+      c.final_deltas.iter().all(d => d == c.final_deltas[0]),
+      msg=c.name,
+    )
+  }
+  assert_true(steps > 8000)
+}

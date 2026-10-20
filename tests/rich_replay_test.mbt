@@ -32,7 +32,8 @@ struct RichCase {
   name : String
   clients : Array[UInt32]
   ops : Array[RichOp]
-  final_delta : String
+  /// The delta every replica ended with in Yjs (Yjs does not always converge).
+  final_deltas : Array[String]
 }
 
 ///|
@@ -96,8 +97,8 @@ fn replay_rich(c : RichCase) -> Int32 raise {
       msg="\{ctx} (updates)",
     )
   }
-  for t in texts {
-    assert_eq(delta_json(t), c.final_delta, msg="\{c.name} final")
+  for i, t in texts {
+    assert_eq(delta_json(t), c.final_deltas[i], msg="\{c.name} final \{i}")
   }
   for d in docs {
     assert_true(!d.has_pending(), msg="\{c.name} pending left")

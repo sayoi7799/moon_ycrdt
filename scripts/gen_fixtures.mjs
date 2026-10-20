@@ -1057,6 +1057,10 @@ const richRecorder = (name, ids) => {
   const logs = docs.map(() => [])
   docs.forEach((d, i) => d.on('update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
   const text = (r) => docs[r].getText('t')
+  // Request the type before anything arrives, the way editor bindings do. A
+  // type that is requested after content has been applied is a different
+  // object in Yjs (see richConvertedScripts).
+  docs.forEach((_, r) => text(r))
   const ops = []
   const step = (r, op, f) => {
     const before = logs[r].length
@@ -1071,6 +1075,33 @@ const richRecorder = (name, ids) => {
     applyDelta: (r, delta, opts) => step(r, { op: 'applyDelta', input: delta, sanitize: opts === undefined ? true : opts.sanitize }, () => opts === undefined ? text(r).applyDelta(delta) : text(r).applyDelta(delta, opts)),
     delta: (r) => JSON.parse(JSON.stringify(text(r).toDelta())),
     length: (r) => text(r).length,
+    logLength: (r) => logs[r].length,
+    // the positions of the text that are not inside a surrogate pair
+    boundaries: (r) => {
+      const out = [0]
+      let at = 0
+      for (const op of text(r).toDelta()) {
+        if (typeof op.insert === 'string') {
+          for (let i = 0; i < op.insert.length; i++) {
+            at++
+            const c = op.insert.charCodeAt(i)
+            const next = op.insert.charCodeAt(i + 1)
+            const inside = c >= 0xD800 && c <= 0xDBFF && next >= 0xDC00 && next <= 0xDFFF
+            if (!inside) out.push(at)
+          }
+        } else {
+          at++
+          out.push(at)
+        }
+      }
+      return out
+    },
+    totalLogs: () => logs.reduce((a, l) => a + l.length, 0),
+    deliver: (from, to, indices) => {
+      const before = logs[to].length
+      for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+      ops.push({ op: 'sync', from, to, indices, update: logs[to].slice(before).map(hex), delta: JSON.stringify(text(to).toDelta()) })
+    },
     syncAll: () => {
       for (let to = 0; to < docs.length; to++) {
         for (let from = 0; from < docs.length; from++) {
@@ -1083,11 +1114,10 @@ const richRecorder = (name, ids) => {
       }
     },
     finish: () => {
-      const finalDelta = JSON.stringify(text(0).toDelta())
-      for (let r = 1; r < docs.length; r++) {
-        if (JSON.stringify(text(r).toDelta()) !== finalDelta) throw new Error(`${name}: replicas differ`)
-      }
-      return { name, clients: ids, ops, finalDelta }
+      // Yjs does not always converge on the delta; the end state of every
+      // replica is recorded as Yjs left it
+      const finalDeltas = docs.map((_, r) => JSON.stringify(text(r).toDelta()))
+      return { name, clients: ids, ops, finalDeltas, converged: finalDeltas.every(d => d === finalDeltas[0]) }
     }
   }
 }
@@ -1114,7 +1144,7 @@ const mbtRichCases = (prefix, listName, cases) => {
   cases.forEach((c, i) => {
     mbt += `\n///|\nfn ${prefix}_${i + 1}() -> RichCase {\n  {\n    name: ${mbtString(c.name)},\n    clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n    ops: [\n`
     mbt += c.ops.map(o => `      ${mbtRichOp(o)},`).join('\n')
-    mbt += `\n    ],\n    final_delta: ${mbtString(c.finalDelta)},\n  }\n}\n`
+    mbt += `\n    ],\n    final_deltas: [${c.finalDeltas.map(mbtString).join(', ')}],\n  }\n}\n`
   })
   mbt += `\n///|\nfn ${listName}() -> Array[RichCase] {\n  [\n${cases.map((_, i) => `    ${prefix}_${i + 1}(),`).join('\n')}\n  ]\n}\n`
   return mbt
@@ -1410,6 +1440,120 @@ const genRichConcurrent = () => {
   writeFixture('rich_concurrent', 'tests', cases, mbtRichCases('rich_concurrent_case', 'rich_concurrent_cases', cases))
 }
 
+// Random rich-text scenarios: 2-4 replicas edit one text at nearby positions
+// with random formatting, and exchange their updates (the clean-up updates
+// Yjs emits included) in random order with duplicates. Seeds are fixed.
+
+const RICH_CASES = 300
+const RICH_OBJECT_VALUES = false
+
+const richValue = (rand, key) => {
+  switch (key) {
+    case 'bold': case 'italic': case 'underline': return true
+    case 'color': return ['red', 'blue', 'green'][Math.floor(rand() * 3)]
+    case 'size': return [10, 12, 14][Math.floor(rand() * 3)]
+    default: return RICH_OBJECT_VALUES ? { href: ['a', 'b'][Math.floor(rand() * 2)] } : 'x'
+  }
+}
+
+const RICH_KEYS = ['bold', 'italic', 'underline', 'color', 'size', 'link']
+const RICH_CHUNKS = ['a', 'bc', 'def', 'Z', '中', '😀', 'x y']
+
+// random attributes: 1-3 keys, a value or null (remove)
+const richAttrs = (rand) => {
+  const attrs = {}
+  const n = 1 + Math.floor(rand() * 3)
+  for (let i = 0; i < n; i++) {
+    const key = RICH_KEYS[Math.floor(rand() * RICH_KEYS.length)]
+    attrs[key] = rand() < 0.3 ? null : richValue(rand, key)
+  }
+  return attrs
+}
+
+export const richScenario = (seed) => {
+  const rand = rng(seed * 15485863 + 29)
+  const pick = (arr) => arr[Math.floor(rand() * arr.length)]
+  const n = 2 + Math.floor(rand() * 3)
+  const ids = []
+  while (ids.length < n) {
+    const id = rand() < 0.5 ? 1 + Math.floor(rand() * 5) : Math.floor(rand() * 4294967295)
+    if (!ids.includes(id)) ids.push(id)
+  }
+  const r = richRecorder(`seed ${seed}`, ids)
+  const logsLen = (x) => r.logLength(x)
+  const steps = 12 + Math.floor(rand() * 18)
+  for (let s = 0; s < steps; s++) {
+    const rep = Math.floor(rand() * n)
+    // positions between characters only: Yjs replicas do not agree on the
+    // text when an emoji is split in two (U+FFFD), which is unrelated to
+    // formatting and covered by the edge-case tests
+    const ok = r.boundaries(rep)
+    const len = ok[ok.length - 1]
+    const bias = rand()
+    const pos = bias < 0.2 ? 0 : bias < 0.35 ? len : pick(ok)
+    // a range: a boundary and one a few boundaries further on
+    const range = () => {
+      const i = Math.floor(rand() * (ok.length - 1))
+      const j = Math.min(ok.length - 1, i + 1 + Math.floor(rand() * 5))
+      return [ok[i], ok[j] - ok[i]]
+    }
+    const choice = rand()
+    if (choice < 0.28 || len === 0) {
+      const str = pick(RICH_CHUNKS)
+      if (rand() < 0.5) r.insert(rep, pos, str)
+      else r.insert(rep, pos, str, richAttrs(rand))
+    } else if (choice < 0.32) {
+      r.embed(rep, pos, { image: pick(['p.png', 'q.png']) }, rand() < 0.5 ? undefined : richAttrs(rand))
+    } else if (choice < 0.55) {
+      const [start, flen] = range()
+      r.format(rep, start, flen, richAttrs(rand))
+    } else if (choice < 0.68) {
+      const [start, dlen] = range()
+      r.del(rep, start, dlen)
+    } else if (choice < 0.76) {
+      // a small delta that walks over the text along character boundaries
+      const delta = []
+      let at = 0
+      const k = 1 + Math.floor(rand() * 4)
+      for (let i = 0; i < k; i++) {
+        const t = rand()
+        const next = ok.find(p => p > at)
+        if (t < 0.4 && next !== undefined) {
+          delta.push(rand() < 0.5 ? { retain: next - at } : { retain: next - at, attributes: richAttrs(rand) })
+          at = next
+        } else if (t < 0.6 && next !== undefined) {
+          delta.push({ delete: next - at })
+          at = next
+        } else {
+          delta.push(rand() < 0.5 ? { insert: pick(RICH_CHUNKS) } : { insert: pick(RICH_CHUNKS), attributes: richAttrs(rand) })
+        }
+      }
+      r.applyDelta(rep, delta)
+    } else {
+      const from = Math.floor(rand() * n)
+      const to = (from + 1 + Math.floor(rand() * (n - 1))) % n
+      if (logsLen(from) === 0) continue
+      const k = 1 + Math.floor(rand() * (logsLen(from) + 1))
+      r.deliver(from, to, Array.from({ length: k }, () => Math.floor(rand() * logsLen(from))))
+    }
+  }
+  // exchange everything until nothing new appears: clean-up updates can
+  // themselves cause further clean-ups
+  for (let round = 0; round < 10; round++) {
+    const before = r.totalLogs()
+    r.syncAll()
+    if (r.totalLogs() === before) break
+  }
+  const result = r.finish()
+  if (!result.converged) throw new Error(`rich seed ${seed}: Yjs replicas did not converge`)
+  return result
+}
+
+const genRichConvergence = () => {
+  const cases = Array.from({ length: RICH_CASES }, (_, i) => richScenario(i + 1))
+  writeFixture('rich_convergence', 'tests', cases, mbtRichCases('rich_convergence_case', 'rich_convergence_cases', cases))
+}
+
 const genRichFormat = () => {
   const cases = richFormatScripts()
   writeFixture('rich_format', 'tests', cases, mbtRichCases('rich_format_case', 'rich_format_cases', cases))
@@ -1433,4 +1577,5 @@ genRichInsert()
 genRichFormat()
 genRichApplyDelta()
 genRichConcurrent()
+genRichConvergence()
 genExportBase()
