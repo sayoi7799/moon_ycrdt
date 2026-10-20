@@ -33,3 +33,14 @@ test "apply_delta matches Yjs step by step" {
   }
   assert_true(steps >= 20)
 }
+
+///|
+test "concurrent formatting matches Yjs, including its clean-up updates" {
+  let cases = rich_concurrent_cases()
+  assert_true(cases.length() >= 6)
+  let mut steps = 0
+  for c in cases {
+    steps += replay_rich(c)
+  }
+  assert_true(steps >= 40)
+}

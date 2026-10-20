@@ -1340,6 +1340,76 @@ const genRichApplyDelta = () => {
   writeFixture('rich_apply_delta', 'tests', cases, mbtRichCases('rich_apply_delta_case', 'rich_apply_delta_cases', cases))
 }
 
+const richConcurrentScripts = () => {
+  const out = []
+  const script = (name, ids, f) => { const r = richRecorder(name, ids); f(r); out.push(r.finish()) }
+  script('both replicas bold the same range', [1, 2], r => {
+    r.insert(0, 0, 'hello world')
+    r.syncAll()
+    r.format(0, 0, 5, { bold: true })
+    r.format(1, 0, 5, { bold: true })
+    r.syncAll()
+  })
+  script('both replicas format overlapping ranges', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij')
+    r.syncAll()
+    r.format(0, 0, 6, { bold: true })
+    r.format(1, 3, 6, { bold: true })
+    r.syncAll()
+    r.format(0, 2, 4, { bold: null })
+    r.format(1, 0, 10, { bold: true })
+    r.syncAll()
+  })
+  script('one replica formats while the other deletes', [1, 2], r => {
+    r.insert(0, 0, 'abcdefghij', { italic: true })
+    r.syncAll()
+    r.format(0, 2, 6, { bold: true })
+    r.del(1, 3, 4)
+    r.syncAll()
+    r.del(0, 0, 3)
+    r.format(1, 0, 3, { bold: true })
+    r.syncAll()
+  })
+  script('different values for the same attribute', [1, 2], r => {
+    r.insert(0, 0, 'abcdefgh')
+    r.syncAll()
+    r.format(0, 0, 8, { color: 'red' })
+    r.format(1, 2, 4, { color: 'blue' })
+    r.syncAll()
+    r.format(0, 4, 4, { color: 'green' })
+    r.format(1, 0, 8, { color: 'red' })
+    r.syncAll()
+  })
+  script('remove and apply the same attribute concurrently', [1, 2], r => {
+    r.insert(0, 0, 'abcdefgh', { bold: true })
+    r.syncAll()
+    r.format(0, 0, 8, { bold: null })
+    r.format(1, 2, 4, { bold: true, italic: true })
+    r.syncAll()
+    r.insert(1, 4, 'X', { bold: true })
+    r.insert(0, 4, 'Y')
+    r.syncAll()
+  })
+  script('three replicas edit formatted text', [1, 2, 3], r => {
+    r.insert(0, 0, 'shared formatted text', { bold: true })
+    r.syncAll()
+    r.format(0, 0, 6, { italic: true })
+    r.format(1, 3, 9, { italic: true, bold: null })
+    r.del(2, 7, 5)
+    r.insert(2, 2, '++', { underline: true })
+    r.syncAll()
+    r.format(1, 0, 10, { bold: true })
+    r.embed(0, 5, { image: 'q.png' })
+    r.syncAll()
+  })
+  return out
+}
+
+const genRichConcurrent = () => {
+  const cases = richConcurrentScripts()
+  writeFixture('rich_concurrent', 'tests', cases, mbtRichCases('rich_concurrent_case', 'rich_concurrent_cases', cases))
+}
+
 const genRichFormat = () => {
   const cases = richFormatScripts()
   writeFixture('rich_format', 'tests', cases, mbtRichCases('rich_format_case', 'rich_format_cases', cases))
@@ -1362,4 +1432,5 @@ genRichDelta()
 genRichInsert()
 genRichFormat()
 genRichApplyDelta()
+genRichConcurrent()
 genExportBase()

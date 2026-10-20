@@ -20,6 +20,8 @@ pub struct Doc {
   priv txn_before : Map[UInt32, Int32]
   /// Deletions performed in this transaction.
   priv mut txn_ds : @update.DeleteSet
+  /// Types with a change inside them in this transaction (`transaction.changed`).
+  priv txn_changed : Array[YType]
   priv listeners : Array[(Bytes, Bool) -> Unit]
 }
 
@@ -37,6 +39,7 @@ pub fn Doc::new(client_id : UInt32) -> Doc {
     touched: {},
     txn_before: {},
     txn_ds: @update.DeleteSet::new(),
+    txn_changed: [],
     listeners: [],
   }
 }
@@ -170,7 +173,16 @@ pub fn Doc::apply_update(
   self.apply_delete_set(old_pending, rest_ds)
   rest_ds.sort_and_merge()
   self.pending_ds = rest_ds
+  // After a remote change Yjs cleans up redundant formatting in a second
+  // transaction, once the update event of the first has been emitted.
+  let cleanup_needed = self.richtext_needs_cleanup()
+  let before = self.txn_before.copy()
+  let ds = self.txn_ds
+  ds.sort_and_merge()
   self.end_transaction(false)
+  if cleanup_needed {
+    self.richtext_cleanup(before, ds)
+  }
 }
 
 ///|
@@ -366,6 +378,7 @@ fn Doc::end_transaction(self : Doc, is_local : Bool) -> Unit {
   }
   self.txn_before.clear()
   self.txn_ds = @update.DeleteSet::new()
+  self.txn_changed.clear()
 }
 
 ///|

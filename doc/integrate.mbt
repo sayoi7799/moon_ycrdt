@@ -90,6 +90,7 @@ fn Doc::integrate_item(self : Doc, item : Item) -> Unit {
     parent.length += item.length
   }
   self.add_struct(Item(item))
+  self.note_changed(parent)
   match item.content {
     Deleted(_) => {
       item.deleted = true
@@ -134,6 +135,7 @@ pub fn Doc::delete_item(self : Doc, item : Item) -> Unit {
     item.parent.length -= item.length
   }
   item.deleted = true
+  self.note_changed(item.parent)
   self.touch(item.id.client, item.id.clock)
   self.txn_ds.add(item.id.client, item.id.clock, item.length)
   if item.nested is Some(t) {
