@@ -1,0 +1,19 @@
+# Files left out of the archive built by `moon package` / `moon publish`.
+# This file replaces .gitignore for the archive (the two are not combined),
+# so the entries of .gitignore that matter are repeated here.
+# Check the result with: moon package --list
+
+# Hackathon proposal: not part of the library.
+/docs/
+
+# Human-readable copies of the test data. The tests do not read them: the
+# same data is embedded in the generated *_gen_test.mbt files. They stay in
+# the Git repository, and scripts/gen_fixtures.mjs regenerates them.
+/fixtures/
+
+# Dependencies of the Node scripts (installed with `npm ci`).
+node_modules/
+
+# Build output and OS files, as in .gitignore.
+target/
+.DS_Store

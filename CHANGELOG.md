@@ -56,6 +56,11 @@
 - GitHub Actions 在 ubuntu、macos、windows 上运行 `moon check --deny-warn`、`moon build`、`moon test`（均为 `--target all`）、
   `moon fmt --check` 和 `moon info` 差异检查；另有 Node + 固定版本 Yjs 的互通验证 job。
 
+**发布准备**
+- `moon.mod` 声明 `supported_targets = "+wasm+wasm-gc+js+native"`，与 CI 实际验证的后端一致。
+- 新增 `.moonignore`：发布包不含 `docs/`、`fixtures/` 和 `node_modules/`（压缩包约 320 KB）。
+  从发布包解压出的目录单独运行 `moon check --deny-warn` 和 `moon test --target all` 均通过。
+
 ### 已知限制
 
 - 不支持文本格式属性的读写 API、update v2、Y.Xml* 的 API、子文档加载、UndoManager、awareness 状态、相对位置、快照和垃圾回收。

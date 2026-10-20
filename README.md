@@ -337,6 +337,9 @@ cd scripts && npm ci && node gen_fixtures.mjs && cd .. && moon fmt
 
 生成是确定性的（随机场景使用固定种子），CI 会重新生成并检查与仓库中的文件一致。
 
+发布到 mooncakes.io 的包不含 `fixtures/` 和 `docs/`（见 [.moonignore](.moonignore)）：测试用的数据已经内嵌在
+`*_gen_test.mbt` 里，不需要这些 JSON 文件，完整的 `fixtures/` 在 GitHub 仓库中。
+
 ## 参考与许可证
 
 本项目用 MoonBit 重新实现 Yjs 的协议和行为，只参考协议与行为，不逐行翻译代码。
