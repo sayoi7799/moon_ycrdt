@@ -5,6 +5,18 @@
 
 ## [Unreleased]
 
+### 新增
+
+**协作编辑演示**（issue #6）
+- `examples/ws_server`：用本库写的 y-websocket 服务端（`moonbitlang/async`，native）。按连接路径分房间，处理
+  SyncStep1 / SyncStep2 / Update，把更新和 awareness 消息转发给同房间的其他连接；有改动的房间定期保存为
+  `.ydoc` 文件（`Y.applyUpdate` 可读），首次使用时从文件恢复。独立模块（自己的 `moon.mod` 和 `moon.work`），
+  不进发布包，不影响库的依赖和多后端 CI。
+- `examples/web`：官方 `yjs` + `y-websocket` 客户端加 textarea 的最小网页（Vite）。
+- `examples/web/test/e2e.mjs`：两个官方客户端经服务端的端到端测试，包括服务端重启后文档仍在；CI 新增只在
+  ubuntu 上运行的 job。
+- README 增加运行步骤。
+
 ## [0.2.0] - 2026-10-22
 
 在 0.1.0 的基础上加入 Y.Text 富文本（格式属性、Delta），可与 ProseMirror / Quill 一类编辑器绑定的数据格式对接。
