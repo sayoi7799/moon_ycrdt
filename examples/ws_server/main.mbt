@@ -138,7 +138,12 @@ async fn main {
   let store = Store::{ dir: data, }
   store.init()
   let rooms = Rooms::new(store)
-  let server = @http.Server(@socket.Addr::parse("\{host}:\{port}"))
+  // reuse_addr: a restart right after a stop must not wait for the old
+  // connections to leave TIME_WAIT
+  let server = @http.Server(
+    @socket.Addr::parse("\{host}:\{port}"),
+    reuse_addr=true,
+  )
   println(
     "y-websocket server listening on ws://\{host}:\{port}, data in \{data}",
   )
