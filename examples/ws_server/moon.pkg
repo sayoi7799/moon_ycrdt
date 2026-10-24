@@ -1,0 +1,14 @@
+import {
+  "sayoi7799/moon_ycrdt/doc",
+  "sayoi7799/moon_ycrdt/lib0",
+  "sayoi7799/moon_ycrdt/protocol",
+  "moonbitlang/async",
+  "moonbitlang/async/aqueue",
+  "moonbitlang/async/http",
+  "moonbitlang/async/socket",
+  "moonbitlang/async/websocket",
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+}
+
+pkgtype(kind: "executable")
