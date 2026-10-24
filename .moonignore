@@ -17,3 +17,7 @@ node_modules/
 # Build output and OS files, as in .gitignore.
 target/
 .DS_Store
+
+# The y-websocket server example is a module of its own (it needs
+# moonbitlang/async, which only supports native), not part of the library.
+/examples/ws_server/

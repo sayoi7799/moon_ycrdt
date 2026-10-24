@@ -23,6 +23,7 @@ y-websocket 服务以及 Yrs 后端交换同一份文档。
 - [快速上手](#快速上手)
 - [对接 y-websocket](#对接-y-websocket)
 - [可运行示例](#可运行示例)
+- [协作编辑演示：y-websocket 服务端](#协作编辑演示y-websocket-服务端)
 - [API 速查](#api-速查)
 - [支持范围](#支持范围)
 - [工作原理](#工作原理)
@@ -199,6 +200,84 @@ Y.applyUpdate(doc, new Uint8Array(Buffer.from(base64, 'base64')))
 console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 ```
 
+## 协作编辑演示：y-websocket 服务端
+
+`examples/ws_server` 是一个用本库写的 y-websocket 服务端，`examples/web` 是连接它的网页：官方的 `yjs` 和
+`y-websocket` 客户端加一个 `<textarea>`。两个浏览器窗口里的文本实时同步，服务端重启后内容还在。
+
+需要：MoonBit 工具链、Node.js 22（网页用 Vite 8 开发服务器）。服务端用 [`moonbitlang/async`](https://mooncakes.io/docs/moonbitlang/async)
+（它自带的 `http` 和 `websocket` 包），只支持 native 后端。它的 README 写的是 Linux / macOS，实际上也在 Windows 11
+上编译并运行过；CI 在 ubuntu 上跑。因此 `examples/ws_server` 是独立的模块（有自己的 `moon.mod` 和 `moon.work`），
+不是 `moon_ycrdt` 的依赖，也不进发布包。
+
+**1. 启动服务端**（在一个终端里）：
+
+```bash
+cd examples/ws_server
+```
+
+```bash
+moon run --target native . -- --port 1234 --data ./data
+```
+
+看到 `y-websocket server listening on ws://127.0.0.1:1234` 就绪。参数都可省略：
+
+| 参数 | 默认值 | 含义 |
+|---|---|---|
+| `--host` | `127.0.0.1` | 监听地址 |
+| `--port` | `1234` | 监听端口（y-websocket 的默认端口） |
+| `--data` | `data` | 保存文档的目录，不存在会创建 |
+| `--save-interval` | `2` | 有改动的房间每隔几秒保存一次 |
+
+**2. 启动网页**（在另一个终端里）：
+
+```bash
+cd examples/web
+```
+
+```bash
+npm ci
+```
+
+```bash
+npm run dev
+```
+
+**3. 打开两个浏览器窗口**，都访问 <http://localhost:5173/?room=demo>。在一个窗口里输入，另一个窗口里文字立即出现；
+两边同时输入也会收敛。换一个 `?room=` 就是另一份文档。页面上的状态点是绿色表示已连上服务端。
+
+**4. 验证重启后内容还在**：在服务端的终端按 `Ctrl-C`，再用同一条命令启动，然后刷新浏览器窗口，文字还在。
+
+
+服务端做的事：
+
+- 连接路径就是房间名（`ws://host:port/<房间名>`），每个房间一个 `Doc`；房间名最长 40 个 UTF-16 码元。
+- 新连接先收到服务端的 SyncStep1；客户端的 SyncStep1 由 `handle_sync_message` 回复 SyncStep2；SyncStep2 和 Update
+  应用到文档，`Doc::on_update` 把结果作为 Update 广播给同房间的其他连接（不回给发送者）。
+- awareness 消息不解析，原样转发给同房间的其他连接。服务端不记录各客户端的 awareness 状态，所以新连接看不到之前
+  已在线的光标（演示的网页没有用 awareness）。
+- 每个房间保存为 `<data>/<房间名转义后>.ydoc`，内容是 `encode_state_as_update` 的结果，所以可以直接用
+  `Y.applyUpdate` 读取。先写 `.tmp` 再改名，中途崩溃不会留下写了一半的文件；第一个客户端进入房间时从文件恢复。
+  保存间隔内的改动在进程被强杀时会丢失。
+- 没有认证、没有 TLS，只适合本机或可信网络。
+
+网页的 `?server=ws://主机:端口` 可以指向别的服务端，例如用官方的 `y-websocket` 服务端对比。网页里关闭了
+`BroadcastChannel`（`disableBc: true`），否则同一浏览器的两个窗口会绕过服务端直接互通，看不出服务端在工作。
+
+编辑器用的是 textarea，不是 Tiptap / ProseMirror：它们的 Yjs 绑定用 `Y.XmlFragment`，本库还没有 `Y.Xml*` 的 API
+（见[支持范围](#支持范围)）。
+
+自动化测试 `examples/web/test/e2e.mjs`：启动编译好的服务端，用两个官方 `y-websocket` 客户端验证双向同步、并发收敛、
+后加入的客户端、房间隔离、保存的文件能被 Yjs 读取，以及停止再启动服务端后文档仍在：
+
+```bash
+cd examples/ws_server && moon build --target native
+```
+
+```bash
+cd examples/web && npm run e2e -- ../ws_server/_build/native/debug/build/sayoi7799/moon_ycrdt_ws_server/moon_ycrdt_ws_server.exe
+```
+
 ## API 速查
 
 | 包 | 主要 API |
@@ -236,7 +315,8 @@ console.log(doc.getText('doc').toString()) // "hello, Alice, Bob world"
 | update v2 | ❌ | |
 | 子文档加载、UndoManager、awareness 状态、相对位置、快照 | ❌ | |
 | 垃圾回收 | ❌ | 本地文档相当于 `gc: false`，但能解码对方发来的 GC 结构和 ContentDeleted |
-| y-websocket 服务端、编辑器绑定 | ❌ | |
+| y-websocket 服务端 | 示例 | `examples/ws_server`：native 程序，房间广播和文件持久化，见[协作编辑演示](#协作编辑演示y-websocket-服务端)；不是库的一部分 |
+| 编辑器绑定 | 示例 | `examples/web` 里的 textarea 绑定是示例代码；Tiptap / ProseMirror 需要 `Y.Xml*`，❌ |
 
 已知限制：
 
@@ -342,11 +422,13 @@ moon bench -p sayoi7799/moon_ycrdt/benchmarks --target native --release
 | 富文本：编辑脚本 | 由 Yjs 逐步记录：带 / 不带属性插入和 embed（11 组 53 步）、`format`（11 组 47 步）、`applyDelta`（10 组 29 步）、并发格式化（6 组 67 步）、类型晚取（7 组 35 步）。每一步比较 delta 和本地更新的字节，远端更新后 Yjs 产生的清理更新也要一致 | `tests/rich_scripts_test.mbt` |
 | 富文本：随机并发 | 300 组固定种子（1–300），2–4 个副本，带属性的插入、embed、`format`（含 `null`）、删除、`applyDelta`，乱序重复同步直到不再产生新更新；共 8734 步，其中 149 次是 Yjs 的清理更新，每一步的 delta 和更新字节都与 Yjs 一致，最终所有副本一致 | `tests/rich_scripts_test.mbt` |
 | README 示例 | 快速上手、富文本与 y-websocket 流程的代码 | `tests/readme_test.mbt` |
+| 示例服务端 | 两个官方 `y-websocket` 客户端经 MoonBit 服务端：双向同步、并发收敛、后加入的客户端、房间隔离；保存的文件能被 `Y.applyUpdate` 读取；服务端重启后文档仍在。另有房间名与文件名转义的单元测试 | `examples/web/test/e2e.mjs`、`examples/ws_server/store_wbtest.mbt` |
 
 ## 开发
 
 CI（[.github/workflows/ci.yml](.github/workflows/ci.yml)）在 ubuntu、macos、windows 上运行下面这些命令，
-另有一个 job 用 Node 和固定版本的 Yjs 做互通验证。本地复现：
+另有一个 job 用 Node 和固定版本的 Yjs 做互通验证，一个 job（ubuntu）检查并测试 `examples/ws_server`、
+用官方 y-websocket 客户端跑端到端测试。本地复现：
 
 ```bash
 moon check --deny-warn --target all

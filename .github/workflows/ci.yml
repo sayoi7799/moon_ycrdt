@@ -110,3 +110,50 @@ jobs:
           moon run examples/roundtrip --target native -- "$(cat input.txt)" | tee roundtrip.txt
           node scripts/read_update.mjs "$(tail -1 roundtrip.txt | cut -d' ' -f3)" doc | tee read.txt
           grep -q 'MoonBit\] Written in Yjs' read.txt
+
+  ws-server:
+    name: y-websocket server example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: install-moonbit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: examples/web/package-lock.json
+
+      - name: install the official y-websocket client
+        working-directory: examples/web
+        run: npm ci
+
+      # examples/ws_server is a module of its own (moonbitlang/async is native
+      # only), so the checks of the library do not cover it.
+      - name: check, test and format the server
+        working-directory: examples/ws_server
+        run: |
+          moon update
+          moon check --deny-warn --target native
+          moon test --target native
+          moon fmt --check
+          moon info
+          git diff --exit-code
+
+      - name: build the server
+        working-directory: examples/ws_server
+        run: moon build --target native
+
+      - name: two official clients through the server, and a restart
+        working-directory: examples/web
+        run: npm run e2e -- ../ws_server/_build/native/debug/build/sayoi7799/moon_ycrdt_ws_server/moon_ycrdt_ws_server.exe
+
+      - name: the web example builds
+        working-directory: examples/web
+        run: npm run build

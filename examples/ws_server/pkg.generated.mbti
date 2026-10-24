@@ -1,0 +1,19 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "sayoi7799/moon_ycrdt_ws_server"
+
+// Values
+
+// Errors
+
+// Types and methods
+type Peer
+
+type Room
+
+type Rooms
+
+type Store
+
+// Type aliases
+
+// Traits
