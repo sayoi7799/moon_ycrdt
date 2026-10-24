@@ -4,3 +4,6 @@ target/
 .mooncakes/
 .moonagent/
 node_modules/
+
+# Rooms saved by examples/ws_server
+examples/ws_server/data/

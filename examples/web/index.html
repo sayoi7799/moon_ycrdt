@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>moon_ycrdt demo</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 42rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      #status {
+        font-size: 0.9rem;
+        color: #555;
+      }
+      #status::before {
+        content: '';
+        display: inline-block;
+        width: 0.6rem;
+        height: 0.6rem;
+        margin-right: 0.4rem;
+        border-radius: 50%;
+        background: #c33;
+      }
+      #status.connected::before {
+        background: #2a2;
+      }
+      textarea {
+        box-sizing: border-box;
+        width: 100%;
+        height: 16rem;
+        margin-top: 0.5rem;
+        padding: 0.6rem;
+        font: 1rem/1.5 system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>moon_ycrdt demo</h1>
+    <p>
+      Room <code id="room"></code>. Open this page in a second window and type in
+      either one: the text goes through the MoonBit server.
+    </p>
+    <div id="status">connecting…</div>
+    <textarea id="editor" placeholder="Type here" disabled></textarea>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
