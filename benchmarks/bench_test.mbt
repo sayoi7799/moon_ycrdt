@@ -118,3 +118,17 @@ test "array: 2000 pushes and 500 random inserts" (it : @bench.T) {
     it.keep(doc)
   })
 }
+
+///|
+test "text: 100k characters, 5000 random inserts and 5000 random deletes" (
+  it : @bench.T,
+) {
+  it.bench(fn() { it.keep(@benchmarks.long_text_edits(5000)) })
+}
+
+///|
+test "array: 100k values, 5000 random inserts and 5000 random deletes" (
+  it : @bench.T,
+) {
+  it.bench(fn() { it.keep(@benchmarks.long_array_edits(5000)) })
+}

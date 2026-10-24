@@ -101,3 +101,39 @@ pub fn three_way_sync(edits : Int32) -> Int32 {
   }
   @types.Text::new(docs[0], "t").length()
 }
+
+///|
+/// A text of 100000 characters (one insert) followed by `n` random inserts of
+/// two characters and `n` random deletes of 1-3 characters, every edit in its
+/// own transaction. The edits split the text into about `2 * n` items, which
+/// is what makes finding a position expensive. Returns the final length.
+pub fn long_text_edits(n : Int32) -> Int32 {
+  let doc = @doc.Doc::new(1)
+  let text = @types.Text::new(doc, "t")
+  text.insert(0, "abcdefghij".repeat(10000))
+  random_inserts(doc, n, 11)
+  random_deletes(doc, n, 12)
+  text.length()
+}
+
+///|
+/// The same on a `YArray` of 100000 numbers (one insert): `n` random inserts
+/// of one value and `n` random deletes of 1-3 values. Returns the final length.
+pub fn long_array_edits(n : Int32) -> Int32 {
+  let doc = @doc.Doc::new(1)
+  let array = @types.YArray::new(doc, "a")
+  let initial : Array[@lib0.Any] = []
+  for i in 0..<100000 {
+    initial.push(@lib0.Any::int(i))
+  }
+  array.insert(0, initial)
+  let rng = Lcg::new(13)
+  for i in 0..<n {
+    array.insert(rng.next(array.length() + 1), [@lib0.Any::int(i)])
+  }
+  for _ in 0..<n {
+    let pos = rng.next(array.length())
+    array.delete(pos, @cmp.minimum(1 + rng.next(3), array.length() - pos))
+  }
+  array.length()
+}

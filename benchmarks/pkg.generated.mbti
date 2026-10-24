@@ -8,6 +8,10 @@ import {
 // Values
 pub fn fragmented_document(Int32) -> Bytes
 
+pub fn long_array_edits(Int32) -> Int32
+
+pub fn long_text_edits(Int32) -> Int32
+
 pub fn random_deletes(@doc.Doc, Int32, UInt32) -> Unit
 
 pub fn random_inserts(@doc.Doc, Int32, UInt32) -> Unit
