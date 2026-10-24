@@ -320,18 +320,19 @@ cd examples/web && npm run e2e -- ../ws_server/_build/native/debug/build/sayoi77
 
 已知限制：
 
-- **Yjs 的定位缓存（search marker）与带格式的文本**：Yjs 用 search marker 加速定位。不带属性的 `insert` 和
-  `delete` 会用它，带属性的 `insert`、`format` 和 `applyDelta` 不用。marker 从目标位置附近开始，看不到它左边的
-  格式项，所以带格式的文本里"新文本继承什么格式"取决于 marker 在不在。marker 属于某一个 JS 对象，规律是：
+- **Yjs 的定位缓存（search marker）与带格式的文本**：本库实现了 Yjs 的 search marker：每个 `Y.Text` /
+  `Y.Array` 最多 80 个，选择最近的 marker、移动或替换最久未用的、本地编辑后平移、合并 Item 时调整、远端更新后清空，
+  规则逐条按 `AbstractType.js` 移植。这不只是为了速度：Yjs 里不带属性的 `insert` 和 `delete` 通过 marker 定位，
+  带属性的 `insert`、`format` 和 `applyDelta` 不用；marker 从目标位置附近开始，看不到它左边的格式项，所以带格式的
+  文本里"新文本继承什么格式"取决于 marker 在哪里。marker 属于某一个 JS 对象，规律是：
   1. **一个 `YText` 对象一旦整合过任何格式项**（本地的或远端更新里的），marker 就被**永久关闭**，之后所有定位都从头
      累积属性，结果是确定的。先调用 `getText` 再同步更新（编辑器绑定的通常用法）就是这种情形，本库与 Yjs 逐字节一致
      （300 组随机并发场景和各组脚本）。
   2. **例外：根类型在内容到达之后才调用 `getText`。** Yjs 此时用一个新对象替换占位类型：marker 是开着的，而且这个
      对象还没有"含格式"标志，所以不带属性的 `insert` 和 `delete` 看不到 marker 左边的格式；远端更新后的格式清理
-     也要等到整合第一个新的格式项才开始。本库按源码实现了这两点，并用一个全新的 marker 模拟 `findMarker`，
-     7 个专门设计的场景与 Yjs 一致。但 Yjs 的 marker 会在多次操作之间累积（最多 80 个，位置还随编辑平移），
-     本库没有实现，所以连续多次依赖 marker 的操作序列没有被证明一致；"没有含格式标志所以不清理"这一条
-     也没有测试覆盖。
+     也要等到整合第一个新的格式项才开始。本库实现了这两点，marker 在多次操作之间累积、被替换（超过 80 个）、
+     被远端更新清空的行为也一致：20 组各约 100 步的长序列与 Yjs 逐步一致（改动 marker 的上限、清空规则或最近
+     marker 的取舍，其中至少一个测试会失败）。"没有含格式标志所以不清理"这一条仍没有专门的测试覆盖。
 - **对象或数组形式的属性值**：Yjs 在格式清理里用 `===` 比较解码出的值。同一个 JS 对象被两个格式项共用时
   （例如 `format` 为恢复旧值会重用已有格式项的值对象）它们被认为相同；编码后的数据里看不出共用，本库把对象和数组
   视为恒不相同。这只影响清理时多余格式项的取舍，不影响文本和格式的收敛。布尔、数字、字符串和 `null` 完全一致；
@@ -346,7 +347,8 @@ cd examples/web && npm run e2e -- ../ws_server/_build/native/debug/build/sayoi77
 - Yjs 的数组不接受 `undefined` 和 bigint；本库照常把它们编码进数组（Yjs 能解码）。
 - 不检测 client id 冲突（Yjs 会在冲突时换 id）。每个副本应使用随机的 32 位 client id，
   `examples/roundtrip` 演示了用 `@env.rand` 生成。
-- 定位按链表线性查找，没有 search marker 缓存（见[性能](#性能)）。
+- 长文档里的随机位置编辑仍随 Item 数变慢，但系数小得多：search marker 把沿链表走的步数降到每次约 18 步，剩下的主要是
+  每个 client 的 struct 数组在中间插入（拆分）和删除（合并）一项时要移动后面的元素（见[性能](#性能)）。
 
 ## 工作原理
 
@@ -384,23 +386,35 @@ Item 后面）决定了新 Item 的 origin，这些细节都照 Yjs 实现，所
 moon bench -p sayoi7799/moon_ycrdt/benchmarks --target native --release
 ```
 
-参考数据：AMD Ryzen 9 7945HX、Windows 11、native release，单位为每次运行的平均时间。
-"优化前"是事务结束时对整个 client 数组做合并的版本，"现在"只检查本事务改动过的位置。
+参考数据：AMD Ryzen 9 7945HX、Windows 11、native release，单位为每次运行的平均时间。三列依次是：事务结束时对整个
+client 数组做合并的版本（只检查本事务改动过的位置之前）、定位还是沿链表从头走的版本（加 search marker 之前）、现在
+（定位从最近的 search marker 开始）。
 
-| 基准 | 优化前 | 现在 |
-|---|---|---|
-| lib0：编解码 1 万个 varUint 和 1000 个 Any 对象 | 1.80 ms | 1.84 ms |
-| 解码并重新编码一个 4000 项的碎片化文档 | 2.96 ms | 2.88 ms |
-| 在文本末尾逐字输入 2000 个字符（每字一个事务） | 1.61 ms | 1.77 ms |
-| 2000 次随机位置插入 | 96.8 ms | 8.58 ms |
-| 4000 字的文本里 1000 次随机删除 | 208 ms | 18.3 ms |
-| 加载一个 4000 项的碎片化文档（`apply_update`） | 4.92 ms | 5.94 ms |
-| 导出这个文档的完整状态 | 1.66 ms | 1.66 ms |
-| 3 个副本 × 300 轮并发编辑并互相同步 | 18.7 ms | 8.82 ms |
-| Map：在 100 个键上 set 5000 次 | 430 ms | 5.95 ms |
-| Array：push 2000 次再随机插入 500 次 | 13.8 ms | 6.37 ms |
+| 基准 | 合并优化前 | marker 之前 | 现在 |
+|---|---|---|---|
+| lib0：编解码 1 万个 varUint 和 1000 个 Any 对象 | 1.80 ms | 1.78 ms | 1.74 ms |
+| 解码并重新编码一个 4000 项的碎片化文档 | 2.96 ms | 2.94 ms | 2.72 ms |
+| 在文本末尾逐字输入 2000 个字符（每字一个事务） | 1.61 ms | 2.60 ms | 2.58 ms |
+| 2000 次随机位置插入 | 96.8 ms | 9.21 ms | 4.82 ms |
+| 4000 字的文本里 1000 次随机删除 | 208 ms | 18.8 ms | 7.96 ms |
+| 加载一个 4000 项的碎片化文档（`apply_update`） | 4.92 ms | 6.53 ms | 6.55 ms |
+| 导出这个文档的完整状态 | 1.66 ms | 1.59 ms | 1.56 ms |
+| 3 个副本 × 300 轮并发编辑并互相同步 | 18.7 ms | 9.74 ms | 9.63 ms |
+| Map：在 100 个键上 set 5000 次 | 430 ms | 6.56 ms | 6.33 ms |
+| Array：push 2000 次再随机插入 500 次 | 13.8 ms | 6.34 ms | 6.00 ms |
+| **长文本**：10 万字符，5000 次随机插入 + 5000 次随机删除 | — | 668 ms | 188 ms |
+| **长数组**：10 万个值，5000 次随机插入 + 5000 次随机删除 | — | 744 ms | 192 ms |
 
-定位仍是沿链表线性查找（没有实现 Yjs 的 search marker 缓存），对很长的文档，随机位置编辑的开销与文档的 Item 数成正比。
+"—"表示当时还没有这项基准。"marker 之前"一列是在加 marker 的同一台机器上重新测的，所以和第一列不是同一批数据。
+
+长文本的工作负载：先一次插入 10 万个字符，再每个事务插入两个字符 5000 次、删除 1-3 个字符 5000 次，位置由固定种子的
+伪随机数决定；这些编辑把文本拆成约 1 万个 Item。长数组同理。
+
+**为什么只快了 3.5 到 4 倍**：marker 解决的是沿链表找位置——在这个负载里每次定位只走约 18 步（没有 marker 时平均要走
+Item 总数的一半）。但耗时仍随 Item 数增长（5000 次编辑 188 ms，10000 次 775 ms），因为每个 client 的 struct 数组在中间
+插入（拆分 Item）和删除（合并相邻 Item）一项时，要移动它后面所有元素的引用：在一个 3 万个对象引用的数组里，
+一次插入加一次删除实测约 42 µs。这是 Yjs 同样的结构（它在 JS 里用 `splice`），可以用分块的存储取代，但会改动
+整个 struct store，不在这一轮的范围内。
 
 ## 测试
 
@@ -421,6 +435,8 @@ moon bench -p sayoi7799/moon_ycrdt/benchmarks --target native --release
 | 富文本：delta 读取 | 13 个 Yjs 文档（加粗、重叠、`null` 取消、对象 / 数组 / 数字 / 字符串值、embed、删除、Unicode、并发格式、属性键顺序）：`to_delta()` 的 JSON 文本与 Yjs 的 `JSON.stringify(toDelta())` 逐字符相同 | `tests/rich_delta_test.mbt` |
 | 富文本：编辑脚本 | 由 Yjs 逐步记录：带 / 不带属性插入和 embed（11 组 53 步）、`format`（11 组 47 步）、`applyDelta`（10 组 29 步）、并发格式化（6 组 67 步）、类型晚取（7 组 35 步）。每一步比较 delta 和本地更新的字节，远端更新后 Yjs 产生的清理更新也要一致 | `tests/rich_scripts_test.mbt` |
 | 富文本：随机并发 | 300 组固定种子（1–300），2–4 个副本，带属性的插入、embed、`format`（含 `null`）、删除、`applyDelta`，乱序重复同步直到不再产生新更新；共 8734 步，其中 149 次是 Yjs 的清理更新，每一步的 delta 和更新字节都与 Yjs 一致，最终所有副本一致 | `tests/rich_scripts_test.mbt` |
+| search marker：长序列 | 20 组富文本（根类型在格式化内容到达之后才取得，各约 100 次不带属性的插入、删除和远端更新，marker 被反复创建、移动、替换和清空）、15 组各 300 步的 Y.Array：每一步的 delta 与每个本地更新的字节都与 Yjs 一致 | `tests/rich_scripts_test.mbt`、`tests/array_test.mbt` |
+| search marker：模型对照 | 不用 Yjs：随机操作的结果与朴素模型一致，每个 marker 的 `index` 与扫描链表算出的位置一致（对应 Yjs 源码里被注释掉的 "assure position"），含合并时的调整和远端更新后的清空 | `tests/marker_test.mbt` |
 | README 示例 | 快速上手、富文本与 y-websocket 流程的代码 | `tests/readme_test.mbt` |
 | 示例服务端 | 两个官方 `y-websocket` 客户端经 MoonBit 服务端：双向同步、并发收敛、后加入的客户端、房间隔离；保存的文件能被 `Y.applyUpdate` 读取；服务端重启后文档仍在。另有房间名与文件名转义的单元测试 | `examples/web/test/e2e.mjs`、`examples/ws_server/store_wbtest.mbt` |
 

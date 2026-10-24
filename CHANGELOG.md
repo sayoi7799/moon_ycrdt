@@ -5,7 +5,23 @@
 
 ## [Unreleased]
 
+### 变更
+
+**search marker**（issue #8）
+- `Y.Text` 和 `Y.Array` 的定位改用 Yjs 的 search marker（每个类型最多 80 个），不再每次从链表头走：数组的 `get`、
+  `insert`、`delete`、`push`，文本的不带属性的 `insert` 和 `delete`。marker 的选取、移动、替换、编辑后平移、合并时调整、
+  远端更新后清空，以及整合格式项后关闭，都按 `AbstractType.js` 移植。所有已有测试不改期望值，输出字节不变。
+- 取代原先"模拟一个全新 marker"的做法：现在 marker 在多次操作之间累积，和 Yjs 一致。
+- 10 万字符文本的随机插入删除基准（5000 + 5000 次）从 668 ms 降到 188 ms，数组从 744 ms 降到 192 ms；
+  2000 次随机插入 9.21 → 4.82 ms，1000 次随机删除 18.8 → 7.96 ms。剩余的开销来自 struct 数组的中间插入和删除（见 README）。
+- `doc` 包新增 `Marker`、`MAX_SEARCH_MARKER`、`YType::find_marker`、`YType::update_marker_changes`。
+
 ### 新增
+
+**测试**（issue #8）
+- 20 组各约 100 步的富文本长序列（根类型在格式化内容到达后才取得）和 15 组各 300 步的 `Y.Array` 长序列，期望值由
+  `yjs@13.6.33` 生成；`tests/marker_test.mbt` 用朴素模型检查结果，并检查每个 marker 的位置。
+- 基准：10 万字符文本、10 万个值的数组上的随机插入和删除。
 
 **协作编辑演示**（issue #6）
 - `examples/ws_server`：用本库写的 y-websocket 服务端（`moonbitlang/async`，native）。按连接路径分房间，处理
