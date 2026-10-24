@@ -47,6 +47,8 @@ pub impl Show for Text with fn output(self, logger) {
 priv struct Pos {
   mut left : @doc.Item?
   mut right : @doc.Item?
+  /// Number of visible elements in front of the position.
+  mut index : Int32
   attrs : Map[String, String]
 }
 
@@ -65,6 +67,9 @@ fn Pos::update_attrs(self : Pos, item : @doc.Item) -> Unit {
 fn Pos::forward(self : Pos) -> Unit {
   let r = self.right.unwrap()
   self.update_attrs(r)
+  if !r.deleted && !(r.content is Format(_, _)) {
+    self.index += r.length
+  }
   self.left = Some(r)
   self.right = r.right
 }
@@ -76,46 +81,22 @@ fn Pos::forward(self : Pos) -> Unit {
 ///
 /// `use_marker` says whether the Yjs operation looks the position up through
 /// a search marker (insert without attributes, delete) or walks from the start
-/// of the text (insert with attributes, format, applyDelta). The marker is only
-/// there while the type has not seen a formatting item (`markers_enabled`);
-/// walking from the start accumulates the attributes of everything to the left,
-/// a marker starts with none. Markers are a cache that depends on the history of
-/// the Yjs object, so only a single fresh marker is emulated (`findMarker`: the
-/// item containing `index`, moved left over items of the same client with
-/// consecutive clocks). For text without formatting both give the same result.
+/// of the text (insert with attributes, format, applyDelta). Walking from the
+/// start accumulates the attributes of everything to the left; a marker starts
+/// with none, so what a position inherits depends on where the marker is. A
+/// marker only exists while the type has not seen a formatting item
+/// (`markers_enabled`).
 fn Text::find_position(self : Text, index : Int32, use_marker : Bool) -> Pos {
   guard index >= 0 && index <= self.ty.length else {
     abort("index \{index} out of range (length \{self.ty.length})")
   }
-  let pos = { left: None, right: self.ty.start, attrs: Map([]), }
-  let mut count = index
-  if use_marker &&
-    self.ty.markers_enabled &&
-    index > 0 &&
-    self.ty.start is Some(first) {
-    let mut p = first
-    let mut pindex = 0
-    while p.right is Some(next) && pindex < index {
-      if !p.deleted && p.is_countable() {
-        if index < pindex + p.length {
-          break
-        }
-        pindex += p.length
-      }
-      p = next
-    }
-    while p.left is Some(l) &&
-          l.id.client == p.id.client &&
-          l.id.clock + l.length == p.id.clock {
-      p = l
-      if !p.deleted && p.is_countable() {
-        pindex -= p.length
-      }
-    }
-    pos.left = p.left
-    pos.right = Some(p)
-    count = index - pindex
+  let pos = { left: None, right: self.ty.start, index: 0, attrs: Map([]), }
+  if use_marker && self.ty.find_marker(index) is Some(m) {
+    pos.left = m.p.left
+    pos.right = Some(m.p)
+    pos.index = m.index
   }
+  let mut count = index - pos.index
   while pos.right is Some(r) && count > 0 {
     if !r.deleted && !(r.content is Format(_, _)) {
       if count < r.length {
@@ -229,6 +210,8 @@ fn Text::insert_content(
   }
   minimize_attribute_changes(pos, attributes)
   let negated = self.insert_attributes(pos, attributes)
+  // the markers learn about the new content before it is linked in
+  self.ty.update_marker_changes(pos.index, content.length())
   let item = self.doc.insert(self.ty, pos.left, pos.right, None, content)
   pos.right = Some(item)
   pos.forward()
@@ -337,6 +320,7 @@ fn Text::delete_content(self : Text, pos : Pos, length : Int32) -> Unit {
     self.doc.cleanup_formatting_gap(s, pos.right, start_attrs, pos.attrs)
     |> ignore
   }
+  self.ty.update_marker_changes(pos.index, remaining - length)
 }
 
 ///|
