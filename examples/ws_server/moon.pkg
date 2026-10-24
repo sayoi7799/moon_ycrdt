@@ -4,6 +4,7 @@ import {
   "sayoi7799/moon_ycrdt/protocol",
   "moonbitlang/async",
   "moonbitlang/async/aqueue",
+  "moonbitlang/async/fs",
   "moonbitlang/async/http",
   "moonbitlang/async/socket",
   "moonbitlang/async/websocket",

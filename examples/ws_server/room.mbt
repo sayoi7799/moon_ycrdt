@@ -34,13 +34,22 @@ struct Room {
   /// The connection whose frame is being applied right now. Its update is
   /// not echoed back to it.
   mut origin : Peer?
+  /// Changed since it was last saved.
+  mut dirty : Bool
 }
 
 ///|
 fn Room::new(name : String) -> Room {
-  let room = { name, doc: @doc.Doc::new(0), peers: [], origin: None, }
+  let room = {
+    name,
+    doc: @doc.Doc::new(0),
+    peers: [],
+    origin: None,
+    dirty: false,
+  }
   // every applied update goes to the other connections of the room
   room.doc.on_update((update, _) => {
+    room.dirty = true
     let frame = @protocol.Sync(@protocol.update_message(update)).encode()
     room.broadcast(frame)
   })
@@ -106,24 +115,51 @@ fn Room::handle_frame(
 }
 
 ///|
-/// All rooms of the server, created on first use.
+/// All rooms of the server. A room is created, and restored from its file if
+/// it has one, when the first client asks for it.
 struct Rooms {
   rooms : Map[String, Room]
+  store : Store
+  /// Held while a room is being restored, so that two clients of the same
+  /// new room do not both create it.
+  lock : @async.Mutex
 }
 
 ///|
-fn Rooms::new() -> Rooms {
-  { rooms: {}, }
+fn Rooms::new(store : Store) -> Rooms {
+  { rooms: {}, store, lock: @async.Mutex(), }
 }
 
 ///|
-fn Rooms::get_or_create(self : Rooms, name : String) -> Room {
-  match self.rooms.get(name) {
-    Some(room) => room
-    None => {
-      let room = Room::new(name)
-      self.rooms[name] = room
-      room
+async fn Rooms::get_or_create(self : Rooms, name : String) -> Room {
+  self.lock.acquire()
+  defer self.lock.release()
+  if self.rooms.get(name) is Some(room) {
+    return room
+  }
+  let room = Room::new(name)
+  if self.store.load(name) is Some(saved) {
+    room.doc.apply_update(saved)
+    room.dirty = false
+    println("room \{name}: restored \{saved.length()} bytes from disk")
+  }
+  self.rooms[name] = room
+  room
+}
+
+///|
+/// Saves every room that changed since the last time.
+async fn Rooms::save_dirty(self : Rooms) -> Unit {
+  for name, room in self.rooms {
+    if room.dirty {
+      // cleared first: a change made while the file is written marks it again
+      room.dirty = false
+      self.store.save(name, room.doc) catch {
+        e => {
+          room.dirty = true
+          println("room \{name}: could not save (\{e})")
+        }
+      }
     }
   }
 }

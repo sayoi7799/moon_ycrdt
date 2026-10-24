@@ -12,6 +12,8 @@ type Room
 
 type Rooms
 
+type Store
+
 // Type aliases
 
 // Traits

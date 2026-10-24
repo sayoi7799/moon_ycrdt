@@ -27,6 +27,10 @@ fn room_name(path : String) -> String {
 }
 
 ///|
+/// Longer room names would not fit into a file name (see `file_name`).
+const MAX_ROOM_NAME : Int32 = 40
+
+///|
 /// Serves one websocket connection until the client goes away.
 async fn serve_connection(
   rooms : Rooms,
@@ -41,7 +45,22 @@ async fn serve_connection(
     }
   }
   defer ws.close()
-  let room = rooms.get_or_create(room_name(request.path))
+  let name = room_name(request.path)
+  if name.length() > MAX_ROOM_NAME {
+    ws.send_close(code=PolicyViolation, reason="room name is too long") catch {
+      _ => ()
+    }
+    return
+  }
+  let room = rooms.get_or_create(name) catch {
+    e => {
+      println("\{addr}: cannot open room \{name} (\{e})")
+      ws.send_close(code=InternalError, reason="cannot open the room") catch {
+        _ => ()
+      }
+      return
+    }
+  }
   let peer = Peer::new()
   room.join(peer)
   println("\{addr} joined room \{room.name} (\{room.peers.length()} connected)")
@@ -77,36 +96,63 @@ async fn serve_connection(
 }
 
 ///|
+const USAGE : String = "usage: [--host H] [--port P] [--data DIR] [--save-interval SECONDS]"
+
+///|
 async fn main {
   let mut host = "127.0.0.1"
   let mut port = 1234
+  let mut data = "data"
+  let mut save_interval = 2
   let args = @env.args()
   let mut i = 1
   while i < args.length() {
+    guard i + 1 < args.length() else {
+      println("\{args[i]} needs a value; \{USAGE}")
+      return
+    }
+    let value = args[i + 1]
     match args[i] {
-      "--host" if i + 1 < args.length() => {
-        host = args[i + 1]
-        i += 2
-      }
-      "--port" if i + 1 < args.length() => {
-        port = @string.parse_int(args[i + 1]) catch {
+      "--host" => host = value
+      "--data" => data = value
+      "--port" | "--save-interval" => {
+        let n = @string.parse_int(value) catch {
           _ => {
-            println("invalid port \{args[i + 1]}")
+            println("\{args[i]}: \{value} is not a number; \{USAGE}")
             return
           }
         }
-        i += 2
+        if args[i] == "--port" {
+          port = n
+        } else {
+          save_interval = n
+        }
       }
       arg => {
-        println("unknown argument \{arg}; usage: [--host H] [--port P]")
+        println("unknown argument \{arg}; \{USAGE}")
         return
       }
     }
+    i += 2
   }
-  let rooms = Rooms::new()
+  let store = Store::{ dir: data, }
+  store.init()
+  let rooms = Rooms::new(store)
   let server = @http.Server(@socket.Addr::parse("\{host}:\{port}"))
-  println("y-websocket server listening on ws://\{host}:\{port}")
-  server.run_forever(allow_failure=true, (request, _, conn) => {
-    serve_connection(rooms, request, conn)
+  println(
+    "y-websocket server listening on ws://\{host}:\{port}, data in \{data}",
+  )
+  @async.with_task_group(group => {
+    // when the server stops (Ctrl-C), save what has not been saved yet
+    group.add_defer(() => @async.protect_from_cancel(() => rooms.save_dirty()))
+    group.spawn_bg(no_wait=true, () => {
+      for ;; {
+        @async.sleep(save_interval * 1000)
+        rooms.save_dirty()
+      }
+    })
+    server.run_forever(allow_failure=true, (request, _, conn) => {
+      serve_connection(rooms, request, conn)
+    })
   })
 }
