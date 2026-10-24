@@ -5,7 +5,8 @@
   "description": "Browser client for the moon_ycrdt y-websocket server example: the official y-websocket client and a textarea.",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "e2e": "node test/e2e.mjs"
   },
   "dependencies": {
     "y-websocket": "3.1.0",
