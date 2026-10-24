@@ -34,25 +34,45 @@ pub fn YArray::insert(
   if values.length() == 0 {
     return
   }
-  // the visible item that ends exactly at `index` (split if needed)
-  let mut left : @doc.Item? = None
-  if index > 0 {
-    let mut remaining = index
-    let mut cur = self.ty.start
-    while cur is Some(n) {
-      if !n.deleted && n.is_countable() {
-        if remaining <= n.length {
-          if remaining < n.length {
-            self.doc.split(n, remaining) |> ignore
-          }
-          left = Some(n)
-          break
-        }
-        remaining -= n.length
+  if index == 0 {
+    self.ty.update_marker_changes(0, values.length())
+    self.insert_after(None, values)
+    return
+  }
+  // the visible item that ends exactly at `index` (split if needed), found
+  // from the nearest search marker
+  let mut n : @doc.Item? = self.ty.start
+  let mut remaining = index
+  if self.ty.find_marker(index) is Some(m) {
+    n = Some(m.p)
+    remaining -= m.index
+    if remaining == 0 {
+      // the previous item that is not deleted (`Item.prev`), so that there is
+      // something to split or end at
+      n = m.p.left
+      while n is Some(d) && d.deleted {
+        n = d.left
       }
-      cur = n.right
+      if n is Some(l) && l.is_countable() && !l.deleted {
+        remaining += l.length
+      }
     }
   }
+  let mut left : @doc.Item? = None
+  while n is Some(c) {
+    if !c.deleted && c.is_countable() {
+      if remaining <= c.length {
+        if remaining < c.length {
+          self.doc.split(c, remaining) |> ignore
+        }
+        left = Some(c)
+        break
+      }
+      remaining -= c.length
+    }
+    n = c.right
+  }
+  self.ty.update_marker_changes(index, values.length())
   self.insert_after(left, values)
 }
 
@@ -98,7 +118,17 @@ pub fn YArray::push(self : YArray, values : Array[@lib0.Any]) -> Unit {
   if values.length() == 0 {
     return
   }
+  // from the marker with the highest index, to the very last item
   let mut last = self.ty.start
+  let mut best = 0
+  if self.ty.markers_enabled {
+    for m in self.ty.markers {
+      if m.index > best {
+        best = m.index
+        last = Some(m.p)
+      }
+    }
+  }
   while last is Some(n) && n.right is Some(r) {
     last = Some(r)
   }
@@ -116,6 +146,10 @@ pub fn YArray::delete(self : YArray, index : Int32, len : Int32) -> Unit {
   }
   let mut cur = self.ty.start
   let mut skip = index
+  if self.ty.find_marker(index) is Some(m) {
+    cur = Some(m.p)
+    skip -= m.index
+  }
   // find the first item to delete, splitting it if the range starts inside
   while cur is Some(n) && skip > 0 {
     if !n.deleted && n.is_countable() {
@@ -137,6 +171,7 @@ pub fn YArray::delete(self : YArray, index : Int32, len : Int32) -> Unit {
     }
     cur = n.right
   }
+  self.ty.update_marker_changes(index, remaining - len)
   self.doc.commit()
 }
 
@@ -183,6 +218,10 @@ pub fn YArray::get(self : YArray, index : Int32) -> @lib0.Any? {
   }
   let mut remaining = index
   let mut cur = self.ty.start
+  if self.ty.find_marker(index) is Some(m) {
+    cur = Some(m.p)
+    remaining -= m.index
+  }
   while cur is Some(n) {
     if !n.deleted && n.is_countable() {
       if remaining < n.length {

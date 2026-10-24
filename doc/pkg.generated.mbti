@@ -7,6 +7,8 @@ import {
 }
 
 // Values
+pub const MAX_SEARCH_MARKER : Int32 = 80
+
 pub const TYPE_REF_UNKNOWN : Int32 = -1
 
 pub fn apply_update(Doc, Bytes) -> Unit raise @lib0.DecodeError
@@ -60,9 +62,16 @@ pub struct Item {
   mut content : @update.Content
   mut deleted : Bool
   mut nested : YType?
+  mut marked : Bool
 }
 pub fn Item::is_countable(Self) -> Bool
 pub fn Item::last_id(Self) -> @update.ID
+
+pub struct Marker {
+  mut p : Item
+  mut index : Int32
+  mut timestamp : Int32
+}
 
 pub enum Struct {
   GC(GCRange)
@@ -82,7 +91,11 @@ pub struct YType {
   mut length : Int32
   mut has_formatting : Bool
   mut markers_enabled : Bool
+  markers : Array[Marker]
+  mut marker_clock : Int32
 }
+pub fn YType::find_marker(Self, Int32) -> Marker?
+pub fn YType::update_marker_changes(Self, Int32, Int32) -> Unit
 
 // Type aliases
 

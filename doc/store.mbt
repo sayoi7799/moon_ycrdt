@@ -100,6 +100,7 @@ fn Doc::split_item(self : Doc, left : Item, diff : Int32) -> Item {
     content: rc,
     deleted: left.deleted,
     nested: None,
+    marked: false,
   }
   left.content = lc
   left.length = diff
@@ -180,6 +181,15 @@ fn try_merge(left : Struct, right : Struct) -> Bool {
         (JSON(a), JSON(b)) => JSON(a + b)
         (Deleted(a), Deleted(b)) => Deleted(a + b)
         _ => return false
+      }
+      // the merged-away item is forgotten: markers on it move to `l`
+      for m in l.parent.markers {
+        if physical_equal(m.p, r) {
+          m.p = l
+          if !l.deleted && l.is_countable() {
+            m.index -= l.length
+          }
+        }
       }
       l.content = merged
       l.right = r.right

@@ -70,3 +70,23 @@ test "a text type requested after formatted content arrived behaves like Yjs" {
     replay_rich(c) |> ignore
   }
 }
+
+///|
+test "long runs on a late-typed text keep Yjs' search markers in step" {
+  // Yjs still has search markers for a text requested after formatted content
+  // arrived. Each case makes ~100 plain inserts and deletes (the markers are
+  // created, moved, replaced beyond 80, and dropped when a remote change
+  // arrives); where a marker is decides what formatting an insert inherits.
+  let cases = rich_marker_cases()
+  assert_eq(cases.length(), 20)
+  let mut steps = 0
+  for c in cases {
+    assert_true(c.late_type)
+    steps += replay_rich(c)
+    assert_true(
+      c.final_deltas.iter().all(d => d == c.final_deltas[0]),
+      msg=c.name,
+    )
+  }
+  assert_true(steps > 2000)
+}

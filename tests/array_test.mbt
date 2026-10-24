@@ -29,9 +29,9 @@ fn array_state(a : @types.YArray) -> String {
 }
 
 ///|
-test "100 random Y.Array scenarios match Yjs at every step" {
-  let cases = array_cases()
-  assert_eq(cases.length(), 100)
+/// Replays `cases` and returns the number of steps. A step whose recorded
+/// state is empty is only checked through the bytes of its updates.
+fn run_array_cases(cases : Array[ArrayCase]) -> Int32 raise {
   let mut steps = 0
   for c in cases {
     let docs = c.clients.map(id => @doc.Doc::new(id))
@@ -63,7 +63,9 @@ test "100 random Y.Array scenarios match Yjs at every step" {
           (to, None, state)
         }
       }
-      assert_eq(array_state(arrays[r]), expected, msg=ctx)
+      if !expected.is_empty() {
+        assert_eq(array_state(arrays[r]), expected, msg=ctx)
+      }
       if expected_update is Some(ups) {
         assert_eq(hexes(logs[r][lens[r]:]), ups, msg="\{ctx} (update bytes)")
       }
@@ -74,7 +76,21 @@ test "100 random Y.Array scenarios match Yjs at every step" {
       assert_eq(a.length(), a.to_array().length())
     }
   }
-  assert_true(steps > 2000)
+  steps
+}
+
+///|
+test "100 random Y.Array scenarios match Yjs at every step" {
+  let cases = array_cases()
+  assert_eq(cases.length(), 100)
+  assert_true(run_array_cases(cases) > 2000)
+}
+
+///|
+test "15 long runs on a Y.Array (300 steps each, search markers replaced many times) match Yjs" {
+  let cases = array_long_cases()
+  assert_eq(cases.length(), 15)
+  assert_true(run_array_cases(cases) > 4500)
 }
 
 ///|

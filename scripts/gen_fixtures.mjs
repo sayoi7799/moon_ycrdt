@@ -799,7 +799,7 @@ export const showAny = (v) => {
   return `{${Object.keys(v).map(k => `${JSON.stringify(k)}:${showAny(v[k])}`).join(',')}}`
 }
 
-export const arrayScenario = (seed) => {
+export const arrayScenario = (seed, { steps: fixedSteps, finalOnly = false } = {}) => {
   const rand = rng(seed * 104729 + 7)
   const n = 2 + Math.floor(rand() * 2)
   const ids = []
@@ -824,7 +824,10 @@ export const arrayScenario = (seed) => {
   const logs = docs.map(() => [])
   docs.forEach((d, i) => d.on('update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
   const arr = (r) => docs[r].getArray('a')
-  const state = (r) => showAny(arr(r).toArray())
+  const fullState = (r) => showAny(arr(r).toArray())
+  // long scenarios only record the final state (the update bytes of every step
+  // already pin down every position)
+  const state = (r) => finalOnly ? '' : fullState(r)
   const ops = []
   const local = (r, op, f) => {
     const before = logs[r].length
@@ -835,7 +838,7 @@ export const arrayScenario = (seed) => {
     for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
     ops.push({ op: 'sync', from, to, indices, state: state(to) })
   }
-  const steps = 10 + Math.floor(rand() * 25)
+  const steps = fixedSteps ?? 10 + Math.floor(rand() * 25)
   for (let s = 0; s < steps; s++) {
     const r = Math.floor(rand() * n)
     const len = arr(r).length
@@ -865,15 +868,14 @@ export const arrayScenario = (seed) => {
       if (from !== to && logs[from].length > 0) deliver(from, to, logs[from].map((_, i) => i))
     }
   }
-  const finalState = state(0)
+  const finalState = fullState(0)
   for (let r = 0; r < n; r++) {
-    if (state(r) !== finalState) throw new Error(`array seed ${seed}: Yjs replicas did not converge`)
+    if (fullState(r) !== finalState) throw new Error(`array seed ${seed}: Yjs replicas did not converge`)
   }
   return { seed, clients: ids, ops, finalState }
 }
 
-const genArrays = () => {
-  const cases = Array.from({ length: ARRAY_CASES }, (_, i) => arrayScenario(i + 1))
+const writeArrays = (name, cases, prefix) => {
   const mbtArrOp = (o) => {
     const ups = `[${(o.update ?? []).map(u => `"${u}"`).join(', ')}]`
     const vs = `[${(o.values ?? []).map(mbtAny).join(', ')}]`
@@ -886,13 +888,25 @@ const genArrays = () => {
   }
   let mbt = ''
   cases.forEach((c, i) => {
-    mbt += `\n///|\nfn array_case_${i + 1}() -> ArrayCase {\n  {\n    seed: ${c.seed},\n    clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n    ops: [\n`
+    mbt += `\n///|\nfn ${prefix}_case_${i + 1}() -> ArrayCase {\n  {\n    seed: ${c.seed},\n    clients: [${c.clients.map(x => `${x}U`).join(', ')}],\n    ops: [\n`
     mbt += c.ops.map(o => `      ${mbtArrOp(o)},`).join('\n')
     mbt += `\n    ],\n    final_state: ${mbtString(c.finalState)},\n  }\n}\n`
   })
-  mbt += `\n///|\nfn array_cases() -> Array[ArrayCase] {\n  [\n${cases.map((_, i) => `    array_case_${i + 1}(),`).join('\n')}\n  ]\n}\n`
+  mbt += `\n///|\nfn ${prefix}_cases() -> Array[ArrayCase] {\n  [\n${cases.map((_, i) => `    ${prefix}_case_${i + 1}(),`).join('\n')}\n  ]\n}\n`
   const json = cases.map(c => ({ ...c, ops: c.ops.map(o => o.values ? { ...o, values: o.values.map(describe) } : o) }))
-  writeFixture('arrays', 'tests', json, mbt)
+  writeFixture(name, 'tests', json, mbt)
+}
+
+const genArrays = () => {
+  writeArrays('arrays', Array.from({ length: ARRAY_CASES }, (_, i) => arrayScenario(i + 1)), 'array')
+}
+
+// Long runs on one list: far more than 80 distinct positions are looked up, so
+// the search markers of Yjs are replaced many times.
+export const ARRAY_LONG_CASES = 15
+const genArraysLong = () => {
+  const cases = Array.from({ length: ARRAY_LONG_CASES }, (_, i) => arrayScenario(1000 + i, { steps: 300, finalOnly: true }))
+  writeArrays('arrays_long', cases, 'array_long')
 }
 
 // ---------------------------------------------------------------------------
@@ -1549,6 +1563,76 @@ export const richScenario = (seed) => {
   return result
 }
 
+// Long editing runs on a text type that was requested after formatted content
+// arrived. Yjs then still has search markers for it, and where they are decides
+// what formatting a plain insert inherits. Replica 1 makes ~100 inserts and
+// deletes at random positions, so the markers are created, moved, replaced
+// (there are at most 80) and dropped when replica 0's plain edits arrive.
+export const RICH_MARKER_CASES = 20
+const MARKER_CHUNKS = ['a', 'bc', 'def', 'Z', 'x y', 'QRS']
+export const richMarkerScenario = (seed) => {
+  const rand = rng(seed * 7919 + 101)
+  const pick = (arr) => arr[Math.floor(rand() * arr.length)]
+  const ids = [1 + Math.floor(rand() * 5), 6 + Math.floor(rand() * 4294967000)]
+  const r = richRecorder(`marker seed ${seed}`, ids, true)
+  // replica 0 writes formatted text
+  for (let i = 0; i < 14; i++) {
+    const len = r.length(0)
+    const pos = Math.floor(rand() * (len + 1))
+    if (rand() < 0.6) r.insert(0, pos, pick(MARKER_CHUNKS), richAttrs(rand))
+    else r.insert(0, pos, pick(MARKER_CHUNKS))
+  }
+  for (let i = 0; i < 6; i++) {
+    const len = r.length(0)
+    if (len < 2) break
+    const a = Math.floor(rand() * (len - 1))
+    r.format(0, a, 1 + Math.floor(rand() * Math.min(6, len - a)), richAttrs(rand))
+  }
+  let sent = 0
+  const send = () => {
+    const to = r.logLength(0)
+    if (to > sent) {
+      r.deliver(0, 1, Array.from({ length: to - sent }, (_, i) => sent + i))
+      sent = to
+    }
+  }
+  send()
+  const steps = 90 + Math.floor(rand() * 40)
+  for (let s = 0; s < steps; s++) {
+    const t = rand()
+    const len = r.length(1)
+    if (t < 0.55 || len < 4) {
+      r.insert(1, Math.floor(rand() * (len + 1)), pick(MARKER_CHUNKS))
+    } else if (t < 0.8) {
+      const pos = Math.floor(rand() * len)
+      r.del(1, pos, 1 + Math.floor(rand() * Math.min(3, len - pos)))
+    } else if (t < 0.9) {
+      // plain edits of replica 0 arrive: a remote change drops the markers
+      const len0 = r.length(0)
+      if (rand() < 0.6 || len0 < 3) r.insert(0, Math.floor(rand() * (len0 + 1)), pick(MARKER_CHUNKS))
+      else r.del(0, Math.floor(rand() * (len0 - 1)), 1)
+      send()
+    } else if (t < 0.915) {
+      // an insert with attributes does not use the marker, and may switch
+      // the markers off for good
+      r.insert(1, Math.floor(rand() * (len + 1)), pick(MARKER_CHUNKS), richAttrs(rand))
+    }
+  }
+  for (let round = 0; round < 10; round++) {
+    const before = r.totalLogs()
+    r.syncAll()
+    if (r.totalLogs() === before) break
+  }
+  const result = r.finish()
+  if (!result.converged) throw new Error(`marker seed ${seed}: Yjs replicas did not converge`)
+  return result
+}
+
+const genRichMarker = () => {
+  const cases = Array.from({ length: RICH_MARKER_CASES }, (_, i) => richMarkerScenario(i + 1))
+  writeFixture('rich_marker', 'tests', cases, mbtRichCases('rich_marker_case', 'rich_marker_cases', cases))
+}
+
 // Scripts where the receiving replica asks for the text type only after
 // formatted content has arrived, and then edits in ways that depend on the
 // search marker Yjs may still have: insert without attributes and delete.
@@ -1649,6 +1733,7 @@ genConvergence()
 genEdge()
 genPreserve()
 genArrays()
+genArraysLong()
 genProtocol()
 genRichDelta()
 genRichInsert()
@@ -1657,5 +1742,6 @@ genRichApplyDelta()
 genRichConcurrent()
 genRichConvergence()
 genRichLateScripts()
+genRichMarker()
 genReadmeRich()
 genExportBase()

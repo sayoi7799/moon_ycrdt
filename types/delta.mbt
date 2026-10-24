@@ -181,7 +181,7 @@ pub fn Text::apply_delta(
   delta : Array[DeltaOp],
   sanitize~ : Bool = true,
 ) -> Unit {
-  let pos = Pos::{ left: None, right: self.ty.start, attrs: Map([]), }
+  let pos = Pos::{ left: None, right: self.ty.start, index: 0, attrs: Map([]), }
   for i, op in delta {
     match op {
       Insert(value, attrs) => {
