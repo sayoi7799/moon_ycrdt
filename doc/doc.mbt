@@ -176,6 +176,7 @@ pub fn Doc::apply_update(
   // After a remote change Yjs cleans up redundant formatting in a second
   // transaction, once the update event of the first has been emitted.
   let cleanup_needed = self.richtext_needs_cleanup()
+  self.drop_markers_of_changed_types()
   let before = self.txn_before.copy()
   let ds = self.txn_ds
   ds.sort_and_merge()
@@ -338,6 +339,7 @@ pub fn Doc::insert(
     content,
     deleted: false,
     nested: None,
+    marked: false,
   }
   self.integrate_item(item)
   item

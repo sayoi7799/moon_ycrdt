@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/core/cmp",
   "sayoi7799/moon_ycrdt/lib0",
   "sayoi7799/moon_ycrdt/update",
   "moonbitlang/core/hashset",

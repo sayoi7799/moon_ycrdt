@@ -21,6 +21,21 @@ pub struct Item {
   mut deleted : Bool
   /// The shared type created by `Content::Type` items.
   mut nested : YType?
+  /// Whether a search marker points here (`Item.marker`). Yjs clears the
+  /// marker list of a type when a remote change arrives but leaves this flag
+  /// set, and later marker updates look at it, so it is kept the same way.
+  mut marked : Bool
+}
+
+///|
+/// A cached position in a list type (`ArraySearchMarker`): `p` is an item, and
+/// `index` the number of visible elements in front of it.
+pub struct Marker {
+  mut p : Item
+  mut index : Int32
+  /// When the marker was last used; the oldest one is replaced when a type
+  /// already has `MAX_SEARCH_MARKER` of them.
+  mut timestamp : Int32
 }
 
 ///|
@@ -103,6 +118,11 @@ pub struct YType {
   /// (`YText._searchMarker !== null`). Integrating a formatting item turns
   /// them off for good; a type created from a placeholder starts with them on.
   mut markers_enabled : Bool
+  /// The search markers (`_searchMarker`); empty and unused unless
+  /// `markers_enabled`.
+  markers : Array[Marker]
+  /// Source of the marker timestamps of this type.
+  mut marker_clock : Int32
 }
 
 ///|
@@ -122,6 +142,8 @@ fn YType::new(
     length: 0,
     has_formatting: false,
     markers_enabled: true,
+    markers: [],
+    marker_clock: 0,
   }
 }
 

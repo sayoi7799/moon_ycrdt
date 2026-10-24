@@ -101,6 +101,7 @@ fn Doc::integrate_item(self : Doc, item : Item) -> Unit {
     Format(_, _) => {
       // `ContentFormat.integrate` in Yjs
       parent.markers_enabled = false
+      parent.markers.clear()
       parent.has_formatting = true
     }
     _ => ()
@@ -259,6 +260,7 @@ fn Doc::integrate_remote(
             content,
             deleted: false,
             nested: None,
+            marked: false,
           }
           self.integrate_item(item)
         }
