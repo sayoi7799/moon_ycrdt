@@ -2,6 +2,7 @@ import {
   "sayoi7799/moon_ycrdt/lib0",
   "sayoi7799/moon_ycrdt/doc",
   "sayoi7799/moon_ycrdt/types",
+  "sayoi7799/moon_ycrdt/update",
   "moonbitlang/core/encoding/base64",
 }
 
