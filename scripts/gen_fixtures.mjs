@@ -1839,6 +1839,119 @@ const genInteropV2 = () => {
   writeFixture('interop_v2', 'tests', cases, mbt)
 }
 
+// ---------------------------------------------------------------------------
+// Working on updates without a document: mergeUpdates, diffUpdate and
+// encodeStateVectorFromUpdate, in both formats. The pools are the local updates
+// of the scenarios above (several clients, text, map, array, formatting). From
+// each pool, seeded random picks are merged: all of them in order, a shuffle
+// with repeats, and a random subset (which leaves gaps that become skips).
+// The merged updates are diffed against state vectors the pool passes through.
+
+export const UPDATE_OPS_POOLS = 36
+
+const updatePools = () => {
+  const pools = []
+  const take = (name, ops) => {
+    const ups = ops.flatMap(o => o.update ?? [])
+    if (ups.length >= 3) pools.push({ name, updates: ups })
+  }
+  for (let i = 0; i < 12; i++) take(`convergence ${i + 1}`, convergenceScenario(i + 1).ops)
+  for (let i = 0; i < 12; i++) take(`array ${i + 1}`, arrayScenario(i + 1).ops)
+  for (let i = 0; i < 12; i++) take(`rich ${i + 1}`, richScenario(i + 1).ops)
+  const base = pools.slice(0, UPDATE_OPS_POOLS)
+  // snapshots of the whole state after a third, two thirds and all of a pool:
+  // they overlap in the middle of merged items, and (with gc) hold GC structs
+  const snapshots = base.filter((_, i) => i % 2 === 0).map((pool, i) => {
+    const n = pool.updates.length
+    const d = new Y.Doc({ gc: i % 4 !== 0 })
+    d.clientID = 77
+    const ups = []
+    let applied = 0
+    for (const k of [Math.ceil(n / 3), Math.ceil(2 * n / 3), n]) {
+      for (; applied < k; applied++) Y.applyUpdate(d, new Uint8Array(Buffer.from(pool.updates[applied], 'hex')))
+      ups.push(hex(Y.encodeStateAsUpdate(d)))
+    }
+    // the diffs of snapshots use states between them (in the middle of items)
+    return { name: `snapshots of ${pool.name}`, updates: ups, stateUpdates: pool.updates }
+  })
+  return base.concat(snapshots)
+}
+
+const genUpdateOps = () => {
+  const toV2 = hexStr => hex(Y.convertUpdateFormatV1ToV2(Buffer.from(hexStr, 'hex')))
+  const fromHex = h => new Uint8Array(Buffer.from(h, 'hex'))
+  const pools = updatePools()
+  const merges = []
+  const diffs = []
+  pools.forEach((pool, pi) => {
+    const rand = rng(pi * 7907 + 3)
+    const n = pool.updates.length
+    const picks = []
+    picks.push(pool.updates.map((_, i) => i))
+    {
+      // a shuffle with some repeats
+      const order = pool.updates.map((_, i) => i).sort(() => rand() - 0.5)
+      order.splice(Math.floor(rand() * order.length), 0, order[0])
+      picks.push(order)
+    }
+    {
+      // a random subset, in random order
+      const subset = pool.updates.map((_, i) => i).filter(() => rand() < 0.6).sort(() => rand() - 0.5)
+      picks.push(subset.length > 0 ? subset : [0, n - 1])
+    }
+    picks.push([Math.floor(rand() * n)]) // a single update comes back unchanged
+    picks.push([])
+    for (const idx of picks) {
+      const v1 = idx.map(i => fromHex(pool.updates[i]))
+      const v2 = idx.map(i => fromHex(toV2(pool.updates[i])))
+      const m1 = Y.mergeUpdates(v1)
+      const m2 = Y.mergeUpdatesV2(v2)
+      merges.push({
+        pool: pi,
+        indices: idx,
+        v1: hex(m1),
+        v2: hex(m2),
+        sv1: hex(Y.encodeStateVectorFromUpdate(m1)),
+        sv2: hex(Y.encodeStateVectorFromUpdateV2(m2))
+      })
+    }
+    // diffs of the full merge against the states after the first k updates
+    const full = merges[merges.length - 5]
+    const fullV1 = fromHex(full.v1)
+    const fullV2 = fromHex(full.v2)
+    const stateUps = pool.stateUpdates ?? pool.updates
+    const ns = stateUps.length
+    const ks = [...new Set([1, Math.floor(ns / 3), Math.floor(ns / 2), ns - 1, ns])].filter(k => k > 0)
+    for (const k of ks) {
+      const d = new Y.Doc({ gc: false })
+      for (let i = 0; i < k; i++) Y.applyUpdate(d, fromHex(stateUps[i]))
+      const sv = Y.encodeStateVector(d)
+      diffs.push({ merge: merges.length - 5, sv: hex(sv), v1: hex(Y.diffUpdate(fullV1, sv)), v2: hex(Y.diffUpdateV2(fullV2, sv)) })
+    }
+    // against an empty state vector and one that knows only the first client
+    const empty = new Uint8Array([0])
+    diffs.push({ merge: merges.length - 5, sv: hex(empty), v1: hex(Y.diffUpdate(fullV1, empty)), v2: hex(Y.diffUpdateV2(fullV2, empty)) })
+    // the update with gaps (random subset) against the state vector of the pool's first half
+    {
+      const sub = merges[merges.length - 3]
+      const d = new Y.Doc({ gc: false })
+      for (let i = 0; i < Math.ceil(ns / 2); i++) Y.applyUpdate(d, fromHex(stateUps[i]))
+      const sv = Y.encodeStateVector(d)
+      diffs.push({ merge: merges.length - 3, sv: hex(sv), v1: hex(Y.diffUpdate(fromHex(sub.v1), sv)), v2: hex(Y.diffUpdateV2(fromHex(sub.v2), sv)) })
+    }
+  })
+  let mbt = '\n///|\nlet update_pools : Array[Array[String]] = [\n'
+  for (const pool of pools) mbt += `  [${pool.updates.map(u => `"${u}"`).join(', ')}],\n`
+  mbt += ']\n'
+  mbt += '\n///|\nlet merge_cases : Array[(Int, Array[Int], String, String, String, String)] = [\n'
+  for (const m of merges) mbt += `  (${m.pool}, [${m.indices.join(', ')}], "${m.v1}", "${m.v2}", "${m.sv1}", "${m.sv2}"),\n`
+  mbt += ']\n'
+  mbt += '\n///|\nlet diff_cases : Array[(Int, String, String, String)] = [\n'
+  for (const d of diffs) mbt += `  (${d.merge}, "${d.sv}", "${d.v1}", "${d.v2}"),\n`
+  mbt += ']\n'
+  writeFixture('update_ops', 'tests', { pools, merges, diffs }, mbt)
+}
+
 genLib0()
 genUpdates()
 genInterop()
@@ -1860,5 +1973,6 @@ genConvergenceV2()
 genArraysV2()
 genRichV2()
 genInteropV2()
+genUpdateOps()
 genReadmeRich()
 genExportBase()
