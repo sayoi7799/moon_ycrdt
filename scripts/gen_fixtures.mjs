@@ -109,7 +109,30 @@ const genLib0 = () => {
     loneSurrogate: { units: [0x61, 0xd83d, 0x62], hex: enc(e => encoding.writeVarString(e, 'a\ud83db')) }
   }
 
+  // the run-length encoders of format v2: the encoded bytes of value sequences
+  const runs = (EncoderClass, values, ...args) => {
+    const e = new EncoderClass(...args)
+    for (const v of values) e.write(v)
+    return hex(EncoderClass === encoding.RleEncoder ? encoding.toUint8Array(e) : e.toUint8Array())
+  }
+  const rep = (v, n) => Array.from({ length: n }, () => v)
+  const rleSeqs = [[], [5], [1, 1, 1], [1, 2, 3], [0, 0, 1, 1, 1, 2], rep(7, 300), [].concat(...rep([1, 0], 40)), [255, 255, 0], [0], [0, 0], rep(0, 130)]
+  const uintSeqs = [[], [0], [0, 0, 0], [1], [1, 1], [5, 5, 5, 6, 7, 7], [4294967295, 4294967295, 0, 4294967295], rep(7, 200),
+    [3000000000, 3000000000, 1, 1, 1, 2 ** 31], [0, 1, 0, 1, 0, 0], rep(0, 131), [2, 2, 3, 3, 3, 3], [127, 128, 128, 16384, 16384]]
+  const diffSeqs = [[], [0], [0, 0, 0], [5], [1, 2, 3, 4, 5], [10, 10, 10], [5, 3, 1, -1, -3], [0, 1000000, 2 ** 31 - 1, 0, -(2 ** 31)],
+    [1, 1, 2, 2, 3, 3], Array.from({ length: 300 }, (_, i) => i * 2), rep(-4, 70), [100, 99, 98, 98, 98, 200, 200], [0, 0, 1, 2, 4, 8, 16, 15, 14]]
+  const stringSeqs = [[], [''], ['a'], ['hello', '', 'world'], ['😀', '中文', 'a😀b'], rep('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 4),
+    ['', '', ''], rep('ab', 5), ['one', 'two', 'three', 'four', 'five', 'six'], ['\u0000', 'é', '\n']]
+  json.rle = rleSeqs.map(v => ({ values: v, hex: runs(encoding.RleEncoder, v, encoding.writeUint8) }))
+  json.uintOptRle = uintSeqs.map(v => ({ values: v, hex: runs(encoding.UintOptRleEncoder, v) }))
+  json.intDiffOptRle = diffSeqs.map(v => ({ values: v, hex: runs(encoding.IntDiffOptRleEncoder, v) }))
+  json.stringRle = stringSeqs.map(v => ({ values: v, hex: runs(encoding.StringEncoder, v) }))
+
   let mbt = ''
+  mbt += `\n///|\nlet rle_cases : Array[(Array[Int], String)] = [\n${json.rle.map(c => `  ([${c.values.join(', ')}], "${c.hex}"),`).join('\n')}\n]\n`
+  mbt += `\n///|\nlet uint_opt_rle_cases : Array[(Array[UInt], String)] = [\n${json.uintOptRle.map(c => `  ([${c.values.map(x => x + 'U').join(', ')}], "${c.hex}"),`).join('\n')}\n]\n`
+  mbt += `\n///|\nlet int_diff_opt_rle_cases : Array[(Array[Int], String)] = [\n${json.intDiffOptRle.map(c => `  ([${c.values.join(', ')}], "${c.hex}"),`).join('\n')}\n]\n`
+  mbt += `\n///|\nlet string_rle_cases : Array[(Array[String], String)] = [\n${json.stringRle.map(c => `  ([${c.values.map(mbtString).join(', ')}], "${c.hex}"),`).join('\n')}\n]\n`
   mbt += `\n///|\nlet var_uint_cases : Array[(UInt64, String)] = [\n${json.varUint.map(c => `  (${c.value}UL, "${c.hex}"),`).join('\n')}\n]\n`
   mbt += `\n///|\nlet var_int_cases : Array[(Int64, String)] = [\n${json.varInt.map(c => `  (${c.value}L, "${c.hex}"),`).join('\n')}\n]\n`
   mbt += `\n///|\nlet var_string_cases : Array[(String, String)] = [\n${json.varString.map(c => `  (${mbtString(c.value)}, "${c.hex}"),`).join('\n')}\n]\n`

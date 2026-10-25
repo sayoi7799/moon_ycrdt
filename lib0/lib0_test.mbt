@@ -137,3 +137,98 @@ test "decoder errors" {
     IntegerOutOfRange,
   )
 }
+
+///|
+test "Rle matches lib0 and decodes back" {
+  for c in rle_cases {
+    let (values, h) = c
+    let e = @lib0.RleEncoder::new()
+    for v in values {
+      e.write(v)
+    }
+    assert_eq(hex(e.to_bytes()), h)
+    let d = @lib0.RleDecoder::new(from_hex(h))
+    for v in values {
+      assert_eq(d.read(), v)
+    }
+  }
+}
+
+///|
+test "UintOptRle matches lib0 and decodes back" {
+  for c in uint_opt_rle_cases {
+    let (values, h) = c
+    let e = @lib0.UintOptRleEncoder::new()
+    for v in values {
+      e.write(v)
+    }
+    assert_eq(hex(e.to_bytes()), h)
+    let d = @lib0.UintOptRleDecoder::new(from_hex(h))
+    for v in values {
+      assert_eq(d.read(), v)
+    }
+  }
+}
+
+///|
+test "IntDiffOptRle matches lib0 and decodes back" {
+  for c in int_diff_opt_rle_cases {
+    let (values, h) = c
+    let e = @lib0.IntDiffOptRleEncoder::new()
+    for v in values {
+      e.write(v)
+    }
+    assert_eq(hex(e.to_bytes()), h)
+    let d = @lib0.IntDiffOptRleDecoder::new(from_hex(h))
+    for v in values {
+      assert_eq(d.read(), v)
+    }
+  }
+}
+
+///|
+test "StringEncoder matches lib0 and decodes back" {
+  for c in string_rle_cases {
+    let (values, h) = c
+    let e = @lib0.StringEncoder::new()
+    for v in values {
+      e.write(v)
+    }
+    assert_eq(hex(e.to_bytes()), h)
+    let d = @lib0.StringDecoder::new(from_hex(h))
+    for v in values {
+      assert_eq(d.read(), v)
+    }
+  }
+}
+
+///|
+test "a string length that runs past the data, or cuts a surrogate pair, is an error" {
+  // "ab" written as lengths [3]: one more than there is
+  let e = @lib0.Encoder::new()
+  e.write_var_string("ab")
+  e.write_var_int(3L)
+  let d = @lib0.StringDecoder::new(e.to_bytes())
+  assert_true(
+    (try d.read() catch {
+      _ => "error"
+    } noraise {
+      s => s
+    }) ==
+    "error",
+  )
+  // "😀" (two code units) read as lengths [1, 1]
+  let e2 = @lib0.Encoder::new()
+  e2.write_var_string("😀")
+  e2.write_var_int(-1L)
+  e2.write_var_uint(0)
+  let d2 = @lib0.StringDecoder::new(e2.to_bytes())
+  assert_true(
+    (try d2.read() catch {
+      _ => "error"
+    } noraise {
+      s => s
+    }) ==
+    "error",
+  )
+}
