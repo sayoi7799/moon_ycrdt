@@ -5,6 +5,10 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-25
+
+在 0.2.0 的基础上加入更新格式 v2、不加载文档的更新操作、search marker 加速定位，以及 y-websocket 服务端示例。
+
 ### 新增
 
 **更新格式 v2，以及不加载文档的更新操作**（issue #10）
@@ -23,6 +27,14 @@
   `yjs@13.6.33` 生成；`tests/marker_test.mbt` 用朴素模型检查结果，并检查每个 marker 的位置。
 - 基准：10 万字符文本、10 万个值的数组上的随机插入和删除。
 
+**发布前的补齐**（issue #12）
+- Y.Array 的随机并发场景从 100 组加到 200 组（种子 1–200，由 `yjs@13.6.33` 生成），满足申报书"每类至少 200 组"。
+- Y.Array 和富文本的 quickcheck 属性测试（任意交换顺序收敛、重复应用幂等，每条 300 例），在 `tests/property_array_rich_test.mbt`。
+- `scripts/bench_yjs.mjs`：在 `benchmarks` 同样的负载上跑 Yjs（同样的随机数、种子和规模，最终长度一致）；README
+  "性能"一节有与 Yjs 的对比表。结论：短文档的编辑与 Yjs 同一量级；10 万字符 / 10 万个值上的随机插入删除慢约 2.3 到 2.9 倍，
+  加载和导出整个文档约慢 2 倍。
+- README 的"支持范围表"和"已知限制"更新到当前状态：未实现的 awareness 编解码、数组里的嵌套类型如实列出。
+
 **协作编辑演示**（issue #6）
 - `examples/ws_server`：用本库写的 y-websocket 服务端（`moonbitlang/async`，native）。按连接路径分房间，处理
   SyncStep1 / SyncStep2 / Update，把更新和 awareness 消息转发给同房间的其他连接；有改动的房间定期保存为
@@ -39,6 +51,9 @@
   struct，有 origin 的 map 条目写出来时不再带"有 key"那一位。之前我们保留了这一位，字节与 Yjs 不同（文档内容不受影响）。
 
 ### 变更
+
+- 更新格式 v1 的读写只为 v2 分配 9 个游程编码流：重构为 `UpdateEncoder` / `UpdateDecoder` 时每个 v1 更新都建了这些流，
+  3 个副本的同步基准曾从 9.6 ms 变成 13.2 ms，现在是 10 ms。
 
 **search marker**（issue #8）
 - `Y.Text` 和 `Y.Array` 的定位改用 Yjs 的 search marker（每个类型最多 80 个），不再每次从链表头走：数组的 `get`、

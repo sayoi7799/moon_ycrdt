@@ -336,8 +336,10 @@ cd examples/web && npm run e2e -- ../ws_server/_build/native/debug/build/sayoi77
 
 | 功能 | 状态 | 说明 |
 |---|---|---|
-| lib0 编码（varUint / varInt / varString / bytes / Any） | ✅ | 全部有官方 lib0 字节对照 |
+| lib0 编码（varUint / varInt / varString / bytes / Any）和 v2 用的游程编码（Rle、UintOptRle、IntDiffOptRle、字符串） | ✅ | 全部有官方 lib0 字节对照 |
 | update v1 解码 / 编码 | ✅ | Item、GC、Skip；9 种 content 全部可解码并原样写回 |
+| update v2 解码 / 编码；`encode_state_as_update_v2` / `apply_update_v2` / `on_update_v2` | ✅ | 与 `encodeStateAsUpdateV2`、`applyUpdateV2`、`updateV2` 事件和 `convertUpdateFormat` 逐字节一致 |
+| `merge_updates`、`diff_update`、`encode_state_vector_from_update`（v1 和 v2） | ✅ | 不加载文档；与 Yjs 同名函数逐字节一致，见[更新格式 v2](#更新格式-v2-与不加载文档的更新操作) |
 | 删除集、状态向量 | ✅ | |
 | YATA 冲突解决 | ✅ | 与 Yjs 逐字节一致（见测试） |
 | 依赖缺失的更新（pending） | ✅ | 依赖到齐自动应用；`encode_state_as_update` 会带上 pending 数据（中间以 Skip 填补），中继不丢数据 |
@@ -347,14 +349,15 @@ cd examples/web && npm run e2e -- ../ws_server/_build/native/debug/build/sayoi77
 | Y.Text 富文本：带属性插入、`format`、embed、`to_delta`、`apply_delta` | ✅ | 每一步的 delta 和本地更新的字节都与 Yjs 一致；值可以是任意 JSON（对象、数组、数字、字符串、布尔） |
 | Y.Text 格式清理 | ✅ | 本地删除后的 `cleanupFormattingGap`，以及远端更新后 Yjs 另开一个事务做的清理（`cleanupYTextAfterTransaction`，产生只含删除的更新）都与 Yjs 一致 |
 | Y.Map set / get / delete（`Any` 值、字节数组） | ✅ | |
-| Y.Array insert / push / delete / get | ✅ | 定位、值的打包（连续普通值合成一个 Item、字节数组单独成 Item）和 push 的语义都与 Yjs 一致；嵌套类型读作 `Undefined` |
-| y-protocols 同步消息与 y-websocket 外层封装 | ✅ | 与 `y-protocols@1.0.7` 逐字节对照；awareness 消息原样透传，不解析 |
+| Y.Array insert / push / delete / get | ✅ | 定位、值的打包（连续普通值合成一个 Item、字节数组单独成 Item）和 push 的语义都与 Yjs 一致 |
+| Y.Array 里创建和读写嵌套的 Y.Map / Y.Array | ❌ | 嵌套的内容会保留、能合并（Yjs 在里面继续编辑，MoonBit 也能正确处理），但没有读写它的 API，`get` 读作 `Undefined` |
+| search marker 定位缓存（Y.Text / Y.Array） | ✅ | 与 Yjs 的规则一致，见[性能](#性能)和"已知限制" |
+| y-protocols 同步消息与 y-websocket 外层封装 | ✅ | 与 `y-protocols@1.0.7` 逐字节对照 |
+| awareness 的编码 / 解码 | ❌ | awareness 消息原样透传，不解析；服务端示例也不记录各客户端的 awareness 状态 |
 | 不支持的 content（XML 类型、子文档、数组中的嵌套类型） | ✅ 保留 | 原样存储并在编码时写回；Yjs 在这些类型内部继续编辑，MoonBit 也能正确合并 |
 | Y.Xml* 的 API（包括 y-prosemirror / Tiptap 使用的 `XmlFragment`、`XmlElement`、`XmlText`） | ❌ | 数据会保留。`XmlText` 的格式逻辑与 `Text` 相同，下一步可以复用 |
 | 快照、`ychange` 属性 | ❌ | `to_delta` 不支持 snapshot 参数 |
-| update v2 解码 / 编码、`encode_state_as_update_v2` / `apply_update_v2` / `on_update_v2` | ✅ | 与 `encodeStateAsUpdateV2`、`applyUpdateV2`、`updateV2` 事件和 `convertUpdateFormat` 逐字节一致 |
-| `merge_updates`、`diff_update`、`encode_state_vector_from_update`（v1 和 v2） | ✅ | 不加载文档；与 Yjs 同名函数逐字节一致，见[更新格式 v2](#更新格式-v2-与不加载文档的更新操作) |
-| 子文档加载、UndoManager、awareness 状态、相对位置、快照 | ❌ | |
+| 子文档加载、UndoManager、相对位置 | ❌ | |
 | 垃圾回收 | ❌ | 本地文档相当于 `gc: false`，但能解码对方发来的 GC 结构和 ContentDeleted |
 | y-websocket 服务端 | 示例 | `examples/ws_server`：native 程序，房间广播和文件持久化，见[协作编辑演示](#协作编辑演示y-websocket-服务端)；不是库的一部分 |
 | 编辑器绑定 | 示例 | `examples/web` 里的 textarea 绑定是示例代码；Tiptap / ProseMirror 需要 `Y.Xml*`，❌ |
@@ -388,8 +391,14 @@ cd examples/web && npm run e2e -- ../ws_server/_build/native/debug/build/sayoi77
 - Yjs 的数组不接受 `undefined` 和 bigint；本库照常把它们编码进数组（Yjs 能解码）。
 - 不检测 client id 冲突（Yjs 会在冲突时换 id）。每个副本应使用随机的 32 位 client id，
   `examples/roundtrip` 演示了用 `@env.rand` 生成。
-- 长文档里的随机位置编辑仍随 Item 数变慢，但系数小得多：search marker 把沿链表走的步数降到每次约 18 步，剩下的主要是
-  每个 client 的 struct 数组在中间插入（拆分）和删除（合并）一项时要移动后面的元素（见[性能](#性能)）。
+- **更新格式 v2 里的 JSON 值**：Embed 和格式属性的值在 v1 里是 JSON 文本，在 v2 里是 `Any`。本库存成 JSON 文本，所以
+  v2 里不能用 JSON 表示的值（`Infinity`、`undefined`、字节数组）读出来会变成 JSON 能表示的样子，重新编码后与原字节不同。
+  v2 编码器里记住用过的键的那一行在 Yjs 里是被注释掉的，所以每个键都当新键写，本库照搬；解码时两种都认。
+- **`merge_updates`**：两个输入在同一位置分别是 GC 和 Item 时，Yjs 的排序比较函数本身不自洽，本库用稳定的插入排序，
+  没有照搬 V8 的排序实现；"延长已有 Skip"这个分支没有测试能走到（在实际输入里几乎不会出现）。
+- **性能**：随机位置编辑已经与 Yjs 同一量级（见[性能](#性能)），但长文档（10 万字符）上的随机插入删除比 Yjs 慢约
+  2.3 到 2.9 倍，加载和导出整个文档约慢 2 倍。search marker 把沿链表走的步数降到每次约 18 步；剩下的主要是每个
+  client 的 struct 数组在中间插入（拆分）和删除（合并）一项时要移动后面的元素。
 
 ## 工作原理
 
@@ -457,6 +466,41 @@ Item 总数的一半）。但耗时仍随 Item 数增长（5000 次编辑 188 ms
 一次插入加一次删除实测约 42 µs。这是 Yjs 同样的结构（它在 JS 里用 `splice`），可以用分块的存储取代，但会改动
 整个 struct store，不在这一轮的范围内。
 
+### 与 Yjs 的对比
+
+同样的负载在 Yjs 上跑一遍：`scripts/bench_yjs.mjs` 用同样的伪随机数（`benchmarks/workloads.mbt` 里的线性同余生成器）、
+同样的种子和规模，每个编辑一个事务；两边最后的文本和数组长度一样（99899 和 94963）。每个负载在新文档里跑，先热身 3 次，
+至少跑 10 次、满 1 秒，取一次运行的平均时间。Yjs 测了 `gc: true`（默认）和 `gc: false`（本库的做法：删除的内容留着）。
+
+```bash
+cd scripts && npm ci && cd ..
+```
+
+```bash
+node scripts/bench_yjs.mjs
+```
+
+同一台机器（AMD Ryzen 9 7945HX、Windows 11），moon_ycrdt 是 native release，Yjs 13.6.33 跑在 Node v24.20.0（V8，有 JIT）上：
+
+| 基准 | moon_ycrdt | Yjs（gc: true） | Yjs（gc: false） |
+|---|---|---|---|
+| 在文本末尾逐字输入 2000 个字符 | 2.74 ms | 3.24 ms | 3.43 ms |
+| 2000 次随机位置插入 | 4.76 ms | 4.98 ms | 5.34 ms |
+| 4000 字的文本里 1000 次随机删除 | 7.85 ms | 8.06 ms | 8.46 ms |
+| 加载一个 4000 项的碎片化文档 | 6.43 ms | 3.19 ms | 3.00 ms |
+| 导出这个文档的完整状态 | 1.57 ms | 780 µs | 733 µs |
+| Map：在 100 个键上 set 5000 次 | 6.39 ms | 8.39 ms | 8.17 ms |
+| Array：push 2000 次再随机插入 500 次 | 5.99 ms | 6.06 ms | 5.86 ms |
+| 长文本：10 万字符，5000 次随机插入 + 5000 次随机删除 | 183 ms | 63.87 ms | 64.61 ms |
+| 长数组：10 万个值，5000 次随机插入 + 5000 次随机删除 | 186 ms | 79.80 ms | 77.11 ms |
+
+怎么读这张表：
+- 逐字输入、短文档的随机插入和删除、Map、Array 与 Yjs 在同一量级，有的略快；
+- 加载（`apply_update`）和导出整个文档比 Yjs 慢约 2 倍，我没有分析原因；
+- 10 万字符 / 10 万个值上的随机插入删除慢约 2.3 到 2.9 倍。这一项我分析过：search marker 之后沿链表走的步数不是瓶颈，
+  剩下的是 struct 数组在中间插入和删除的开销（见上面"为什么只快了 3.5 到 4 倍"）。
+- 两个运行时不同（native 与 JIT），表只说明量级，不是同一条件下的严格对比。
+
 ## 测试
 
 所有期望值都来自官方实现（`yjs@13.6.33`、`lib0@0.2.119`、`y-protocols@1.0.7`），不是手写的。
@@ -470,9 +514,9 @@ Item 总数的一半）。但耗时仍随 Item 数增长（5000 次编辑 188 ms
 | 边界情况 | 55 个场景：在含 emoji、ZWJ 序列、组合字符的字符串里的**每个** UTF-16 位置插入、删除 1 / 2 个码元（会切开代理对），空插入、删光再写、末尾连续输入、client id 0 与 2^32−1、两个副本切开同一个代理对；空文档、空更新；截断与损坏的输入必须报错且不改动文档 | `tests/edge_test.mbt` |
 | 不支持内容的保留 | 5 类（格式与 embed、XML、含嵌套类型的数组、子文档、gc 产生的 GC 结构）：MoonBit 加载 Yjs 文档、编辑自己支持的部分、再接收 Yjs 在不支持类型内部的编辑，本地更新与最终状态都与 Yjs **逐字节相同** | `tests/preserve_test.mbt` |
 | 并发收敛 | 300 组随机场景（种子 1–300），2–4 个副本、同位置并发插入删除、对同一组键并发写入和删除 Map、随机抽取（有重复）乱序交换：**每一步**的文本和 Map 都与 Yjs 一致，每个本地更新的字节都与 Yjs 发出的一致（共 10914 步） | `tests/convergence_test.mbt` |
-| Y.Array | 100 组随机场景（种子 1–100），2–3 个副本并发 insert / push / delete、乱序重复同步：每一步数组内容与每个本地更新的字节都与 Yjs 一致；读取 Yjs 写的嵌套内容 | `tests/array_test.mbt` |
+| Y.Array | 200 组随机场景（种子 1–200），2–3 个副本并发 insert / push / delete、乱序重复同步：每一步数组内容与每个本地更新的字节都与 Yjs 一致；读取 Yjs 写的嵌套内容 | `tests/array_test.mbt` |
 | y-protocols | 镜像一次 Yjs 会话中的一方：SyncStep1、SyncStep2、Update 以及 y-websocket 帧都与 y-protocols **逐字节相同**；两个 MoonBit 副本只靠协议消息收敛 | `protocol/protocol_test.mbt` |
-| 属性测试 | quickcheck，每条 300 例：任意交换顺序收敛；重复应用幂等；缺依赖的更新进入 pending，补齐后自动应用（pending 数据经编码中继不丢失） | `tests/property_test.mbt` |
+| 属性测试 | quickcheck，每条 300 例：任意交换顺序收敛；重复应用幂等；缺依赖的更新进入 pending，补齐后自动应用（pending 数据经编码中继不丢失）。文本加 Map 三条；Y.Array 和富文本（含格式、`format`、删除）各两条（收敛、幂等） | `tests/property_test.mbt`、`tests/property_array_rich_test.mbt` |
 | 富文本：delta 读取 | 13 个 Yjs 文档（加粗、重叠、`null` 取消、对象 / 数组 / 数字 / 字符串值、embed、删除、Unicode、并发格式、属性键顺序）：`to_delta()` 的 JSON 文本与 Yjs 的 `JSON.stringify(toDelta())` 逐字符相同 | `tests/rich_delta_test.mbt` |
 | 富文本：编辑脚本 | 由 Yjs 逐步记录：带 / 不带属性插入和 embed（11 组 53 步）、`format`（11 组 47 步）、`applyDelta`（10 组 29 步）、并发格式化（6 组 67 步）、类型晚取（7 组 35 步）。每一步比较 delta 和本地更新的字节，远端更新后 Yjs 产生的清理更新也要一致 | `tests/rich_scripts_test.mbt` |
 | 富文本：随机并发 | 300 组固定种子（1–300），2–4 个副本，带属性的插入、embed、`format`（含 `null`）、删除、`applyDelta`，乱序重复同步直到不再产生新更新；共 8734 步，其中 149 次是 Yjs 的清理更新，每一步的 delta 和更新字节都与 Yjs 一致，最终所有副本一致 | `tests/rich_scripts_test.mbt` |
