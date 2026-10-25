@@ -836,7 +836,7 @@ const genPreserve = () => {
 // in a random order with duplicates (seeded). Every step records the array
 // content (rendered like MoonBit's `Show` for `Any`) and the local updates.
 
-export const ARRAY_CASES = 100
+export const ARRAY_CASES = 200
 
 // Same rendering as `impl Show for Any` in lib0/any.mbt (for the values used).
 export const showAny = (v) => {
