@@ -5,18 +5,18 @@
 
 ## [Unreleased]
 
-### 变更
-
-**search marker**（issue #8）
-- `Y.Text` 和 `Y.Array` 的定位改用 Yjs 的 search marker（每个类型最多 80 个），不再每次从链表头走：数组的 `get`、
-  `insert`、`delete`、`push`，文本的不带属性的 `insert` 和 `delete`。marker 的选取、移动、替换、编辑后平移、合并时调整、
-  远端更新后清空，以及整合格式项后关闭，都按 `AbstractType.js` 移植。所有已有测试不改期望值，输出字节不变。
-- 取代原先"模拟一个全新 marker"的做法：现在 marker 在多次操作之间累积，和 Yjs 一致。
-- 10 万字符文本的随机插入删除基准（5000 + 5000 次）从 668 ms 降到 188 ms，数组从 744 ms 降到 192 ms；
-  2000 次随机插入 9.21 → 4.82 ms，1000 次随机删除 18.8 → 7.96 ms。剩余的开销来自 struct 数组的中间插入和删除（见 README）。
-- `doc` 包新增 `Marker`、`MAX_SEARCH_MARKER`、`YType::find_marker`、`YType::update_marker_changes`。
-
 ### 新增
+
+**更新格式 v2，以及不加载文档的更新操作**（issue #10）
+- v2 的编码和解码：`decode_update_v2`、`Update::encode_v2`、`Doc::encode_state_as_update_v2`、`Doc::apply_update_v2`、
+  `Doc::on_update_v2`（`@doc` 下有对应的函数形式）。v2 把字段分到 9 列，用 `Rle`、`UintOptRle`、`IntDiffOptRle` 和字符串
+  编码器压缩，这些编码器在 `lib0` 里（`RleEncoder`、`UintOptRleEncoder`、`IntDiffOptRleEncoder`、`StringEncoder`
+  和对应的解码器）。`update` 包新增 `UpdateEncoder` / `UpdateDecoder`，v1 与 v2 共用同一套 struct、content 和删除集的读写。
+- `merge_updates`、`diff_update`、`encode_state_vector_from_update`，各有 v1 和 v2 版本，不需要加载文档。
+- `Update::normalized`、`StructRef::normalized`：把更新读成 Yjs 读出的样子（见 README）。
+- 测试（期望值由 `yjs@13.6.33` 生成）：12 个样例更新转 v2；60 + 40 + 20 组全程交换 v2 更新的场景；接收方每一步的整体状态和
+  差量；36 个更新池的 `mergeUpdates`、`diffUpdate`、`encodeStateVectorFromUpdate`；lib0 游程编码器；`cmd/export` 的 v2
+  状态、合并和差量交给 Node 端 Yjs 验证（现在共 132 项检查）。
 
 **测试**（issue #8）
 - 20 组各约 100 步的富文本长序列（根类型在格式化内容到达后才取得）和 15 组各 300 步的 `Y.Array` 长序列，期望值由
@@ -32,6 +32,22 @@
 - `examples/web/test/e2e.mjs`：两个官方客户端经服务端的端到端测试，包括服务端重启后文档仍在；CI 新增只在
   ubuntu 上运行的 job。
 - README 增加运行步骤。
+
+### 修复
+
+- 带 pending 数据时的 `encode_state_as_update`（v1 也一样）：Yjs 此时把存储的状态与 pending 数据合并，合并会重新读出每个
+  struct，有 origin 的 map 条目写出来时不再带"有 key"那一位。之前我们保留了这一位，字节与 Yjs 不同（文档内容不受影响）。
+
+### 变更
+
+**search marker**（issue #8）
+- `Y.Text` 和 `Y.Array` 的定位改用 Yjs 的 search marker（每个类型最多 80 个），不再每次从链表头走：数组的 `get`、
+  `insert`、`delete`、`push`，文本的不带属性的 `insert` 和 `delete`。marker 的选取、移动、替换、编辑后平移、合并时调整、
+  远端更新后清空，以及整合格式项后关闭，都按 `AbstractType.js` 移植。所有已有测试不改期望值，输出字节不变。
+- 取代原先"模拟一个全新 marker"的做法：现在 marker 在多次操作之间累积，和 Yjs 一致。
+- 10 万字符文本的随机插入删除基准（5000 + 5000 次）从 668 ms 降到 188 ms，数组从 744 ms 降到 192 ms；
+  2000 次随机插入 9.21 → 4.82 ms，1000 次随机删除 18.8 → 7.96 ms。剩余的开销来自 struct 数组的中间插入和删除（见 README）。
+- `doc` 包新增 `Marker`、`MAX_SEARCH_MARKER`、`YType::find_marker`、`YType::update_marker_changes`。
 
 ## [0.2.0] - 2026-10-22
 
