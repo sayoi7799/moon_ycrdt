@@ -35,7 +35,19 @@ pub fn decode_update(Bytes) -> Update raise @lib0.DecodeError
 
 pub fn decode_update_v2(Bytes) -> Update raise @lib0.DecodeError
 
+pub fn diff_update(Bytes, Bytes) -> Bytes raise @lib0.DecodeError
+
+pub fn diff_update_v2(Bytes, Bytes) -> Bytes raise @lib0.DecodeError
+
 pub fn encode_state_vector(Map[UInt32, Int32]) -> Bytes
+
+pub fn encode_state_vector_from_update(Bytes) -> Bytes raise @lib0.DecodeError
+
+pub fn encode_state_vector_from_update_v2(Bytes) -> Bytes raise @lib0.DecodeError
+
+pub fn merge_updates(Array[Bytes]) -> Bytes raise @lib0.DecodeError
+
+pub fn merge_updates_v2(Array[Bytes]) -> Bytes raise @lib0.DecodeError
 
 pub fn read_content(UpdateDecoder, Int32) -> Content raise @lib0.DecodeError
 
@@ -174,7 +186,7 @@ pub fn UpdateDecoder::reset_ds_current(Self) -> Unit
 
 pub struct UpdateEncoder {
   format : UpdateFormat
-  rest : @lib0.Encoder
+  mut rest : @lib0.Encoder
   // private fields
 }
 pub fn UpdateEncoder::new(UpdateFormat) -> Self

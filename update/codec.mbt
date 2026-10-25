@@ -25,7 +25,7 @@ pub extend UpdateFormat with Eq::{equal, not_equal}
 pub struct UpdateEncoder {
   format : UpdateFormat
   /// Plain varints, `Any` values, byte arrays and (v1) everything else.
-  rest : @lib0.Encoder
+  mut rest : @lib0.Encoder
   priv mut key_clock : Int32
   priv key_clock_enc : @lib0.IntDiffOptRleEncoder
   priv client_enc : @lib0.UintOptRleEncoder
