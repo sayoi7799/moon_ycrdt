@@ -101,7 +101,7 @@ test "info byte layout" {
     parent_sub: None,
     content: String("bc"),
   })
-  let e = @lib0.Encoder::new()
+  let e = @update.UpdateEncoder::new(V1)
   s.write(e, 0)
   assert_eq(@lib0.to_hex(e.to_bytes()), "840100026263")
 }

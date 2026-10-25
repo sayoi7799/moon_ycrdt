@@ -33,15 +33,17 @@ pub fn decode_state_vector(Bytes) -> Map[UInt32, Int32] raise @lib0.DecodeError
 
 pub fn decode_update(Bytes) -> Update raise @lib0.DecodeError
 
+pub fn decode_update_v2(Bytes) -> Update raise @lib0.DecodeError
+
 pub fn encode_state_vector(Map[UInt32, Int32]) -> Bytes
 
-pub fn read_content(@lib0.Decoder, Int32) -> Content raise @lib0.DecodeError
+pub fn read_content(UpdateDecoder, Int32) -> Content raise @lib0.DecodeError
 
-pub fn read_delete_set(@lib0.Decoder) -> DeleteSet raise @lib0.DecodeError
+pub fn read_delete_set(UpdateDecoder) -> DeleteSet raise @lib0.DecodeError
 
 pub fn read_id(@lib0.Decoder) -> ID raise @lib0.DecodeError
 
-pub fn read_struct(@lib0.Decoder, ID) -> StructRef raise @lib0.DecodeError
+pub fn read_struct(UpdateDecoder, ID) -> StructRef raise @lib0.DecodeError
 
 pub fn write_id(@lib0.Encoder, ID) -> Unit
 
@@ -72,7 +74,7 @@ pub fn Content::length(Self) -> Int32
 pub fn Content::not_equal(Self, Self) -> Bool
 pub fn Content::ref_number(Self) -> Int32
 pub fn Content::split(Self, Int32) -> (Self, Self)
-pub fn Content::write(Self, @lib0.Encoder, Int32) -> Unit
+pub fn Content::write(Self, UpdateEncoder, Int32) -> Unit
 
 pub(all) struct DeleteRange {
   clock : Int32
@@ -91,7 +93,7 @@ pub fn DeleteSet::is_empty(Self) -> Bool
 pub fn DeleteSet::new() -> Self
 pub fn DeleteSet::not_equal(Self, Self) -> Bool
 pub fn DeleteSet::sort_and_merge(Self) -> Unit
-pub fn DeleteSet::write(Self, @lib0.Encoder) -> Unit
+pub fn DeleteSet::write(Self, UpdateEncoder) -> Unit
 
 pub(all) struct ID {
   client : UInt32
@@ -133,17 +135,70 @@ pub fn StructRef::id(Self) -> ID
 pub fn StructRef::length(Self) -> Int32
 pub fn StructRef::not_equal(Self, Self) -> Bool
 pub fn StructRef::slice(Self, Int32) -> Self
-pub fn StructRef::write(Self, @lib0.Encoder, Int32) -> Unit
+pub fn StructRef::write(Self, UpdateEncoder, Int32) -> Unit
 
 pub struct Update {
   clients : Array[ClientStructs]
   delete_set : DeleteSet
 } derive(Eq, @debug.Debug)
 pub fn Update::encode(Self) -> Bytes
+pub fn Update::encode_v2(Self) -> Bytes
 pub fn Update::equal(Self, Self) -> Bool
 pub fn Update::new(Array[ClientStructs], DeleteSet) -> Self
 pub fn Update::not_equal(Self, Self) -> Bool
 pub fn Update::state_vector(Self) -> Map[UInt32, Int32]
+
+pub struct UpdateDecoder {
+  format : UpdateFormat
+  rest : @lib0.Decoder
+  // private fields
+}
+pub fn UpdateDecoder::new(UpdateFormat, Bytes) -> Self raise @lib0.DecodeError
+pub fn UpdateDecoder::read_any(Self) -> @lib0.Any raise @lib0.DecodeError
+pub fn UpdateDecoder::read_buf(Self) -> Bytes raise @lib0.DecodeError
+pub fn UpdateDecoder::read_client(Self) -> UInt32 raise @lib0.DecodeError
+pub fn UpdateDecoder::read_ds_clock(Self) -> Int32 raise @lib0.DecodeError
+pub fn UpdateDecoder::read_ds_len(Self) -> Int32 raise @lib0.DecodeError
+pub fn UpdateDecoder::read_info(Self) -> Int32 raise @lib0.DecodeError
+pub fn UpdateDecoder::read_json(Self) -> String raise @lib0.DecodeError
+pub fn UpdateDecoder::read_key(Self) -> String raise @lib0.DecodeError
+pub fn UpdateDecoder::read_left_id(Self) -> ID raise @lib0.DecodeError
+pub fn UpdateDecoder::read_len(Self) -> Int32 raise @lib0.DecodeError
+pub fn UpdateDecoder::read_parent_info(Self) -> Bool raise @lib0.DecodeError
+pub fn UpdateDecoder::read_right_id(Self) -> ID raise @lib0.DecodeError
+pub fn UpdateDecoder::read_string(Self) -> String raise @lib0.DecodeError
+pub fn UpdateDecoder::read_type_ref(Self) -> Int32 raise @lib0.DecodeError
+pub fn UpdateDecoder::reset_ds_current(Self) -> Unit
+
+pub struct UpdateEncoder {
+  format : UpdateFormat
+  rest : @lib0.Encoder
+  // private fields
+}
+pub fn UpdateEncoder::new(UpdateFormat) -> Self
+pub fn UpdateEncoder::reset_ds_current(Self) -> Unit
+pub fn UpdateEncoder::to_bytes(Self) -> Bytes
+pub fn UpdateEncoder::write_any(Self, @lib0.Any) -> Unit
+pub fn UpdateEncoder::write_buf(Self, Bytes) -> Unit
+pub fn UpdateEncoder::write_client(Self, UInt32) -> Unit
+pub fn UpdateEncoder::write_ds_clock(Self, Int32) -> Unit
+pub fn UpdateEncoder::write_ds_len(Self, Int32) -> Unit
+pub fn UpdateEncoder::write_info(Self, Int32) -> Unit
+pub fn UpdateEncoder::write_json(Self, String) -> Unit
+pub fn UpdateEncoder::write_key(Self, String) -> Unit
+pub fn UpdateEncoder::write_left_id(Self, ID) -> Unit
+pub fn UpdateEncoder::write_len(Self, Int32) -> Unit
+pub fn UpdateEncoder::write_parent_info(Self, Bool) -> Unit
+pub fn UpdateEncoder::write_right_id(Self, ID) -> Unit
+pub fn UpdateEncoder::write_string(Self, String) -> Unit
+pub fn UpdateEncoder::write_type_ref(Self, Int32) -> Unit
+
+pub(all) enum UpdateFormat {
+  V1
+  V2
+} derive(Eq, @debug.Debug)
+pub fn UpdateFormat::equal(Self, Self) -> Bool
+pub fn UpdateFormat::not_equal(Self, Self) -> Bool
 
 // Type aliases
 

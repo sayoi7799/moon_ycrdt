@@ -36,14 +36,29 @@ pub fn Update::new(
 }
 
 ///|
+/// Decodes an update of format v1.
 pub fn decode_update(data : Bytes) -> Update raise @lib0.DecodeError {
-  let d = @lib0.Decoder::new(data)
-  let num_clients = d.read_var_uint()
+  decode_update_in(V1, data)
+}
+
+///|
+/// Decodes an update of format v2 (what `Y.applyUpdateV2` reads).
+pub fn decode_update_v2(data : Bytes) -> Update raise @lib0.DecodeError {
+  decode_update_in(V2, data)
+}
+
+///|
+fn decode_update_in(
+  format : UpdateFormat,
+  data : Bytes,
+) -> Update raise @lib0.DecodeError {
+  let d = UpdateDecoder::new(format, data)
+  let num_clients = d.rest.read_var_uint()
   let clients = []
   for _ in 0..<num_clients {
-    let num_structs = d.read_var_uint()
-    let client = d.read_var_uint32()
-    let mut clock = d.read_var_uint()
+    let num_structs = d.rest.read_var_uint()
+    let client = d.read_client()
+    let mut clock = d.rest.read_var_uint()
     let structs = []
     for _ in 0..<num_structs {
       let s = read_struct(d, ID::new(client, clock))
@@ -58,14 +73,25 @@ pub fn decode_update(data : Bytes) -> Update raise @lib0.DecodeError {
 }
 
 ///|
-/// Encodes the update; clients are written in the stored order.
+/// Encodes the update in format v1; clients are written in the stored order.
 pub fn Update::encode(self : Update) -> Bytes {
-  let e = @lib0.Encoder::new()
-  e.write_var_uint(self.clients.length())
+  self.encode_in(V1)
+}
+
+///|
+/// Encodes the update in format v2.
+pub fn Update::encode_v2(self : Update) -> Bytes {
+  self.encode_in(V2)
+}
+
+///|
+fn Update::encode_in(self : Update, format : UpdateFormat) -> Bytes {
+  let e = UpdateEncoder::new(format)
+  e.rest.write_var_uint(self.clients.length())
   for cs in self.clients {
-    e.write_var_uint(cs.structs.length())
-    e.write_var_uint32(cs.client)
-    e.write_var_uint(
+    e.rest.write_var_uint(cs.structs.length())
+    e.write_client(cs.client)
+    e.rest.write_var_uint(
       match cs.structs {
         [first, ..] => first.id().clock
         [] => 0

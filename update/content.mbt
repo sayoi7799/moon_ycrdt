@@ -119,45 +119,45 @@ pub fn Content::split(self : Content, offset : Int32) -> (Content, Content) {
 /// surrogate pairs.
 pub fn Content::write(
   self : Content,
-  e : @lib0.Encoder,
+  e : UpdateEncoder,
   offset : Int32,
 ) -> Unit {
   match self {
-    Deleted(n) => e.write_var_uint(n - offset)
+    Deleted(n) => e.write_len(n - offset)
     JSON(a) => {
-      e.write_var_uint(a.length() - offset)
+      e.write_len(a.length() - offset)
       for i in offset..<a.length() {
-        e.write_var_string(a[i])
+        e.write_string(a[i])
       }
     }
-    Binary(b) => e.write_var_bytes(b)
+    Binary(b) => e.write_buf(b)
     String(s) =>
-      e.write_var_string(
+      e.write_string(
         if offset == 0 {
           s
         } else {
           s.unsafe_substring(start=offset, end=s.length())
         },
       )
-    Embed(json) => e.write_var_string(json)
+    Embed(json) => e.write_json(json)
     Format(key, json) => {
-      e.write_var_string(key)
-      e.write_var_string(json)
+      e.write_key(key)
+      e.write_json(json)
     }
     Type(type_ref, name) => {
-      e.write_var_uint(type_ref)
+      e.write_type_ref(type_ref)
       if name is Some(n) {
-        e.write_var_string(n)
+        e.write_key(n)
       }
     }
     Any(a) => {
-      e.write_var_uint(a.length() - offset)
+      e.write_len(a.length() - offset)
       for i in offset..<a.length() {
         e.write_any(a[i])
       }
     }
     Doc(guid, opts) => {
-      e.write_var_string(guid)
+      e.write_string(guid)
       e.write_any(opts)
     }
   }
@@ -165,31 +165,31 @@ pub fn Content::write(
 
 ///|
 pub fn read_content(
-  d : @lib0.Decoder,
+  d : UpdateDecoder,
   ref_number : Int32,
 ) -> Content raise @lib0.DecodeError {
   match ref_number {
-    1 => Deleted(d.read_var_uint())
+    1 => Deleted(d.read_len())
     2 => {
-      let len = d.read_var_uint()
+      let len = d.read_len()
       let items = []
       for _ in 0..<len {
-        items.push(d.read_var_string())
+        items.push(d.read_string())
       }
       JSON(items)
     }
-    3 => Binary(d.read_var_bytes())
-    4 => String(d.read_var_string())
-    5 => Embed(d.read_var_string())
+    3 => Binary(d.read_buf())
+    4 => String(d.read_string())
+    5 => Embed(d.read_json())
     6 => {
-      let key = d.read_var_string()
-      Format(key, d.read_var_string())
+      let key = d.read_key()
+      Format(key, d.read_json())
     }
     7 => {
-      let type_ref = d.read_var_uint()
+      let type_ref = d.read_type_ref()
       let name = if type_ref == TYPE_REF_XML_ELEMENT ||
         type_ref == TYPE_REF_XML_HOOK {
-        Some(d.read_var_string())
+        Some(d.read_key())
       } else {
         None
       }
@@ -199,7 +199,7 @@ pub fn read_content(
       Type(type_ref, name)
     }
     8 => {
-      let len = d.read_var_uint()
+      let len = d.read_len()
       let items = []
       for _ in 0..<len {
         items.push(d.read_any())
@@ -207,7 +207,7 @@ pub fn read_content(
       Any(items)
     }
     9 => {
-      let guid = d.read_var_string()
+      let guid = d.read_string()
       Doc(guid, d.read_any())
     }
     _ => raise @lib0.Malformed("unknown content ref \{ref_number}")
