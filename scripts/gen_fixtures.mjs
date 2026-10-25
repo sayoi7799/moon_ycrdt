@@ -311,6 +311,13 @@ const genUpdates = () => {
     mbt += `  (\n    "${c.name}",\n    "${c.update}",\n    "${c.stateVector}",\n    [\n${c.structs.map(s => `      ${mbtString(s)},`).join('\n')}\n    ],\n    ${mbtString(c.deleteSet)},\n  ),\n`
   }
   mbt += ']\n'
+  // the same updates in format v2, converted by Yjs, and their state vectors
+  const v2Cases = updateScenarios().map(({ name, update }) => {
+    const v2 = Y.convertUpdateFormatV1ToV2(update)
+    return { name, v2: hex(v2), stateVectorV2: hex(Y.encodeStateVectorFromUpdateV2(v2)) }
+  })
+  mbt += `\n///|\nlet update_v2_cases : Array[(String, String, String)] = [\n${v2Cases.map(c => `  ("${c.name}", "${c.v2}", "${c.stateVectorV2}"),`).join('\n')}\n]\n`
+  cases.forEach((c, i) => { c.v2 = v2Cases[i].v2; c.stateVectorV2 = v2Cases[i].stateVectorV2 })
   writeFixture('updates', 'update', cases, mbt)
 }
 

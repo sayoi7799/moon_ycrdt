@@ -133,6 +133,7 @@ pub(all) enum StructRef {
 pub fn StructRef::equal(Self, Self) -> Bool
 pub fn StructRef::id(Self) -> ID
 pub fn StructRef::length(Self) -> Int32
+pub fn StructRef::normalized(Self) -> Self
 pub fn StructRef::not_equal(Self, Self) -> Bool
 pub fn StructRef::slice(Self, Int32) -> Self
 pub fn StructRef::write(Self, UpdateEncoder, Int32) -> Unit
@@ -145,6 +146,7 @@ pub fn Update::encode(Self) -> Bytes
 pub fn Update::encode_v2(Self) -> Bytes
 pub fn Update::equal(Self, Self) -> Bool
 pub fn Update::new(Array[ClientStructs], DeleteSet) -> Self
+pub fn Update::normalized(Self) -> Self
 pub fn Update::not_equal(Self, Self) -> Bool
 pub fn Update::state_vector(Self) -> Map[UInt32, Int32]
 

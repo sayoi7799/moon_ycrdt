@@ -206,3 +206,17 @@ pub fn StructRef::slice(self : StructRef, offset : Int32) -> StructRef {
       })
   }
 }
+
+///|
+/// The struct as Yjs sees it after reading it from an update. The info byte
+/// of an item with origins says "this is a map entry" without giving the key
+/// (`has_parent_sub`), and the update keeps that bit when it is written again.
+/// Yjs itself drops it as soon as it has read the item (the key is `null`
+/// then), so everything that reads structs and writes them again (merging and
+/// diffing updates, converting between formats) writes the bit cleared.
+pub fn StructRef::normalized(self : StructRef) -> StructRef {
+  match self {
+    Item(r) => Item({ ..r, has_parent_sub: r.parent_sub is Some(_), })
+    _ => self
+  }
+}

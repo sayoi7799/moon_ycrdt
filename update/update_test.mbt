@@ -144,3 +144,22 @@ test "malformed input is rejected" {
   }
   assert_true(r is Some(_))
 }
+
+///|
+test "format v2: Yjs' conversion of every update decodes to the same structs and encodes to the same bytes" {
+  assert_eq(update_v2_cases.length(), update_cases.length())
+  for i, c in update_v2_cases {
+    let (name, v2_hex, _) = c
+    let (v1_name, v1_hex, _, _, _) = update_cases[i]
+    assert_eq(name, v1_name)
+    // Yjs forgets the "has a key" bit of map entries when it reads the update,
+    // so its conversion writes it cleared
+    let v1 = @update.decode_update(from_hex(v1_hex)).normalized()
+    let v2 = @update.decode_update_v2(from_hex(v2_hex))
+    assert_eq(v2, v1, msg=name)
+    // MoonBit writes the bytes Yjs wrote, in both directions
+    assert_eq(@lib0.to_hex(v1.encode_v2()), v2_hex, msg=name)
+    assert_eq(@lib0.to_hex(v2.encode_v2()), v2_hex, msg=name)
+    assert_eq(@lib0.to_hex(v2.encode()), @lib0.to_hex(v1.encode()), msg=name)
+  }
+}

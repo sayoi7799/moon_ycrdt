@@ -125,3 +125,15 @@ pub fn Update::state_vector(self : Update) -> Map[UInt32, Int32] {
   }
   sv
 }
+
+///|
+/// The update as Yjs holds it after reading it (see `StructRef::normalized`).
+pub fn Update::normalized(self : Update) -> Update {
+  {
+    clients: self.clients.map(cs => {
+      client: cs.client,
+      structs: cs.structs.map(s => s.normalized()),
+    }),
+    delete_set: self.delete_set,
+  }
+}
