@@ -208,15 +208,22 @@ pub fn StructRef::slice(self : StructRef, offset : Int32) -> StructRef {
 }
 
 ///|
-/// The struct as Yjs sees it after reading it from an update. The info byte
-/// of an item with origins says "this is a map entry" without giving the key
-/// (`has_parent_sub`), and the update keeps that bit when it is written again.
-/// Yjs itself drops it as soon as it has read the item (the key is `null`
-/// then), so everything that reads structs and writes them again (merging and
-/// diffing updates, converting between formats) writes the bit cleared.
+/// The struct as Yjs sees it after reading it from an update. An item with an
+/// origin does not carry its map key on the wire, only a bit in the info byte
+/// that says "this is a map entry"; the reader forgets that (the key of the
+/// item is `null`, so the bit is not written again). Everything that reads
+/// structs and writes them again (merging and diffing updates, converting
+/// between formats, the state of a document that holds pending structs)
+/// therefore writes the bit cleared for every item with an origin. Items
+/// without origins keep their key and the bit.
 pub fn StructRef::normalized(self : StructRef) -> StructRef {
   match self {
-    Item(r) => Item({ ..r, has_parent_sub: r.parent_sub is Some(_), })
+    Item(r) =>
+      if r.origin is None && r.right_origin is None && r.parent_sub is Some(_) {
+        self
+      } else {
+        Item({ ..r, has_parent_sub: false, parent_sub: None, })
+      }
     _ => self
   }
 }

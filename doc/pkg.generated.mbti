@@ -13,7 +13,11 @@ pub const TYPE_REF_UNKNOWN : Int32 = -1
 
 pub fn apply_update(Doc, Bytes) -> Unit raise @lib0.DecodeError
 
+pub fn apply_update_v2(Doc, Bytes) -> Unit raise @lib0.DecodeError
+
 pub fn encode_state_as_update(Doc, target_state_vector? : Bytes) -> Bytes raise @lib0.DecodeError
+
+pub fn encode_state_as_update_v2(Doc, target_state_vector? : Bytes) -> Bytes raise @lib0.DecodeError
 
 pub fn encode_state_vector(Doc) -> Bytes
 
@@ -29,10 +33,12 @@ pub struct Doc {
   // private fields
 }
 pub fn Doc::apply_update(Self, Bytes) -> Unit raise @lib0.DecodeError
+pub fn Doc::apply_update_v2(Self, Bytes) -> Unit raise @lib0.DecodeError
 pub fn Doc::cleanup_formatting_gap(Self, Item, Item?, Map[String, String], Map[String, String]) -> Int32
 pub fn Doc::commit(Self) -> Unit
 pub fn Doc::delete_item(Self, Item) -> Unit
 pub fn Doc::encode_state_as_update(Self, sv? : Map[UInt32, Int32]) -> Bytes
+pub fn Doc::encode_state_as_update_v2(Self, sv? : Map[UInt32, Int32]) -> Bytes
 pub fn Doc::encode_state_vector(Self) -> Bytes
 pub fn Doc::get_root(Self, String, Int32) -> YType
 pub fn Doc::get_state(Self, UInt32) -> Int32
@@ -41,6 +47,7 @@ pub fn Doc::has_pending(Self) -> Bool
 pub fn Doc::insert(Self, YType, Item?, Item?, String?, @update.Content) -> Item
 pub fn Doc::new(UInt32) -> Self
 pub fn Doc::on_update(Self, (Bytes, Bool) -> Unit) -> Unit
+pub fn Doc::on_update_v2(Self, (Bytes, Bool) -> Unit) -> Unit
 pub fn Doc::root_names(Self) -> Array[String]
 pub fn Doc::split(Self, Item, Int32) -> Item
 pub fn Doc::state_vector(Self) -> Map[UInt32, Int32]
