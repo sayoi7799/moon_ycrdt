@@ -1,4 +1,4 @@
-// Y.Array against Yjs (arrays_gen_test.mbt): 100 seeded random scenarios of
+// Y.Array against Yjs (arrays_gen_test.mbt): 200 seeded random scenarios of
 // concurrent insert / push / delete on 2-3 replicas, exchanged in a random
 // order with duplicates. After every step the array content and the bytes of
 // every local update must match Yjs.
@@ -93,10 +93,10 @@ fn run_array_cases(cases : Array[ArrayCase], v2~ : Bool = false) -> Int32 raise 
 }
 
 ///|
-test "100 random Y.Array scenarios match Yjs at every step" {
+test "200 random Y.Array scenarios match Yjs at every step" {
   let cases = array_cases()
-  assert_eq(cases.length(), 100)
-  assert_true(run_array_cases(cases) > 2000)
+  assert_eq(cases.length(), 200)
+  assert_true(run_array_cases(cases) > 4000)
 }
 
 ///|

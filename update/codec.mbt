@@ -22,40 +22,55 @@ pub(all) enum UpdateFormat {
 pub extend UpdateFormat with Eq::{equal, not_equal}
 
 ///|
+/// The nine streams of format v2 (not allocated for v1).
+priv struct EncoderColumns {
+  key_clock : @lib0.IntDiffOptRleEncoder
+  client : @lib0.UintOptRleEncoder
+  left_clock : @lib0.IntDiffOptRleEncoder
+  right_clock : @lib0.IntDiffOptRleEncoder
+  info : @lib0.RleEncoder
+  string : @lib0.StringEncoder
+  parent_info : @lib0.RleEncoder
+  type_ref : @lib0.UintOptRleEncoder
+  len : @lib0.UintOptRleEncoder
+}
+
+///|
 pub struct UpdateEncoder {
   format : UpdateFormat
   /// Plain varints, `Any` values, byte arrays and (v1) everything else.
   mut rest : @lib0.Encoder
+  priv columns : EncoderColumns?
   priv mut key_clock : Int32
-  priv key_clock_enc : @lib0.IntDiffOptRleEncoder
-  priv client_enc : @lib0.UintOptRleEncoder
-  priv left_clock_enc : @lib0.IntDiffOptRleEncoder
-  priv right_clock_enc : @lib0.IntDiffOptRleEncoder
-  priv info_enc : @lib0.RleEncoder
-  priv string_enc : @lib0.StringEncoder
-  priv parent_info_enc : @lib0.RleEncoder
-  priv type_ref_enc : @lib0.UintOptRleEncoder
-  priv len_enc : @lib0.UintOptRleEncoder
   /// v2 writes the clocks of a delete set as differences.
   priv mut ds_current : Int32
 }
 
 ///|
 pub fn UpdateEncoder::new(format : UpdateFormat) -> UpdateEncoder {
-  {
-    format,
-    rest: @lib0.Encoder::new(),
-    key_clock: 0,
-    key_clock_enc: @lib0.IntDiffOptRleEncoder::new(),
-    client_enc: @lib0.UintOptRleEncoder::new(),
-    left_clock_enc: @lib0.IntDiffOptRleEncoder::new(),
-    right_clock_enc: @lib0.IntDiffOptRleEncoder::new(),
-    info_enc: @lib0.RleEncoder::new(),
-    string_enc: @lib0.StringEncoder::new(),
-    parent_info_enc: @lib0.RleEncoder::new(),
-    type_ref_enc: @lib0.UintOptRleEncoder::new(),
-    len_enc: @lib0.UintOptRleEncoder::new(),
-    ds_current: 0,
+  let columns = match format {
+    V1 => None
+    V2 =>
+      Some(EncoderColumns::{
+        key_clock: @lib0.IntDiffOptRleEncoder::new(),
+        client: @lib0.UintOptRleEncoder::new(),
+        left_clock: @lib0.IntDiffOptRleEncoder::new(),
+        right_clock: @lib0.IntDiffOptRleEncoder::new(),
+        info: @lib0.RleEncoder::new(),
+        string: @lib0.StringEncoder::new(),
+        parent_info: @lib0.RleEncoder::new(),
+        type_ref: @lib0.UintOptRleEncoder::new(),
+        len: @lib0.UintOptRleEncoder::new(),
+      })
+  }
+  { format, rest: @lib0.Encoder::new(), columns, key_clock: 0, ds_current: 0, }
+}
+
+///|
+fn UpdateEncoder::cols(self : UpdateEncoder) -> EncoderColumns {
+  match self.columns {
+    Some(c) => c
+    None => abort("the columns exist in format v2 only")
   }
 }
 
@@ -66,15 +81,15 @@ pub fn UpdateEncoder::to_bytes(self : UpdateEncoder) -> Bytes {
     V2 => {
       let out = @lib0.Encoder::new()
       out.write_var_uint(0) // feature flag, unused
-      out.write_var_bytes(self.key_clock_enc.to_bytes())
-      out.write_var_bytes(self.client_enc.to_bytes())
-      out.write_var_bytes(self.left_clock_enc.to_bytes())
-      out.write_var_bytes(self.right_clock_enc.to_bytes())
-      out.write_var_bytes(self.info_enc.to_bytes())
-      out.write_var_bytes(self.string_enc.to_bytes())
-      out.write_var_bytes(self.parent_info_enc.to_bytes())
-      out.write_var_bytes(self.type_ref_enc.to_bytes())
-      out.write_var_bytes(self.len_enc.to_bytes())
+      out.write_var_bytes(self.cols().key_clock.to_bytes())
+      out.write_var_bytes(self.cols().client.to_bytes())
+      out.write_var_bytes(self.cols().left_clock.to_bytes())
+      out.write_var_bytes(self.cols().right_clock.to_bytes())
+      out.write_var_bytes(self.cols().info.to_bytes())
+      out.write_var_bytes(self.cols().string.to_bytes())
+      out.write_var_bytes(self.cols().parent_info.to_bytes())
+      out.write_var_bytes(self.cols().type_ref.to_bytes())
+      out.write_var_bytes(self.cols().len.to_bytes())
       // the rest follows without a length (`writeUint8Array`)
       out.write_raw_bytes(self.rest.to_bytes())
       out.to_bytes()
@@ -87,8 +102,8 @@ pub fn UpdateEncoder::write_left_id(self : UpdateEncoder, id : ID) -> Unit {
   match self.format {
     V1 => write_id(self.rest, id)
     V2 => {
-      self.client_enc.write(id.client)
-      self.left_clock_enc.write(id.clock)
+      self.cols().client.write(id.client)
+      self.cols().left_clock.write(id.clock)
     }
   }
 }
@@ -98,8 +113,8 @@ pub fn UpdateEncoder::write_right_id(self : UpdateEncoder, id : ID) -> Unit {
   match self.format {
     V1 => write_id(self.rest, id)
     V2 => {
-      self.client_enc.write(id.client)
-      self.right_clock_enc.write(id.clock)
+      self.cols().client.write(id.client)
+      self.cols().right_clock.write(id.clock)
     }
   }
 }
@@ -111,7 +126,7 @@ pub fn UpdateEncoder::write_client(
 ) -> Unit {
   match self.format {
     V1 => self.rest.write_var_uint32(client)
-    V2 => self.client_enc.write(client)
+    V2 => self.cols().client.write(client)
   }
 }
 
@@ -119,7 +134,7 @@ pub fn UpdateEncoder::write_client(
 pub fn UpdateEncoder::write_info(self : UpdateEncoder, info : Int32) -> Unit {
   match self.format {
     V1 => self.rest.write_u8(info)
-    V2 => self.info_enc.write(info)
+    V2 => self.cols().info.write(info)
   }
 }
 
@@ -127,7 +142,7 @@ pub fn UpdateEncoder::write_info(self : UpdateEncoder, info : Int32) -> Unit {
 pub fn UpdateEncoder::write_string(self : UpdateEncoder, s : String) -> Unit {
   match self.format {
     V1 => self.rest.write_var_string(s)
-    V2 => self.string_enc.write(s)
+    V2 => self.cols().string.write(s)
   }
 }
 
@@ -141,7 +156,7 @@ pub fn UpdateEncoder::write_parent_info(
   let v = if is_root { 1 } else { 0 }
   match self.format {
     V1 => self.rest.write_var_uint(v)
-    V2 => self.parent_info_enc.write(v)
+    V2 => self.cols().parent_info.write(v)
   }
 }
 
@@ -152,7 +167,7 @@ pub fn UpdateEncoder::write_type_ref(
 ) -> Unit {
   match self.format {
     V1 => self.rest.write_var_uint(type_ref)
-    V2 => self.type_ref_enc.write(type_ref.reinterpret_as_uint())
+    V2 => self.cols().type_ref.write(type_ref.reinterpret_as_uint())
   }
 }
 
@@ -160,7 +175,7 @@ pub fn UpdateEncoder::write_type_ref(
 pub fn UpdateEncoder::write_len(self : UpdateEncoder, len : Int32) -> Unit {
   match self.format {
     V1 => self.rest.write_var_uint(len)
-    V2 => self.len_enc.write(len.reinterpret_as_uint())
+    V2 => self.cols().len.write(len.reinterpret_as_uint())
   }
 }
 
@@ -200,9 +215,9 @@ pub fn UpdateEncoder::write_key(self : UpdateEncoder, key : String) -> Unit {
   match self.format {
     V1 => self.rest.write_var_string(key)
     V2 => {
-      self.key_clock_enc.write(self.key_clock)
+      self.cols().key_clock.write(self.key_clock)
       self.key_clock += 1
-      self.string_enc.write(key)
+      self.cols().string.write(key)
     }
   }
 }
@@ -240,19 +255,24 @@ pub fn UpdateEncoder::write_ds_len(self : UpdateEncoder, len : Int32) -> Unit {
 }
 
 ///|
+priv struct DecoderColumns {
+  key_clock : @lib0.IntDiffOptRleDecoder
+  client : @lib0.UintOptRleDecoder
+  left_clock : @lib0.IntDiffOptRleDecoder
+  right_clock : @lib0.IntDiffOptRleDecoder
+  info : @lib0.RleDecoder
+  string : @lib0.StringDecoder
+  parent_info : @lib0.RleDecoder
+  type_ref : @lib0.UintOptRleDecoder
+  len : @lib0.UintOptRleDecoder
+}
+
+///|
 pub struct UpdateDecoder {
   format : UpdateFormat
   rest : @lib0.Decoder
+  priv columns : DecoderColumns?
   priv keys : Array[String]
-  priv key_clock_dec : @lib0.IntDiffOptRleDecoder
-  priv client_dec : @lib0.UintOptRleDecoder
-  priv left_clock_dec : @lib0.IntDiffOptRleDecoder
-  priv right_clock_dec : @lib0.IntDiffOptRleDecoder
-  priv info_dec : @lib0.RleDecoder
-  priv string_dec : @lib0.StringDecoder
-  priv parent_info_dec : @lib0.RleDecoder
-  priv type_ref_dec : @lib0.UintOptRleDecoder
-  priv len_dec : @lib0.UintOptRleDecoder
   priv mut ds_current : Int32
 }
 
@@ -263,52 +283,44 @@ pub fn UpdateDecoder::new(
 ) -> UpdateDecoder raise @lib0.DecodeError {
   let d = @lib0.Decoder::new(data)
   match format {
-    V1 => {
-      // the column decoders are not used in v1
-      let none : Bytes = b""
-      {
-        format,
-        rest: d,
-        keys: [],
-        key_clock_dec: @lib0.IntDiffOptRleDecoder::new(none),
-        client_dec: @lib0.UintOptRleDecoder::new(none),
-        left_clock_dec: @lib0.IntDiffOptRleDecoder::new(none),
-        right_clock_dec: @lib0.IntDiffOptRleDecoder::new(none),
-        info_dec: @lib0.RleDecoder::new(none),
-        string_dec: @lib0.StringDecoder::new(b"\x00"),
-        parent_info_dec: @lib0.RleDecoder::new(none),
-        type_ref_dec: @lib0.UintOptRleDecoder::new(none),
-        len_dec: @lib0.UintOptRleDecoder::new(none),
-        ds_current: 0,
-      }
-    }
+    V1 => { format, rest: d, columns: None, keys: [], ds_current: 0, }
     V2 => {
       d.read_var_uint() |> ignore // feature flag, unused
-      let key_clock_dec = @lib0.IntDiffOptRleDecoder::new(d.read_var_bytes())
-      let client_dec = @lib0.UintOptRleDecoder::new(d.read_var_bytes())
-      let left_clock_dec = @lib0.IntDiffOptRleDecoder::new(d.read_var_bytes())
-      let right_clock_dec = @lib0.IntDiffOptRleDecoder::new(d.read_var_bytes())
-      let info_dec = @lib0.RleDecoder::new(d.read_var_bytes())
-      let string_dec = @lib0.StringDecoder::new(d.read_var_bytes())
-      let parent_info_dec = @lib0.RleDecoder::new(d.read_var_bytes())
-      let type_ref_dec = @lib0.UintOptRleDecoder::new(d.read_var_bytes())
-      let len_dec = @lib0.UintOptRleDecoder::new(d.read_var_bytes())
+      let key_clock = @lib0.IntDiffOptRleDecoder::new(d.read_var_bytes())
+      let client = @lib0.UintOptRleDecoder::new(d.read_var_bytes())
+      let left_clock = @lib0.IntDiffOptRleDecoder::new(d.read_var_bytes())
+      let right_clock = @lib0.IntDiffOptRleDecoder::new(d.read_var_bytes())
+      let info = @lib0.RleDecoder::new(d.read_var_bytes())
+      let string = @lib0.StringDecoder::new(d.read_var_bytes())
+      let parent_info = @lib0.RleDecoder::new(d.read_var_bytes())
+      let type_ref = @lib0.UintOptRleDecoder::new(d.read_var_bytes())
+      let len = @lib0.UintOptRleDecoder::new(d.read_var_bytes())
       {
         format,
         rest: @lib0.Decoder::new(d.read_raw_bytes(d.remaining())),
+        columns: Some(DecoderColumns::{
+          key_clock,
+          client,
+          left_clock,
+          right_clock,
+          info,
+          string,
+          parent_info,
+          type_ref,
+          len,
+        }),
         keys: [],
-        key_clock_dec,
-        client_dec,
-        left_clock_dec,
-        right_clock_dec,
-        info_dec,
-        string_dec,
-        parent_info_dec,
-        type_ref_dec,
-        len_dec,
         ds_current: 0,
       }
     }
+  }
+}
+
+///|
+fn UpdateDecoder::cols(self : UpdateDecoder) -> DecoderColumns {
+  match self.columns {
+    Some(c) => c
+    None => abort("the columns exist in format v2 only")
   }
 }
 
@@ -319,8 +331,8 @@ pub fn UpdateDecoder::read_left_id(
   match self.format {
     V1 => read_id(self.rest)
     V2 => {
-      let client = self.client_dec.read()
-      ID::new(client, self.left_clock_dec.read())
+      let client = self.cols().client.read()
+      ID::new(client, self.cols().left_clock.read())
     }
   }
 }
@@ -332,8 +344,8 @@ pub fn UpdateDecoder::read_right_id(
   match self.format {
     V1 => read_id(self.rest)
     V2 => {
-      let client = self.client_dec.read()
-      ID::new(client, self.right_clock_dec.read())
+      let client = self.cols().client.read()
+      ID::new(client, self.cols().right_clock.read())
     }
   }
 }
@@ -344,7 +356,7 @@ pub fn UpdateDecoder::read_client(
 ) -> UInt32 raise @lib0.DecodeError {
   match self.format {
     V1 => self.rest.read_var_uint32()
-    V2 => self.client_dec.read()
+    V2 => self.cols().client.read()
   }
 }
 
@@ -354,7 +366,7 @@ pub fn UpdateDecoder::read_info(
 ) -> Int32 raise @lib0.DecodeError {
   match self.format {
     V1 => self.rest.read_u8()
-    V2 => self.info_dec.read()
+    V2 => self.cols().info.read()
   }
 }
 
@@ -364,7 +376,7 @@ pub fn UpdateDecoder::read_string(
 ) -> String raise @lib0.DecodeError {
   match self.format {
     V1 => self.rest.read_var_string()
-    V2 => self.string_dec.read()
+    V2 => self.cols().string.read()
   }
 }
 
@@ -374,7 +386,7 @@ pub fn UpdateDecoder::read_parent_info(
 ) -> Bool raise @lib0.DecodeError {
   match self.format {
     V1 => self.rest.read_var_uint() == 1
-    V2 => self.parent_info_dec.read() == 1
+    V2 => self.cols().parent_info.read() == 1
   }
 }
 
@@ -384,7 +396,7 @@ pub fn UpdateDecoder::read_type_ref(
 ) -> Int32 raise @lib0.DecodeError {
   match self.format {
     V1 => self.rest.read_var_uint()
-    V2 => self.type_ref_dec.read().reinterpret_as_int()
+    V2 => self.cols().type_ref.read().reinterpret_as_int()
   }
 }
 
@@ -395,7 +407,7 @@ pub fn UpdateDecoder::read_len(
   match self.format {
     V1 => self.rest.read_var_uint()
     V2 => {
-      let n = self.len_dec.read().reinterpret_as_int()
+      let n = self.cols().len.read().reinterpret_as_int()
       if n < 0 {
         raise @lib0.IntegerOutOfRange
       }
@@ -439,11 +451,11 @@ pub fn UpdateDecoder::read_key(
   match self.format {
     V1 => self.rest.read_var_string()
     V2 => {
-      let clock = self.key_clock_dec.read()
+      let clock = self.cols().key_clock.read()
       if clock >= 0 && clock < self.keys.length() {
         self.keys[clock]
       } else {
-        let key = self.string_dec.read()
+        let key = self.cols().string.read()
         self.keys.push(key)
         key
       }
