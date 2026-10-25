@@ -109,7 +109,30 @@ const genLib0 = () => {
     loneSurrogate: { units: [0x61, 0xd83d, 0x62], hex: enc(e => encoding.writeVarString(e, 'a\ud83db')) }
   }
 
+  // the run-length encoders of format v2: the encoded bytes of value sequences
+  const runs = (EncoderClass, values, ...args) => {
+    const e = new EncoderClass(...args)
+    for (const v of values) e.write(v)
+    return hex(EncoderClass === encoding.RleEncoder ? encoding.toUint8Array(e) : e.toUint8Array())
+  }
+  const rep = (v, n) => Array.from({ length: n }, () => v)
+  const rleSeqs = [[], [5], [1, 1, 1], [1, 2, 3], [0, 0, 1, 1, 1, 2], rep(7, 300), [].concat(...rep([1, 0], 40)), [255, 255, 0], [0], [0, 0], rep(0, 130)]
+  const uintSeqs = [[], [0], [0, 0, 0], [1], [1, 1], [5, 5, 5, 6, 7, 7], [4294967295, 4294967295, 0, 4294967295], rep(7, 200),
+    [3000000000, 3000000000, 1, 1, 1, 2 ** 31], [0, 1, 0, 1, 0, 0], rep(0, 131), [2, 2, 3, 3, 3, 3], [127, 128, 128, 16384, 16384]]
+  const diffSeqs = [[], [0], [0, 0, 0], [5], [1, 2, 3, 4, 5], [10, 10, 10], [5, 3, 1, -1, -3], [0, 1000000, 2 ** 31 - 1, 0, -(2 ** 31)],
+    [1, 1, 2, 2, 3, 3], Array.from({ length: 300 }, (_, i) => i * 2), rep(-4, 70), [100, 99, 98, 98, 98, 200, 200], [0, 0, 1, 2, 4, 8, 16, 15, 14]]
+  const stringSeqs = [[], [''], ['a'], ['hello', '', 'world'], ['😀', '中文', 'a😀b'], rep('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 4),
+    ['', '', ''], rep('ab', 5), ['one', 'two', 'three', 'four', 'five', 'six'], ['\u0000', 'é', '\n']]
+  json.rle = rleSeqs.map(v => ({ values: v, hex: runs(encoding.RleEncoder, v, encoding.writeUint8) }))
+  json.uintOptRle = uintSeqs.map(v => ({ values: v, hex: runs(encoding.UintOptRleEncoder, v) }))
+  json.intDiffOptRle = diffSeqs.map(v => ({ values: v, hex: runs(encoding.IntDiffOptRleEncoder, v) }))
+  json.stringRle = stringSeqs.map(v => ({ values: v, hex: runs(encoding.StringEncoder, v) }))
+
   let mbt = ''
+  mbt += `\n///|\nlet rle_cases : Array[(Array[Int], String)] = [\n${json.rle.map(c => `  ([${c.values.join(', ')}], "${c.hex}"),`).join('\n')}\n]\n`
+  mbt += `\n///|\nlet uint_opt_rle_cases : Array[(Array[UInt], String)] = [\n${json.uintOptRle.map(c => `  ([${c.values.map(x => x + 'U').join(', ')}], "${c.hex}"),`).join('\n')}\n]\n`
+  mbt += `\n///|\nlet int_diff_opt_rle_cases : Array[(Array[Int], String)] = [\n${json.intDiffOptRle.map(c => `  ([${c.values.join(', ')}], "${c.hex}"),`).join('\n')}\n]\n`
+  mbt += `\n///|\nlet string_rle_cases : Array[(Array[String], String)] = [\n${json.stringRle.map(c => `  ([${c.values.map(mbtString).join(', ')}], "${c.hex}"),`).join('\n')}\n]\n`
   mbt += `\n///|\nlet var_uint_cases : Array[(UInt64, String)] = [\n${json.varUint.map(c => `  (${c.value}UL, "${c.hex}"),`).join('\n')}\n]\n`
   mbt += `\n///|\nlet var_int_cases : Array[(Int64, String)] = [\n${json.varInt.map(c => `  (${c.value}L, "${c.hex}"),`).join('\n')}\n]\n`
   mbt += `\n///|\nlet var_string_cases : Array[(String, String)] = [\n${json.varString.map(c => `  (${mbtString(c.value)}, "${c.hex}"),`).join('\n')}\n]\n`
@@ -288,6 +311,13 @@ const genUpdates = () => {
     mbt += `  (\n    "${c.name}",\n    "${c.update}",\n    "${c.stateVector}",\n    [\n${c.structs.map(s => `      ${mbtString(s)},`).join('\n')}\n    ],\n    ${mbtString(c.deleteSet)},\n  ),\n`
   }
   mbt += ']\n'
+  // the same updates in format v2, converted by Yjs, and their state vectors
+  const v2Cases = updateScenarios().map(({ name, update }) => {
+    const v2 = Y.convertUpdateFormatV1ToV2(update)
+    return { name, v2: hex(v2), stateVectorV2: hex(Y.encodeStateVectorFromUpdateV2(v2)) }
+  })
+  mbt += `\n///|\nlet update_v2_cases : Array[(String, String, String)] = [\n${v2Cases.map(c => `  ("${c.name}", "${c.v2}", "${c.stateVectorV2}"),`).join('\n')}\n]\n`
+  cases.forEach((c, i) => { c.v2 = v2Cases[i].v2; c.stateVectorV2 = v2Cases[i].stateVectorV2 })
   writeFixture('updates', 'update', cases, mbt)
 }
 
@@ -363,6 +393,24 @@ const interopScenarios = () => {
     order.splice(3, 0, order[0]); order.push(order[5])
     add('concurrent_shuffled', order, ['t'], ['m'])
   }
+  {
+    // The first replica overwrites a key (an item with origins and the "has a
+    // key" bit). The receiver gets that, then an update whose dependency is
+    // still missing: its state is the stored structs merged with the pending
+    // ones, and Yjs writes the merged structs without that bit.
+    const a = newDoc(31)
+    const b = newDoc(32)
+    const ups = []
+    a.on('update', (u, _o, _d, tr) => { if (tr.local) ups.push(u) })
+    b.on('update', (u, _o, _d, tr) => { if (tr.local) ups.push(u) })
+    a.getMap('m').set('k', 1)
+    a.getMap('m').set('k', 2)
+    Y.applyUpdate(b, Y.encodeStateAsUpdate(a))
+    b.getMap('m').set('j', 5)
+    b.getMap('m').set('j', 6)
+    // ua1, ua2, then ub2 before ub1 (ub2 waits for ub1), then ub1
+    add('pending_with_map_overwrite', [ups[0], ups[1], ups[3], ups[2]], [], ['m'])
+  }
   return out
 }
 
@@ -414,7 +462,8 @@ export const mapState = (doc) => {
 
 export const CONVERGENCE_SEED_BASE = 7919
 
-export const convergenceScenario = (seed) => {
+export const convergenceScenario = (seed, v2 = false) => {
+  const apply = v2 ? Y.applyUpdateV2 : Y.applyUpdate
   const rand = rng(seed * CONVERGENCE_SEED_BASE + 13)
   const pick = (arr) => arr[Math.floor(rand() * arr.length)]
   const n = 2 + Math.floor(rand() * 3)
@@ -425,7 +474,7 @@ export const convergenceScenario = (seed) => {
   }
   const docs = ids.map(id => newDoc(id))
   const logs = docs.map(() => [])
-  docs.forEach((d, i) => d.on('update', (u, _origin, _doc, tr) => { if (tr.local) logs[i].push(u) }))
+  docs.forEach((d, i) => d.on(v2 ? 'updateV2' : 'update', (u, _origin, _doc, tr) => { if (tr.local) logs[i].push(u) }))
   const ops = []
   const local = (r, op, f) => {
     const before = logs[r].length
@@ -433,7 +482,7 @@ export const convergenceScenario = (seed) => {
     ops.push({ ...op, replica: r, update: logs[r].slice(before).map(hex), text: docs[r].getText('t').toString(), map: mapState(docs[r]) })
   }
   const deliver = (from, to, indices) => {
-    for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+    for (const i of indices) apply(docs[to], logs[from][i])
     ops.push({ op: 'sync', from, to, indices, text: docs[to].getText('t').toString(), map: mapState(docs[to]) })
   }
   const steps = 15 + Math.floor(rand() * 30)
@@ -799,7 +848,8 @@ export const showAny = (v) => {
   return `{${Object.keys(v).map(k => `${JSON.stringify(k)}:${showAny(v[k])}`).join(',')}}`
 }
 
-export const arrayScenario = (seed, { steps: fixedSteps, finalOnly = false } = {}) => {
+export const arrayScenario = (seed, { steps: fixedSteps, finalOnly = false, v2 = false } = {}) => {
+  const apply = v2 ? Y.applyUpdateV2 : Y.applyUpdate
   const rand = rng(seed * 104729 + 7)
   const n = 2 + Math.floor(rand() * 2)
   const ids = []
@@ -822,7 +872,7 @@ export const arrayScenario = (seed, { steps: fixedSteps, finalOnly = false } = {
   const values = () => Array.from({ length: 1 + Math.floor(rand() * 3) }, value)
   const docs = ids.map(id => newDoc(id))
   const logs = docs.map(() => [])
-  docs.forEach((d, i) => d.on('update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
+  docs.forEach((d, i) => d.on(v2 ? 'updateV2' : 'update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
   const arr = (r) => docs[r].getArray('a')
   const fullState = (r) => showAny(arr(r).toArray())
   // long scenarios only record the final state (the update bytes of every step
@@ -835,7 +885,7 @@ export const arrayScenario = (seed, { steps: fixedSteps, finalOnly = false } = {
     ops.push({ ...op, replica: r, update: logs[r].slice(before).map(hex), state: state(r) })
   }
   const deliver = (from, to, indices) => {
-    for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+    for (const i of indices) apply(docs[to], logs[from][i])
     ops.push({ op: 'sync', from, to, indices, state: state(to) })
   }
   const steps = fixedSteps ?? 10 + Math.floor(rand() * 25)
@@ -1066,10 +1116,11 @@ const genRichDelta = () => {
 // the recorder stores the bytes of the local updates Yjs emitted — including
 // the clean-up transactions Yjs runs after remote changes — and toDelta().
 
-const richRecorder = (name, ids, lazy = false) => {
+const richRecorder = (name, ids, lazy = false, v2 = false) => {
+  const apply = v2 ? Y.applyUpdateV2 : Y.applyUpdate
   const docs = ids.map(id => newDoc(id))
   const logs = docs.map(() => [])
-  docs.forEach((d, i) => d.on('update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
+  docs.forEach((d, i) => d.on(v2 ? 'updateV2' : 'update', (u, _o, _d, tr) => { if (tr.local) logs[i].push(u) }))
   const text = (r) => docs[r].getText('t')
   // Request the type before anything arrives, the way editor bindings do. A
   // type that is requested after content has been applied is a different
@@ -1113,7 +1164,7 @@ const richRecorder = (name, ids, lazy = false) => {
     totalLogs: () => logs.reduce((a, l) => a + l.length, 0),
     deliver: (from, to, indices) => {
       const before = logs[to].length
-      for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+      for (const i of indices) apply(docs[to], logs[from][i])
       ops.push({ op: 'sync', from, to, indices, update: logs[to].slice(before).map(hex), delta: JSON.stringify(text(to).toDelta()) })
     },
     syncAll: () => {
@@ -1122,7 +1173,7 @@ const richRecorder = (name, ids, lazy = false) => {
           if (from === to || logs[from].length === 0) continue
           const indices = logs[from].map((_, i) => i)
           const before = logs[to].length
-          for (const i of indices) Y.applyUpdate(docs[to], logs[from][i])
+          for (const i of indices) apply(docs[to], logs[from][i])
           ops.push({ op: 'sync', from, to, indices, update: logs[to].slice(before).map(hex), delta: JSON.stringify(text(to).toDelta()) })
         }
       }
@@ -1484,7 +1535,7 @@ const richAttrs = (rand) => {
   return attrs
 }
 
-export const richScenario = (seed) => {
+export const richScenario = (seed, v2 = false) => {
   const rand = rng(seed * 15485863 + 29)
   const pick = (arr) => arr[Math.floor(rand() * arr.length)]
   const n = 2 + Math.floor(rand() * 3)
@@ -1493,7 +1544,7 @@ export const richScenario = (seed) => {
     const id = rand() < 0.5 ? 1 + Math.floor(rand() * 5) : Math.floor(rand() * 4294967295)
     if (!ids.includes(id)) ids.push(id)
   }
-  const r = richRecorder(`seed ${seed}`, ids)
+  const r = richRecorder(`seed ${seed}`, ids, false, v2)
   const logsLen = (x) => r.logLength(x)
   const steps = 12 + Math.floor(rand() * 18)
   for (let s = 0; s < steps; s++) {
@@ -1726,6 +1777,181 @@ const genRichInsert = () => {
   writeFixture('rich_insert', 'tests', cases, mbtRichCases('rich_insert_case', 'rich_insert_cases', cases))
 }
 
+// ---------------------------------------------------------------------------
+// Update format v2. The scenarios above again, but with the replicas exchanging
+// v2 updates (`updateV2` events, `applyUpdateV2`); the recorded bytes are what
+// Yjs emits in v2. A few seeds each: the v1 sets already cover the editing
+// logic, these check the encoding of the same kinds of content.
+
+export const CONVERGENCE_V2_CASES = 60
+export const ARRAY_V2_CASES = 40
+export const RICH_V2_CASES = 20
+
+const genConvergenceV2 = () => {
+  const cases = Array.from({ length: CONVERGENCE_V2_CASES }, (_, i) => convergenceScenario(i + 1, true))
+    .map(c => ({ name: `seed ${c.seed}`, ...c }))
+  writeFixture('convergence_v2', 'tests', cases, mbtScriptCases('convergence_v2_case', 'convergence_v2_cases', cases))
+}
+
+const genArraysV2 = () => {
+  writeArrays('arrays_v2', Array.from({ length: ARRAY_V2_CASES }, (_, i) => arrayScenario(i + 1, { v2: true })), 'array_v2')
+}
+
+const genRichV2 = () => {
+  const cases = Array.from({ length: RICH_V2_CASES }, (_, i) => richScenario(i + 1, true))
+  writeFixture('rich_v2', 'tests', cases, mbtRichCases('rich_v2_case', 'rich_v2_cases', cases))
+}
+
+// The interop scenarios: a receiver applies the updates one at a time, once as
+// v1 and once as the same updates converted to v2. After every step the bytes
+// of its whole state in both formats are recorded (while updates are still
+// missing this includes the pending structs, and Yjs merges them in), and in
+// the end the differences for a few state vectors it passed through.
+const genInteropV2 = () => {
+  const cases = interopScenarios().map(({ name, updates }) => {
+    const v2Updates = updates.map(u => Y.convertUpdateFormatV1ToV2(u))
+    const r1 = newDoc(RECEIVER_CLIENT, { gc: false })
+    const r2 = newDoc(RECEIVER_CLIENT, { gc: false })
+    const steps = []
+    const svs = []
+    updates.forEach((u, i) => {
+      Y.applyUpdate(r1, u)
+      Y.applyUpdateV2(r2, v2Updates[i])
+      const s1 = hex(Y.encodeStateAsUpdate(r1))
+      const s2 = hex(Y.encodeStateAsUpdateV2(r1))
+      if (hex(Y.encodeStateAsUpdate(r2)) !== s1 || hex(Y.encodeStateAsUpdateV2(r2)) !== s2) {
+        throw new Error(`${name}: Yjs receivers fed v1 and v2 differ at step ${i}`)
+      }
+      steps.push([s1, s2])
+      svs.push(Y.encodeStateVector(r1))
+    })
+    const picks = [...new Set([0, Math.floor(updates.length / 2), updates.length - 1])].filter(i => i >= 0 && i < svs.length)
+    const diffs = picks.map(i => [hex(svs[i]), hex(Y.encodeStateAsUpdate(r1, svs[i])), hex(Y.encodeStateAsUpdateV2(r1, svs[i]))])
+    return { name, updates: updates.map(hex), updatesV2: v2Updates.map(hex), steps, diffs }
+  })
+  let mbt = '\n///|\nlet interop_v2_cases : Array[(String, Array[String], Array[String], Array[(String, String)], Array[(String, String, String)])] = [\n'
+  for (const c of cases) {
+    mbt += `  (\n    "${c.name}",\n    [${c.updates.map(u => `"${u}"`).join(', ')}],\n    [${c.updatesV2.map(u => `"${u}"`).join(', ')}],\n`
+    mbt += `    [${c.steps.map(([a, b]) => `("${a}", "${b}")`).join(', ')}],\n`
+    mbt += `    [${c.diffs.map(([sv, a, b]) => `("${sv}", "${a}", "${b}")`).join(', ')}],\n  ),\n`
+  }
+  mbt += ']\n'
+  writeFixture('interop_v2', 'tests', cases, mbt)
+}
+
+// ---------------------------------------------------------------------------
+// Working on updates without a document: mergeUpdates, diffUpdate and
+// encodeStateVectorFromUpdate, in both formats. The pools are the local updates
+// of the scenarios above (several clients, text, map, array, formatting). From
+// each pool, seeded random picks are merged: all of them in order, a shuffle
+// with repeats, and a random subset (which leaves gaps that become skips).
+// The merged updates are diffed against state vectors the pool passes through.
+
+export const UPDATE_OPS_POOLS = 36
+
+const updatePools = () => {
+  const pools = []
+  const take = (name, ops) => {
+    const ups = ops.flatMap(o => o.update ?? [])
+    if (ups.length >= 3) pools.push({ name, updates: ups })
+  }
+  for (let i = 0; i < 12; i++) take(`convergence ${i + 1}`, convergenceScenario(i + 1).ops)
+  for (let i = 0; i < 12; i++) take(`array ${i + 1}`, arrayScenario(i + 1).ops)
+  for (let i = 0; i < 12; i++) take(`rich ${i + 1}`, richScenario(i + 1).ops)
+  const base = pools.slice(0, UPDATE_OPS_POOLS)
+  // snapshots of the whole state after a third, two thirds and all of a pool:
+  // they overlap in the middle of merged items, and (with gc) hold GC structs
+  const snapshots = base.filter((_, i) => i % 2 === 0).map((pool, i) => {
+    const n = pool.updates.length
+    const d = new Y.Doc({ gc: i % 4 !== 0 })
+    d.clientID = 77
+    const ups = []
+    let applied = 0
+    for (const k of [Math.ceil(n / 3), Math.ceil(2 * n / 3), n]) {
+      for (; applied < k; applied++) Y.applyUpdate(d, new Uint8Array(Buffer.from(pool.updates[applied], 'hex')))
+      ups.push(hex(Y.encodeStateAsUpdate(d)))
+    }
+    // the diffs of snapshots use states between them (in the middle of items)
+    return { name: `snapshots of ${pool.name}`, updates: ups, stateUpdates: pool.updates }
+  })
+  return base.concat(snapshots)
+}
+
+const genUpdateOps = () => {
+  const toV2 = hexStr => hex(Y.convertUpdateFormatV1ToV2(Buffer.from(hexStr, 'hex')))
+  const fromHex = h => new Uint8Array(Buffer.from(h, 'hex'))
+  const pools = updatePools()
+  const merges = []
+  const diffs = []
+  pools.forEach((pool, pi) => {
+    const rand = rng(pi * 7907 + 3)
+    const n = pool.updates.length
+    const picks = []
+    picks.push(pool.updates.map((_, i) => i))
+    {
+      // a shuffle with some repeats
+      const order = pool.updates.map((_, i) => i).sort(() => rand() - 0.5)
+      order.splice(Math.floor(rand() * order.length), 0, order[0])
+      picks.push(order)
+    }
+    {
+      // a random subset, in random order
+      const subset = pool.updates.map((_, i) => i).filter(() => rand() < 0.6).sort(() => rand() - 0.5)
+      picks.push(subset.length > 0 ? subset : [0, n - 1])
+    }
+    picks.push([Math.floor(rand() * n)]) // a single update comes back unchanged
+    picks.push([])
+    for (const idx of picks) {
+      const v1 = idx.map(i => fromHex(pool.updates[i]))
+      const v2 = idx.map(i => fromHex(toV2(pool.updates[i])))
+      const m1 = Y.mergeUpdates(v1)
+      const m2 = Y.mergeUpdatesV2(v2)
+      merges.push({
+        pool: pi,
+        indices: idx,
+        v1: hex(m1),
+        v2: hex(m2),
+        sv1: hex(Y.encodeStateVectorFromUpdate(m1)),
+        sv2: hex(Y.encodeStateVectorFromUpdateV2(m2))
+      })
+    }
+    // diffs of the full merge against the states after the first k updates
+    const full = merges[merges.length - 5]
+    const fullV1 = fromHex(full.v1)
+    const fullV2 = fromHex(full.v2)
+    const stateUps = pool.stateUpdates ?? pool.updates
+    const ns = stateUps.length
+    const ks = [...new Set([1, Math.floor(ns / 3), Math.floor(ns / 2), ns - 1, ns])].filter(k => k > 0)
+    for (const k of ks) {
+      const d = new Y.Doc({ gc: false })
+      for (let i = 0; i < k; i++) Y.applyUpdate(d, fromHex(stateUps[i]))
+      const sv = Y.encodeStateVector(d)
+      diffs.push({ merge: merges.length - 5, sv: hex(sv), v1: hex(Y.diffUpdate(fullV1, sv)), v2: hex(Y.diffUpdateV2(fullV2, sv)) })
+    }
+    // against an empty state vector and one that knows only the first client
+    const empty = new Uint8Array([0])
+    diffs.push({ merge: merges.length - 5, sv: hex(empty), v1: hex(Y.diffUpdate(fullV1, empty)), v2: hex(Y.diffUpdateV2(fullV2, empty)) })
+    // the update with gaps (random subset) against the state vector of the pool's first half
+    {
+      const sub = merges[merges.length - 3]
+      const d = new Y.Doc({ gc: false })
+      for (let i = 0; i < Math.ceil(ns / 2); i++) Y.applyUpdate(d, fromHex(stateUps[i]))
+      const sv = Y.encodeStateVector(d)
+      diffs.push({ merge: merges.length - 3, sv: hex(sv), v1: hex(Y.diffUpdate(fromHex(sub.v1), sv)), v2: hex(Y.diffUpdateV2(fromHex(sub.v2), sv)) })
+    }
+  })
+  let mbt = '\n///|\nlet update_pools : Array[Array[String]] = [\n'
+  for (const pool of pools) mbt += `  [${pool.updates.map(u => `"${u}"`).join(', ')}],\n`
+  mbt += ']\n'
+  mbt += '\n///|\nlet merge_cases : Array[(Int, Array[Int], String, String, String, String)] = [\n'
+  for (const m of merges) mbt += `  (${m.pool}, [${m.indices.join(', ')}], "${m.v1}", "${m.v2}", "${m.sv1}", "${m.sv2}"),\n`
+  mbt += ']\n'
+  mbt += '\n///|\nlet diff_cases : Array[(Int, String, String, String)] = [\n'
+  for (const d of diffs) mbt += `  (${d.merge}, "${d.sv}", "${d.v1}", "${d.v2}"),\n`
+  mbt += ']\n'
+  writeFixture('update_ops', 'tests', { pools, merges, diffs }, mbt)
+}
+
 genLib0()
 genUpdates()
 genInterop()
@@ -1743,5 +1969,10 @@ genRichConcurrent()
 genRichConvergence()
 genRichLateScripts()
 genRichMarker()
+genConvergenceV2()
+genArraysV2()
+genRichV2()
+genInteropV2()
+genUpdateOps()
 genReadmeRich()
 genExportBase()

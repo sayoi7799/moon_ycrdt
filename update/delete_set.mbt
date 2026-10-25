@@ -76,32 +76,34 @@ pub fn DeleteSet::contains(self : DeleteSet, id : ID) -> Bool {
 
 ///|
 /// Writes clients in descending order, like Yjs.
-pub fn DeleteSet::write(self : DeleteSet, e : @lib0.Encoder) -> Unit {
+pub fn DeleteSet::write(self : DeleteSet, e : UpdateEncoder) -> Unit {
   let clients = self.clients.keys().to_array()
   clients.sort_by((a, b) => b.compare(a))
-  e.write_var_uint(clients.length())
+  e.rest.write_var_uint(clients.length())
   for client in clients {
     let ranges = self.clients.get(client).unwrap()
-    e.write_var_uint32(client)
-    e.write_var_uint(ranges.length())
+    e.reset_ds_current()
+    e.rest.write_var_uint32(client)
+    e.rest.write_var_uint(ranges.length())
     for r in ranges {
-      e.write_var_uint(r.clock)
-      e.write_var_uint(r.len)
+      e.write_ds_clock(r.clock)
+      e.write_ds_len(r.len)
     }
   }
 }
 
 ///|
-pub fn read_delete_set(d : @lib0.Decoder) -> DeleteSet raise @lib0.DecodeError {
+pub fn read_delete_set(d : UpdateDecoder) -> DeleteSet raise @lib0.DecodeError {
   let ds = DeleteSet::new()
-  let num_clients = d.read_var_uint()
+  let num_clients = d.rest.read_var_uint()
   for _ in 0..<num_clients {
-    let client = d.read_var_uint32()
-    let num_ranges = d.read_var_uint()
+    d.reset_ds_current()
+    let client = d.rest.read_var_uint32()
+    let num_ranges = d.rest.read_var_uint()
     let ranges = []
     for _ in 0..<num_ranges {
-      let clock = d.read_var_uint()
-      let len = d.read_var_uint()
+      let clock = d.read_ds_clock()
+      let len = d.read_ds_len()
       ranges.push({ clock, len, })
     }
     ds.clients[client] = ranges

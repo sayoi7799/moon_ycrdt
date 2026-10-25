@@ -7,7 +7,9 @@
 //   2. all local updates of all replicas, applied in a shuffled order,
 //      converge to that same content;
 //   3. replaying exactly the same operations on Yjs replicas with the same
-//      client ids yields byte-identical encoded states.
+//      client ids yields byte-identical encoded states (update formats v1 and
+//      v2), and Yjs' mergeUpdates / diffUpdate give the bytes MoonBit's
+//      merge_updates / diff_update gave.
 //
 // Usage (from the repository root):
 //   moon run cmd/export > fixtures/moonbit_out.json
@@ -81,6 +83,23 @@ for (const c of report.cases) {
     check(hex(Y.encodeStateVector(y)) === hex(fromB64(d.stateVector)), `${c.name}: replica ${i} state vector`)
   })
 
+  // 1b. the same in update format v2, and the functions that work on updates
+  //     without a document
+  c.docs.forEach((d, i) => {
+    const y2 = new Y.Doc()
+    Y.applyUpdateV2(y2, fromB64(d.stateV2))
+    check(canon(readContent(y2, names)) === canon(expectedContent(d)), `${c.name}: replica ${i} v2 state content`)
+    const locals = d.localUpdates.map(fromB64)
+    const localsV2 = d.localUpdatesV2.map(fromB64)
+    check(hex(Y.mergeUpdates(locals)) === hex(fromB64(d.merged)), `${c.name}: replica ${i} merge_updates`)
+    check(hex(Y.mergeUpdatesV2(localsV2)) === hex(fromB64(d.mergedV2)), `${c.name}: replica ${i} merge_updates_v2`)
+    for (const diff of d.diffs) {
+      const sv = fromB64(diff.stateVector)
+      check(hex(Y.diffUpdate(fromB64(d.state), sv)) === hex(fromB64(diff.v1)), `${c.name}: replica ${i} diff_update against ${diff.againstReplica}`)
+      check(hex(Y.diffUpdateV2(fromB64(d.stateV2), sv)) === hex(fromB64(diff.v2)), `${c.name}: replica ${i} diff_update_v2 against ${diff.againstReplica}`)
+    }
+  })
+
   // 2. all local updates, shuffled (deterministically), plus external input
   const external = c.ops.filter(o => o.op === 'apply').map(o => fromB64(o.update))
   const locals = c.docs.flatMap(d => d.localUpdates.map(fromB64))
@@ -120,6 +139,7 @@ for (const c of report.cases) {
   c.docs.forEach((d, i) => {
     check(canon(readContent(ydocs[i], names)) === canon(expectedContent(d)), `${c.name}: replica ${i} replayed content`)
     check(hex(Y.encodeStateAsUpdate(ydocs[i])) === hex(fromB64(d.state)), `${c.name}: replica ${i} replayed state bytes`)
+    check(hex(Y.encodeStateAsUpdateV2(ydocs[i])) === hex(fromB64(d.stateV2)), `${c.name}: replica ${i} replayed state bytes (v2)`)
   })
 
   if (c.name === 'preserve_unknown') {

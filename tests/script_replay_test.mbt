@@ -40,11 +40,20 @@ fn map_state(doc : @doc.Doc) -> String {
 
 ///|
 /// Replays `c` and returns the number of steps checked.
-fn replay(c : ScriptCase) -> Int32 raise {
+fn replay(c : ScriptCase, v2~ : Bool = false) -> Int32 raise {
   let docs = c.clients.map(id => @doc.Doc::new(id))
   let logs : Array[Array[Bytes]] = docs.map(_ => [])
   for i, d in docs {
-    d.on_update((u, is_local) => if is_local { logs[i].push(u) })
+    let record = fn(u : Bytes, is_local : Bool) {
+      if is_local {
+        logs[i].push(u)
+      }
+    }
+    if v2 {
+      d.on_update_v2(record)
+    } else {
+      d.on_update(record)
+    }
   }
   let texts = docs.map(d => @types.Text::new(d, "t"))
   let maps = docs.map(d => @types.YMap::new(d, "m"))
@@ -71,7 +80,11 @@ fn replay(c : ScriptCase) -> Int32 raise {
       }
       Sync(from, to, indices, text, map) => {
         for i in indices {
-          docs[to].apply_update(logs[from][i])
+          if v2 {
+            docs[to].apply_update_v2(logs[from][i])
+          } else {
+            docs[to].apply_update(logs[from][i])
+          }
         }
         (to, None, text, map)
       }

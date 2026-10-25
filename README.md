@@ -21,6 +21,7 @@ y-websocket 服务以及 Yrs 后端交换同一份文档。
 - [定位](#定位)
 - [安装](#安装)
 - [快速上手](#快速上手)
+- [更新格式 v2 与不加载文档的更新操作](#更新格式-v2-与不加载文档的更新操作)
 - [对接 y-websocket](#对接-y-websocket)
 - [可运行示例](#可运行示例)
 - [协作编辑演示：y-websocket 服务端](#协作编辑演示y-websocket-服务端)
@@ -131,6 +132,45 @@ let parsed = @types.delta_from_json(@json.parse(json))
 
 属性是有序的 `(键, Any)` 列表，值为 `Null` 表示取消该属性。`insert` 不带属性时新文本继承所在位置的格式，
 `insert_with_attributes` 则**只**使用给定的格式（没有列出的当前属性会被关掉，插入之后再恢复）。
+
+## 更新格式 v2 与不加载文档的更新操作
+
+Yjs 有两种更新格式：v1 把字段顺序写进一个字节流，v2 把同一种字段（client id、clock、info 字节、字符串、长度……）
+各放进一列，用游程编码压缩，通常更短。两种格式描述的是同一批 struct，本库都支持，并与 Yjs 逐字节对照：
+
+| 功能 | v1 | v2 |
+|---|---|---|
+| 整个文档的状态 | `Doc::encode_state_as_update(sv?)` | `Doc::encode_state_as_update_v2(sv?)` |
+| 应用更新 | `Doc::apply_update` | `Doc::apply_update_v2` |
+| 事务级更新事件 | `Doc::on_update` | `Doc::on_update_v2` |
+| 解码 / 编码为 `Update` | `decode_update` / `Update::encode` | `decode_update_v2` / `Update::encode_v2` |
+
+不需要加载文档、直接处理更新的字节（`update` 包，v1 和 v2 各一个，后缀 `_v2`）：
+
+- `merge_updates(updates)`：合并成一个更新，重叠的部分切开，空洞补上 Skip，删除集取并集（`Y.mergeUpdates`）；
+- `diff_update(update, state_vector)`：只留下对方还没有的部分（`Y.diffUpdate`）；
+- `encode_state_vector_from_update(update)`：这个更新单独能推出的状态向量（`Y.encodeStateVectorFromUpdate`）。
+
+摘自 `tests/readme_test.mbt`：
+
+```moonbit
+let v2 = alice.encode_state_as_update_v2()
+bob.apply_update_v2(v2)
+
+// work on updates as bytes: no document is needed
+let merged = @update.merge_updates(updates)
+let sv = @update.encode_state_vector_from_update(merged)
+let missing = @update.diff_update(merged, bob.encode_state_vector())
+```
+
+几个与 Yjs 一致的细节，使用时可能会遇到：
+
+- Yjs 读出一个更新后，会忘记"这个 map 条目带 key"那一位（有 origin 的条目线上不写 key，只在 info 字节里留一位）。
+  所以凡是"读出再写回"的操作（合并、差量、v1 与 v2 转换，以及带 pending 数据的 `encode_state_as_update`）写出的
+  字节里这一位都是清掉的；直接解码再编码（`decode_update` 后 `encode`）则保留原样。
+- `merge_updates` 只有一个输入时原样返回输入，不重新编码。
+- Embed 和格式属性的值在 v1 里是 JSON 文本，在 v2 里是 `Any`。本库把它们存成 JSON 文本，所以 v2 里不能用 JSON 表示的值
+  （`Infinity`、`undefined`、字节数组等）读出来会变成 JSON 能表示的样子，重新编码后与原字节不同。
 
 ## 对接 y-websocket
 
@@ -282,11 +322,11 @@ cd examples/web && npm run e2e -- ../ws_server/_build/native/debug/build/sayoi77
 
 | 包 | 主要 API |
 |---|---|
-| `doc` | `Doc::new(client_id)`、`apply_update(bytes)`、`encode_state_as_update(sv?)`、`encode_state_vector()`、`state_vector()`、`on_update((update, is_local) => ...)`、`has_pending()`、`root_names()`；函数形式 `@doc.apply_update`、`@doc.encode_state_as_update(doc, target_state_vector?)`、`@doc.encode_state_vector` |
+| `doc` | `Doc::new(client_id)`、`apply_update(bytes)`、`encode_state_as_update(sv?)`、`encode_state_vector()`、`state_vector()`、`on_update((update, is_local) => ...)`、`has_pending()`、`root_names()`，以及 v2 的 `apply_update_v2`、`encode_state_as_update_v2`、`on_update_v2`；函数形式 `@doc.apply_update`、`@doc.encode_state_as_update(doc, target_state_vector?)`、`@doc.encode_state_vector`（和 `_v2`） |
 | `types` | `Text::new(doc, name)`：`insert`、`insert_with_attributes`、`insert_embed`、`format`、`delete`、`to_string`、`length`、`to_delta`、`apply_delta`；`DeltaOp`（`Insert` / `Retain` / `Delete`）、`delta_to_json` / `delta_from_json`<br>`YMap::new(doc, name)`：`set`、`get`、`has`、`delete`、`keys`、`entries`、`size`<br>`YArray::new(doc, name)`：`insert`、`push`、`delete`、`get`、`to_array`、`length` |
 | `protocol` | `SyncMessage`（`SyncStep1` / `SyncStep2` / `Update`）的 `encode` / `decode_sync_message`；`sync_step1`、`sync_step2`、`update_message`、`handle_sync_message`；y-websocket：`WsMessage`、`decode_ws_message`、`handle_ws_message` |
 | `lib0` | `Encoder` / `Decoder`（`write_var_uint`、`write_var_int`、`write_var_string`、`write_any` 等）、`Any`、`encode_any` / `decode_any`、`to_hex` / `from_hex`、`DecodeError` |
-| `update` | `decode_update` / `Update::encode`、`StructRef`、`ItemRef`、`Content`、`DeleteSet`、`encode_state_vector` / `decode_state_vector` |
+| `update` | `decode_update` / `Update::encode`（v2：`decode_update_v2` / `Update::encode_v2`）、`merge_updates`、`diff_update`、`encode_state_vector_from_update`（各有 `_v2`）、`StructRef`、`ItemRef`、`Content`、`DeleteSet`、`encode_state_vector` / `decode_state_vector` |
 
 值统一用 `@lib0.Any` 表示（与 lib0 的 Any 编码一一对应）：`Null`、`Undefined`、`Bool`、`Number(Double)`、
 `BigInt`、`String`、`Array`、`Object`（保留键的顺序）、`Bytes`。`Any::int(n)` 构造整数。
@@ -312,7 +352,8 @@ cd examples/web && npm run e2e -- ../ws_server/_build/native/debug/build/sayoi77
 | 不支持的 content（XML 类型、子文档、数组中的嵌套类型） | ✅ 保留 | 原样存储并在编码时写回；Yjs 在这些类型内部继续编辑，MoonBit 也能正确合并 |
 | Y.Xml* 的 API（包括 y-prosemirror / Tiptap 使用的 `XmlFragment`、`XmlElement`、`XmlText`） | ❌ | 数据会保留。`XmlText` 的格式逻辑与 `Text` 相同，下一步可以复用 |
 | 快照、`ychange` 属性 | ❌ | `to_delta` 不支持 snapshot 参数 |
-| update v2 | ❌ | |
+| update v2 解码 / 编码、`encode_state_as_update_v2` / `apply_update_v2` / `on_update_v2` | ✅ | 与 `encodeStateAsUpdateV2`、`applyUpdateV2`、`updateV2` 事件和 `convertUpdateFormat` 逐字节一致 |
+| `merge_updates`、`diff_update`、`encode_state_vector_from_update`（v1 和 v2） | ✅ | 不加载文档；与 Yjs 同名函数逐字节一致，见[更新格式 v2](#更新格式-v2-与不加载文档的更新操作) |
 | 子文档加载、UndoManager、awareness 状态、相对位置、快照 | ❌ | |
 | 垃圾回收 | ❌ | 本地文档相当于 `gc: false`，但能解码对方发来的 GC 结构和 ContentDeleted |
 | y-websocket 服务端 | 示例 | `examples/ws_server`：native 程序，房间广播和文件持久化，见[协作编辑演示](#协作编辑演示y-websocket-服务端)；不是库的一部分 |
@@ -425,7 +466,7 @@ Item 总数的一半）。但耗时仍随 Item 数增长（5000 次编辑 188 ms
 | lib0 编码 | 每种编码的字节对照，含 0、127、128、负数、2^31 以上、2^53−1、空串、中文、emoji、BOM、−0、Infinity、bigint、孤立代理项 | `lib0/lib0_test.mbt` |
 | 解码层 | 12 个 Yjs 生成的更新（gc / 非 gc 文本、Unicode、各种 Map 值、格式与 embed、嵌套与 XML 类型、子文档、GC 结构、多 client、差量、从 Item 中间开始的差量、含 Skip 的合并更新、旧版 ContentJSON）：解码结果与 `Y.decodeUpdate` 一致，再编码**逐字节相同** | `update/update_test.mbt` |
 | Yjs → MoonBit | 15 个场景（含乱序、重复投递）：文本、Map、状态向量与 Yjs 一致，MoonBit 重新编码的整体状态与 Yjs 的**逐字节相同**；幂等；差量同步 | `tests/interop_test.mbt` |
-| MoonBit → Yjs | `cmd/export` 导出 7 组编辑脚本（Unicode 文本、全部 Any 类型、2 / 3 副本并发、编辑含格式 / embed / XML / 子文档的 Yjs 文档、Y.Array 并发编辑、富文本格式与 delta）；`scripts/verify_moonbit.mjs` 用 Yjs 验证：完整状态读回一致、打乱顺序应用增量更新后收敛、在 Yjs 上用相同 client id 重放同样的操作得到**逐字节相同**的状态、不支持的内容仍在（共 60 项检查） | `cmd/export`、`scripts/verify_moonbit.mjs` |
+| MoonBit → Yjs | `cmd/export` 导出 7 组编辑脚本（Unicode 文本、全部 Any 类型、2 / 3 副本并发、编辑含格式 / embed / XML / 子文档的 Yjs 文档、Y.Array 并发编辑、富文本格式与 delta）；`scripts/verify_moonbit.mjs` 用 Yjs 验证：完整状态读回一致、打乱顺序应用增量更新后收敛、在 Yjs 上用相同 client id 重放同样的操作得到**逐字节相同**的状态、不支持的内容仍在；v2 的状态用 `applyUpdateV2` 读回、与 `encodeStateAsUpdateV2` 逐字节相同；`merge_updates` / `diff_update`（v1 和 v2）与 Yjs 逐字节相同（共 132 项检查） | `cmd/export`、`scripts/verify_moonbit.mjs` |
 | 边界情况 | 55 个场景：在含 emoji、ZWJ 序列、组合字符的字符串里的**每个** UTF-16 位置插入、删除 1 / 2 个码元（会切开代理对），空插入、删光再写、末尾连续输入、client id 0 与 2^32−1、两个副本切开同一个代理对；空文档、空更新；截断与损坏的输入必须报错且不改动文档 | `tests/edge_test.mbt` |
 | 不支持内容的保留 | 5 类（格式与 embed、XML、含嵌套类型的数组、子文档、gc 产生的 GC 结构）：MoonBit 加载 Yjs 文档、编辑自己支持的部分、再接收 Yjs 在不支持类型内部的编辑，本地更新与最终状态都与 Yjs **逐字节相同** | `tests/preserve_test.mbt` |
 | 并发收敛 | 300 组随机场景（种子 1–300），2–4 个副本、同位置并发插入删除、对同一组键并发写入和删除 Map、随机抽取（有重复）乱序交换：**每一步**的文本和 Map 都与 Yjs 一致，每个本地更新的字节都与 Yjs 发出的一致（共 10914 步） | `tests/convergence_test.mbt` |
@@ -435,6 +476,9 @@ Item 总数的一半）。但耗时仍随 Item 数增长（5000 次编辑 188 ms
 | 富文本：delta 读取 | 13 个 Yjs 文档（加粗、重叠、`null` 取消、对象 / 数组 / 数字 / 字符串值、embed、删除、Unicode、并发格式、属性键顺序）：`to_delta()` 的 JSON 文本与 Yjs 的 `JSON.stringify(toDelta())` 逐字符相同 | `tests/rich_delta_test.mbt` |
 | 富文本：编辑脚本 | 由 Yjs 逐步记录：带 / 不带属性插入和 embed（11 组 53 步）、`format`（11 组 47 步）、`applyDelta`（10 组 29 步）、并发格式化（6 组 67 步）、类型晚取（7 组 35 步）。每一步比较 delta 和本地更新的字节，远端更新后 Yjs 产生的清理更新也要一致 | `tests/rich_scripts_test.mbt` |
 | 富文本：随机并发 | 300 组固定种子（1–300），2–4 个副本，带属性的插入、embed、`format`（含 `null`）、删除、`applyDelta`，乱序重复同步直到不再产生新更新；共 8734 步，其中 149 次是 Yjs 的清理更新，每一步的 delta 和更新字节都与 Yjs 一致，最终所有副本一致 | `tests/rich_scripts_test.mbt` |
+| 更新格式 v2 | 12 个样例更新经 `convertUpdateFormatV1ToV2` 转成 v2 后，解码结果与 v1 相同、两个方向写回的字节与 Yjs 相同；60 组文本和 Map、40 组 Y.Array、20 组富文本场景全程交换 v2 更新（每个本地更新是 Yjs `updateV2` 事件的字节，Yjs 写的 v2 更新都能应用）；15 个互通场景里接收方在每一步之后的整体状态（v1 和 v2，含 pending 和被覆盖的 map 键）以及对途中状态向量的差量 | `update/update_test.mbt`、`tests/v2_test.mbt` |
+| 不加载文档的更新操作 | 36 个更新池（来自已记录的场景，加上它们的整体状态快照，含和不含 GC）：按顺序合并、打乱并重复、只取一部分（留下空洞）、单个更新、空列表，再对合并结果做差量（包括落在 Item 中间的状态向量）、读出状态向量，v1 和 v2 都与 Yjs 逐字节相同 | `tests/update_ops_test.mbt` |
+| lib0 游程编码 | `Rle`、`UintOptRle`、`IntDiffOptRle`、字符串编码器：多组序列（游程、重复的 0、32 位边界、负差值、两种长度的字符串）与 lib0 逐字节相同，并能解码回去 | `lib0/lib0_test.mbt` |
 | search marker：长序列 | 20 组富文本（根类型在格式化内容到达之后才取得，各约 100 次不带属性的插入、删除和远端更新，marker 被反复创建、移动、替换和清空）、15 组各 300 步的 Y.Array：每一步的 delta 与每个本地更新的字节都与 Yjs 一致 | `tests/rich_scripts_test.mbt`、`tests/array_test.mbt` |
 | search marker：模型对照 | 不用 Yjs：随机操作的结果与朴素模型一致，每个 marker 的 `index` 与扫描链表算出的位置一致（对应 Yjs 源码里被注释掉的 "assure position"），含合并时的调整和远端更新后的清空 | `tests/marker_test.mbt` |
 | README 示例 | 快速上手、富文本与 y-websocket 流程的代码 | `tests/readme_test.mbt` |

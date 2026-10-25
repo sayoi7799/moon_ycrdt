@@ -96,6 +96,22 @@
             "AQG5YBbEuWACuWADBPCfjokA",
             "AAG5YAICAxYC"
           ],
+          "stateV2": "AAAE+cABDwwAAwAEAAxUFgIMAmIECkgIRA0EAIQDxACEAMQBhALEMSV0SGVsbG8gd29ybGQsIWgg5Lit5paHIO+/ve+/vfCfkY3wn46JQQICBkEBBEEAQgABAQAAAQ0AAblgBAAAAQIOAAIB",
+          "localUpdatesV2": [
+            "AAADucABAAABBA8MdEhlbGxvIHdvcmxkAQsBAQAAAQEAAA==",
+            "AAAE+cABAQEIAQoBxAMBLAEAAAABAQsA",
+            "AAAE+cABAAEUAAGEAwEhAQAAAAEBDAA=",
+            "AAAAAAAAAQAAAAAAAblgAQAA",
+            "AAAE+cABAQEAAQIBxAMBaAEAAAABAQ0A",
+            "AAAE+cABAQEWAQoBxAoIIOS4reaWhyAEAAAAAQEOAA==",
+            "AAAE+cABAAEYAAGECgjwn5iA8J+RjQQAAAABARIA",
+            "AAAAAAAAAQAAAAAAAblgARMA",
+            "AAAE+cABAQEEAQYBxAYE8J+OiQIAAAABARYA",
+            "AAAAAAAAAQAAAAAAAblgAgICEQE="
+          ],
+          "merged": "AQe5YAAEAQF0C0hlbGxvIHdvcmxkxLlgBLlgBQEshLlgCgEhxLlgALlgAQFoxLlgC7lgBQgg5Lit5paHIIS5YAwI8J+YgPCfkY3EuWACuWADBPCfjokBuWAEAAECAxMBFgI=",
+          "mergedV2": "AAAE+cABCQYIDFQWAlQECkgIRAsEAMQAhADEAYQAxCsjdEhlbGxvIHdvcmxkLCFoIOS4reaWhyDwn5iA8J+RjfCfjokBC0EBRAACAQEAAAEHAAG5YAQAAAECDgACAQ==",
+          "diffs": [],
           "texts": {
             "t": "he, 中文  world!�👍"
           },
@@ -243,6 +259,25 @@
             "AQGBvMGWCwqogbzBlgsBAX1IAA==",
             "AAGBvMGWCwEDAQ=="
           ],
+          "stateV2": "AAAGwfiCrRYBAgACAAUoByMAqEk2bWludG1uZWdhdGl2ZW1mbG9hdG1kb3VibGVtYmlnbXRleHRtZmxhZ3Ntb2JqZWN0bWJ5dGVzAQMBCAEFAQYBAwEEAQUBBgEFAQEAAkEIAQsAfSp9R3w/wAAAez+5mZmZmZmaegAAAQAAAAAAdwvkuK3mlocg8J+YgHUEeHl+f3YCAWF9AQZuZXN0ZWR2AQFidQADAQL/fSt9SAGBvMGWCwIAAQEA",
+          "localUpdatesV2": [
+            "AAAFgfiCrRYAAAEoBwRtaW50AQMBAQABAQEBAH0qAA==",
+            "AAAFgfiCrRYAAAEoDAltbmVnYXRpdmUBCAEBAAEBAQEBfUcA",
+            "AAAFgfiCrRYAAAEoCQZtZmxvYXQBBQEBAAEBAQECfD/AAAAA",
+            "AAAFgfiCrRYAAAEoCgdtZG91YmxlAQYBAQABAQEBA3s/uZmZmZmZmgA=",
+            "AAAFgfiCrRYAAAEoBwRtYmlnAQMBAQABAQEBBHoAAAEAAAAAAAA=",
+            "AAAFgfiCrRYAAAEoCAVtdGV4dAEEAQEAAQEBAQV3C+S4reaWhyDwn5iAAA==",
+            "AAAFgfiCrRYAAAEoCQZtZmxhZ3MBBQEBAAEBAQEGdQR4eX5/AA==",
+            "AAAFgfiCrRYAAAEoCgdtb2JqZWN0AQYBAQABAQEBB3YCAWF9AQZuZXN0ZWR2AQFidQAA",
+            "AAAFgfiCrRYAAAEjCQZtYnl0ZXMBBQEBAAABAQgDAQL/AA==",
+            "AAAGwfiCrRYAAQAAAagBAAAAAQEBAQl9KwGBvMGWCwEAAA==",
+            "AAAAAAAAAQAAAAAAAYG8wZYLAQEA",
+            "AAAGwfiCrRYAAQIAAagBAAAAAQEBAQp9SAA=",
+            "AAAAAAAAAQAAAAAAAYG8wZYLAQMA"
+          ],
+          "merged": "AQuBvMGWCwAoAQFtA2ludAF9KigBAW0IbmVnYXRpdmUBfUcoAQFtBWZsb2F0AXw/wAAAKAEBbQZkb3VibGUBez+5mZmZmZmaKAEBbQNiaWcBegAAAQAAAAAAKAEBbQR0ZXh0AXcL5Lit5paHIPCfmIAoAQFtBWZsYWdzAXUEeHl+fygBAW0Gb2JqZWN0AXYCAWF9AQZuZXN0ZWR2AQFidQAjAQFtBWJ5dGVzAwEC/4iBvMGWCwABfSuIgbzBlgsBAX1IAYG8wZYLAgACAwE=",
+          "mergedV2": "AAAGwfiCrRYBAgACAAUoByMAiEk2bWludG1uZWdhdGl2ZW1mbG9hdG1kb3VibGVtYmlnbXRleHRtZmxhZ3Ntb2JqZWN0bWJ5dGVzAQMBCAEFAQYBAwEEAQUBBgEFAQEAAkEIAQsAfSp9R3w/wAAAez+5mZmZmZmaegAAAQAAAAAAdwvkuK3mlocg8J+YgHUEeHl+f3YCAWF9AQZuZXN0ZWR2AQFidQADAQL/fSt9SAGBvMGWCwIAAQEA",
+          "diffs": [],
           "texts": {},
           "deltas": {},
           "maps": {
@@ -380,6 +415,24 @@
             "AQEBDigBAW0Dd2hvAXcFZmlyc3QA",
             "AQEBD8QBDQIDDDxhZnRlci1zeW5jPgA="
           ],
+          "stateV2": "AAAEAkEHAgQGAQAUBQhICEgGEcQARAAoAAQAhADEAEQAKADENShbQl1iMG13aG90YmFzZSB0ZXh0W0FdYTBtd2hvPGFmdGVyLXN5bmM+AwIBAwEEBQMCAQMMAQEAAkEAAgMAdwZzZWNvbmQGAHcFZmlyc3QCAgEAAgEBDgA=",
+          "localUpdatesV2": [
+            "AAABAQAAAQQNCnRiYXNlIHRleHQBCQEBAAABAQAA",
+            "AAACQQEBBgEIAcQFA1tBXQMAAAABAQkA",
+            "AAACQQAAAQABRAQCYTACAAAAAQEMAA==",
+            "AAABAQAAASgHBG13aG8BAwEBAAEBAQEOdwVmaXJzdAA=",
+            "AAADQQACARoBBgHEDgw8YWZ0ZXItc3luYz4MAAAAAQEPAA=="
+          ],
+          "merged": "AQUBAAQBAXQJYmFzZSB0ZXh0xAEDAQQDW0FdRAEAAmEwKAEBbQN3aG8BdwVmaXJzdMQBDQIDDDxhZnRlci1zeW5jPgA=",
+          "mergedV2": "AAADQQMCAgYUAwhIBgkEAMQARAAoAMQnH3RiYXNlIHRleHRbQV1hMG13aG88YWZ0ZXItc3luYz4BCQMCAQMMAQEAAQEBBQB3BWZpcnN0AA==",
+          "diffs": [
+            {
+              "againstReplica": 1,
+              "stateVector": "AgIGARs=",
+              "v1": "AAICAQADAQEOAQ==",
+              "v2": "AAAAAAAAAQAAAAAAAgIBAAIBAQ4A"
+            }
+          ],
           "texts": {
             "t": "a0<after-sync>b0base[A] text"
           },
@@ -406,6 +459,23 @@
             "AQECA0QBAAJiMAA=",
             "AAECAQAD",
             "AQECBSgBAW0Dd2hvAXcGc2Vjb25kAA=="
+          ],
+          "stateV2": "AAAEAkEHAgQGAQAUBQhICEgGEcQARAAoAAQAhADEAEQAKADENShbQl1iMG13aG90YmFzZSB0ZXh0W0FdYTBtd2hvPGFmdGVyLXN5bmM+AwIBAwEEBQMCAQMMAQEAAkEAAgMAdwZzZWNvbmQGAHcFZmlyc3QCAgEAAgEBDgA=",
+          "localUpdatesV2": [
+            "AAADAkEAAQYBCAHEBQNbQl0DAAAAAQEAAA==",
+            "AAACAgEAAQABRAQCYjACAAAAAQEDAA==",
+            "AAAAAAAAAQAAAAAAAQIBAAI=",
+            "AAABAgAAASgHBG13aG8BAwEBAAEBAQEFdwZzZWNvbmQA"
+          ],
+          "merged": "AQMCAMQBAwEEA1tCXUQBAAJiMCgBAW0Dd2hvAXcGc2Vjb25kAQIBAAM=",
+          "mergedV2": "AAADAkEBAQYCCEgFxABEACgOCVtCXWIwbXdobwMCAQMBAQABAQEDAHcGc2Vjb25kAQIBAAI=",
+          "diffs": [
+            {
+              "againstReplica": 0,
+              "stateVector": "AgIGARs=",
+              "v1": "AAICAQADAQEOAQ==",
+              "v2": "AAAAAAAAAQAAAAAAAgIBAAIBAQ4A"
+            }
           ],
           "texts": {
             "t": "a0<after-sync>b0base[A] text"
@@ -624,6 +694,30 @@
             "AQEHBCgBAW0BawF9AQA=",
             "AQEHBcQDAAcDAT4A"
           ],
+          "stateV2": "AAATgKDZ5h1HAoCg2eYdRwQDBwNHAAgAAkIAAkIBAAYDAEIABEQNxAIEAIQBxAAoAMQBKBsVWfCfmIBhZnRlcnRhYmNYbWs+Wm1rAQIFQQkBAQACQQADAwAGAH0BAgB9AwIHAgAAAQADAQAB",
+          "localUpdatesV2": [
+            "AAABBwAAAQQHBHRhYmMBAwEBAAABAQAA",
+            "AAACRwEBAAECAcQDAVgBAAAAAQEDAA==",
+            "AAAAAAAAAQAAAAAAAQcBAgA=",
+            "AAABBwAAASgFAm1rQQABAQABAQEBBH0BAA==",
+            "AAADBwMHAQABBgHEAwE+AQAAAAEBBQA="
+          ],
+          "merged": "AQQHAAQBAXQDYWJjxAcABwEBWCgBAW0BawF9AcQDAAcDAT4BBwECAQ==",
+          "mergedV2": "AAAERwEDBwIBAAICBAcEAMQAKADEDQh0YWJjWG1rPgEDQQIBAQABAQEEAH0BAQcBAgA=",
+          "diffs": [
+            {
+              "againstReplica": 1,
+              "stateVector": "A4DQrPMOCAcGAwI=",
+              "v1": "AAIHAgABAgEDAQAC",
+              "v2": "AAAAAAAAAQAAAAAAAgcCAAABAAMBAAE="
+            },
+            {
+              "againstReplica": 2,
+              "stateVector": "A4DQrPMOCAcGAwI=",
+              "v1": "AAIHAgABAgEDAQAC",
+              "v2": "AAAAAAAAAQAAAAAAAgcCAAABAAMBAAE="
+            }
+          ],
           "texts": {
             "t": ">XYafterb😀"
           },
@@ -650,6 +744,28 @@
             "AQGA0KzzDgHEBwEHAgTwn5iAAA==",
             "AQGA0KzzDgPEgNCs8w4ABwEFYWZ0ZXIA"
           ],
+          "stateV2": "AAATgKDZ5h1HAoCg2eYdRwQDBwNHAAgAAkIAAkIBAAYDAEIABEQNxAIEAIQBxAAoAMQBKBsVWfCfmIBhZnRlcnRhYmNYbWs+Wm1rAQIFQQkBAQACQQADAwAGAH0BAgB9AwIHAgAAAQADAQAB",
+          "localUpdatesV2": [
+            "AAAHgKDZ5h1HAAEAAQIBxAMBWQEAAAABAQAA",
+            "AAAHgKDZ5h1HAAECAQQBxAYE8J+YgAIAAAABAQEA",
+            "AAAHwKDZ5h0ABwEAAQIBxAcFYWZ0ZXIFAAAAAQEDAA=="
+          ],
+          "merged": "AQOA0KzzDgDEBwAHAQFZxAcBBwIE8J+YgMSA0KzzDgAHAQVhZnRlcgA=",
+          "mergedV2": "AAANgKDZ5h1HAoCg2eYdBwMAAkIDAwBCAcQOClnwn5iAYWZ0ZXIBAgUAAAABAwAA",
+          "diffs": [
+            {
+              "againstReplica": 0,
+              "stateVector": "A4DQrPMOCAcGAwI=",
+              "v1": "AAIHAgABAgEDAQAC",
+              "v2": "AAAAAAAAAQAAAAAAAgcCAAABAAMBAAE="
+            },
+            {
+              "againstReplica": 2,
+              "stateVector": "A4DQrPMOCAcGAwI=",
+              "v1": "AAIHAgABAgEDAQAC",
+              "v2": "AAAAAAAAAQAAAAAAAgcCAAABAAMBAAE="
+            }
+          ],
           "texts": {
             "t": ">XYafterb😀"
           },
@@ -675,6 +791,28 @@
             "AQEDAMQHAAcBAVoA",
             "AAIHAQABAwEAAQ==",
             "AQEDASgBAW0BawF9AwA="
+          ],
+          "stateV2": "AAATgKDZ5h1HAoCg2eYdRwQDBwNHAAgAAkIAAkIBAAYDAEIABEQNxAIEAIQBxAAoAMQBKBsVWfCfmIBhZnRlcnRhYmNYbWs+Wm1rAQIFQQkBAQACQQADAwAGAH0BAgB9AwIHAgAAAQADAQAB",
+          "localUpdatesV2": [
+            "AAADA0cAAQABAgHEAwFaAQAAAAEBAAA=",
+            "AAAAAAAAAQAAAAAAAgcBAAADAQAA",
+            "AAABAwAAASgFAm1rQQABAQABAQEBAX0DAA=="
+          ],
+          "merged": "AQIDAMQHAAcBAVooAQFtAWsBfQMCBwEAAQMBAAE=",
+          "mergedV2": "AAADA0cAAQABAgPEACgGA1pta0EBAQEAAQEBAgB9AwIHAQAAAwEAAA==",
+          "diffs": [
+            {
+              "againstReplica": 0,
+              "stateVector": "A4DQrPMOCAcGAwI=",
+              "v1": "AAIHAgABAgEDAQAC",
+              "v2": "AAAAAAAAAQAAAAAAAgcCAAABAAMBAAE="
+            },
+            {
+              "againstReplica": 1,
+              "stateVector": "A4DQrPMOCAcGAwI=",
+              "v1": "AAIHAgABAgEDAQAC",
+              "v2": "AAAAAAAAAQAAAAAAAgcCAAABAAMBAAE="
+            }
           ],
           "texts": {
             "t": ">XYafterb😀"
@@ -759,6 +897,17 @@
             "AQE3CYQFCgQgZW5kAA==",
             "AQE3DSgBAW0FcGxhaW4BdwV2YWx1ZQA="
           ],
+          "stateV2": "AAMAAwMMN0UANwU3RQBJBUUOEwIABgxUAAgBAAZMAgQKShBGCgIJBAEARAoACgEAJ8QChAAoAAcAiAAoAAcAKACHAAcABAApAAQAhANGAMYAxQDGAMQAxoABZC1pbi1ib2xkLSBlbmRtcGxhaW5hcnJreG1scGNsYXNzaG9vay1uYW1leG1sIHRleHRkb2Nzc3Vic3ViLWd1aWRyaWNoaGVsbG8gd29ybGRib2xkYm9sZGl0YWxpYyFpdGFsaWMCA0QAAQUDAQMBBQkIBAMIBAIBAgUBRAAGAQYJAQEAAAEAAAIBBAEDBQYEAQJBAAMFAHcFdmFsdWUJAHcFcGxhaW59A3cBdncCYzF2AAsAeH52AQVpbWFnZXcFeC5wbmd4fgI3AQICBQIDAQcA",
+          "localUpdatesV2": [
+            "AAADN0UAAQIBBAHECwktaW4tYm9sZC0JAAAAAQEAAA==",
+            "AAAAAAAAAQAAAAAAAQUCAwEHAA==",
+            "AAAAAAAAAQAAAAAAATcBAgI=",
+            "AAACNwUBFAABhAYEIGVuZAQAAAABAQkA",
+            "AAABNwAAASgJBm1wbGFpbgEFAQEAAQEBAQ13BXZhbHVlAA=="
+          ],
+          "merged": "AQM3AMQFAQUCCS1pbi1ib2xkLYQFCgQgZW5kKAEBbQVwbGFpbgF3BXZhbHVlAjcBAgMFAgMCDAE=",
+          "mergedV2": "AAADN0UBAgISAQQFxACEACgYEy1pbi1ib2xkLSBlbmRtcGxhaW4JBAEFAQEAAQEBAwB3BXZhbHVlAjcBAgIFAgMBBwA=",
+          "diffs": [],
           "texts": {
             "rich": "he-iold-l worl!d end"
           },
@@ -950,6 +1099,24 @@
             "AAEVAgABBAE=",
             "AQIVB0MVAAPDvwDIFQcVAAF9QwA="
           ],
+          "stateV2": "AAAHgviCrRZVDQkABkYDAEQIQggFAgEAQgATyACIAAgAiACDAIgAyAGIAEMAyAMBYQEBAQACQQcCAgB3AUJ3A2VuZAkAfQF3A3R3bwEDfncBQXYBAWt4dQF9BQPDvwB9QwEVAgABAgA=",
+          "localUpdatesV2": [
+            "AAACVQECAwAABQgAgwCIAwFhAQEBAAICAQEDAH0BdwN0d28BA34A",
+            "AAACVQEBAAECAcgBAAAAAQIBAQR3AUF2AQFreAA=",
+            "AAACVQABBgABiAEAAAABAQEBBnUBfQUA",
+            "AAAAAAAAAQAAAAAAARUCAAADAA==",
+            "AAACVQIBDgIBAANDAMgBAAAAAQEBAgcDw78AfUMA"
+          ],
+          "merged": "AQcVAAgBAWECfQF3A3R3b4MVAQEDiBUCAX7IFQAVAQJ3AUF2AQFreIgVAwF1AX0FQxUAA8O/AMgVBxUAAX1DARUCAAEEAQ==",
+          "mergedV2": "AAACVQcFAwBEBggDAkIADQgAgwCIAMgAiABDAMgDAWEBAQEABQIBAkEAAQcAfQF3A3R3bwEDfncBQXYBAWt4dQF9BQPDvwB9QwEVAgAAAwA=",
+          "diffs": [
+            {
+              "againstReplica": 1,
+              "stateVector": "AoK8wZYLAhUJ",
+              "v1": "AAEVAgACBAE=",
+              "v2": "AAAAAAAAAQAAAAAAARUCAAECAA=="
+            }
+          ],
           "texts": {},
           "deltas": {},
           "maps": {}
@@ -982,6 +1149,22 @@
             "AQGCvMGWCwDIFQAVAQF3AUIA",
             "AAEVAQEB",
             "AQGCvMGWCwGIFQMBdwNlbmQA"
+          ],
+          "stateV2": "AAAHgviCrRZVDQkABkYDAEQIQggFAgEAQgATyACIAAgAiACDAIgAyAGIAEMAyAMBYQEBAQACQQcCAgB3AUJ3A2VuZAkAfQF3A3R3bwEDfncBQXYBAWt4dQF9BQPDvwB9QwEVAgABAgA=",
+          "localUpdatesV2": [
+            "AAAHgviCrRZVAAEAAQIByAEAAAABAQEBAHcBQgA=",
+            "AAAAAAAAAQAAAAAAARUBAQA=",
+            "AAAGgviCrRYVAQYAAYgBAAAAAQEBAQF3A2VuZAA="
+          ],
+          "merged": "AQKCvMGWCwDIFQAVAQF3AUKIFQMBdwNlbmQBFQEBAQ==",
+          "mergedV2": "AAAHgviCrRZVAQIABgECA8gAiAEAAAACQQABAgB3AUJ3A2VuZAEVAQEA",
+          "diffs": [
+            {
+              "againstReplica": 0,
+              "stateVector": "AoK8wZYLAhUJ",
+              "v1": "AAEVAgACBAE=",
+              "v2": "AAAAAAAAAQAAAAAAARUCAAECAA=="
+            }
           ],
           "texts": {},
           "deltas": {},
@@ -1178,6 +1361,26 @@
             "AAKDvMGWCwIAAQUKHwECAQ==",
             "AQUfFsYfDoO8wZYLEQRzaXplAjE0xh8Wg7zBlgsRBWNvbG9yBG51bGzEHxeDvMGWCxED5Litxh8Yg7zBlgsRBHNpemUEbnVsbMYfGYO8wZYLEQVjb2xvcgUicmVkIgA="
           ],
+          "stateV2": "AAMAAxlog/iCrRZfBsP4gq0WAB+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFl8Zg/iCrRYfg/iCrRYfg/iCrRYfg/iCrRYfg/iCrRYfg/iCrRYdBgxKAEQGAwEGAwJCXAIEAwEGBEwCEgMBXBQQAwETCAxKEFYGAQcCTAwCAQIMVh4BAiHGAcQARgDGBMQAxgUGAIQGhgBGAMYCxQDGAUYAxgLEAMbPAasBY29sb3Jjb2xvciF1bmRlcmxpbmV1bmRlcmxpbmVsaW5raXRhbGljYm9sZGNvbG9yw6nwn5iAbGlua2l0YWxpY2JvbGRjb2xvcmJvbGRib2xkcmljaGJvbGRIZWxsbyB3b3JsZGJvbGRpdGFsaWNpdGFsaWNsaW5rYm9sZGxpbmtib2xkdW5kZXJsaW5ldW5kZXJsaW5lc2l6ZWNvbG9y5Litc2l6ZWNvbG9yRQABSQAEBgQFAwQGBAVEAgECQQEDAgRGAEQCSQAEBQEEBQEBAAACEAB3A3JlZH54fnYBBGhyZWZ3DWh0dHBzOi8veC5vcmd+fn5+eHh3A3JlZH54FwB4fnh+dgEEaHJlZncTaHR0cHM6Ly9leGFtcGxlLmNvbX52AgVpbWFnZXcFeC5wbmcFd2lkdGh9pAF+eHh+fQ5+fncDcmVkAoO8wZYLAwAAAQACCR8CAgIPAQ==",
+          "localUpdatesV2": [
+            "AAIAAgJfAQIAFgAFBgCEAIYcF3JpY2hib2xkSGVsbG8gd29ybGRib2xkRAALBAEBAAABAwB4fgA=",
+            "AAIAAgJfAgEKAgAMA0YAxg8MaXRhbGljaXRhbGljRgAAAAABAg14fgA=",
+            "AAMAAwECXwkEDBIDAQMOAQIFxgHFAMYTEGxpbmtib2xkbGlua2JvbGREAgAAAAEFD3YBBGhyZWZ3E2h0dHBzOi8vZXhhbXBsZS5jb21+dgIFaW1hZ2V3BXgucG5nBXdpZHRofaQBfngA",
+            "AAIAAgdfAYP4gq0WAQgCGlYDRgDGFRJ1bmRlcmxpbmV1bmRlcmxpbmVJAAAAAAECFHh+AA==",
+            "AAAAAAAAAQAAAAAAAR8BFAA=",
+            "AAAAAAAAAQAAAAAAAoO8wZYLAgAABAkfAQIA",
+            "AAMAAwEfXwCD+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFgQcEAMBAyIBAgXGAcQAxhsVc2l6ZWNvbG9y5Litc2l6ZWNvbG9yBAUBBAUAAAABBRZ9Dn5+dwNyZWQA"
+          ],
+          "merged": "AREfAAYBBHJpY2gEYm9sZAR0cnVlhB8AC0hlbGxvIHdvcmxkhh8LBGJvbGQEbnVsbEYfAAZpdGFsaWMEdHJ1ZcYfBR8GBml0YWxpYwRudWxsxh8GHwcEbGluax57ImhyZWYiOiJodHRwczovL2V4YW1wbGUuY29tIn3GHw8fBwRib2xkBG51bGzFHxAfBx17ImltYWdlIjoieC5wbmciLCJ3aWR0aCI6MTAwfcYfER8HBGxpbmsEbnVsbMYfEh8HBGJvbGQEdHJ1ZUYfDQl1bmRlcmxpbmUEdHJ1ZcYfBIO8wZYLAgl1bmRlcmxpbmUEbnVsbMYfDoO8wZYLEQRzaXplAjE0xh8Wg7zBlgsRBWNvbG9yBG51bGzEHxeDvMGWCxED5Litxh8Yg7zBlgsRBHNpemUEbnVsbMYfGYO8wZYLEQVjb2xvcgUicmVkIgKDvMGWCwIAAQUKHwICARQB",
+          "mergedV2": "AAMAAwslXxCD+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFgwAFkwCEgMBXBQQAwEKAAwCAQIMVh4BAhUGAIQAhgBGAMYCxQDGAUYAxgLEAMZqWnJpY2hib2xkSGVsbG8gd29ybGRib2xkaXRhbGljaXRhbGljbGlua2JvbGRsaW5rYm9sZHVuZGVybGluZXVuZGVybGluZXNpemVjb2xvcuS4rXNpemVjb2xvckQACwRGAEQCSQAEBQEEBQEBAAABEQB4fnh+dgEEaHJlZncTaHR0cHM6Ly9leGFtcGxlLmNvbX52AgVpbWFnZXcFeC5wbmcFd2lkdGh9pAF+eHh+fQ5+fncDcmVkAoO8wZYLAgAABAkfAgIAEQA=",
+          "diffs": [
+            {
+              "againstReplica": 1,
+              "stateVector": "AoO8wZYLEh8b",
+              "v1": "AAKDvMGWCwMAAQIBBQofAgIDFAI=",
+              "v2": "AAAAAAAAAQAAAAAAAoO8wZYLAwAAAQACCR8CAgIPAQ=="
+            }
+          ],
           "texts": {
             "rich": "Ho中 world"
           },
@@ -1250,6 +1453,23 @@
             "AQGDvMGWCwLEHwQfBQEhAA==",
             "AQKDvMGWCwNGHw0JdW5kZXJsaW5lBHRydWXGHwSDvMGWCwIJdW5kZXJsaW5lBG51bGwA",
             "AQuDvMGWCwXGg7zBlgsCHwUEbGluaxh7ImhyZWYiOiJodHRwczovL3gub3JnIn3Gg7zBlgsFHwUGaXRhbGljBG51bGzGg7zBlgsGHwUEYm9sZARudWxsxoO8wZYLBx8FBWNvbG9yBG51bGzEg7zBlgsIHwUGw6nwn5iAxoO8wZYLCx8FBGxpbmsEbnVsbMaDvMGWCwwfBQZpdGFsaWMEdHJ1ZcaDvMGWCw0fBQRib2xkBHRydWXGg7zBlgsOHwUFY29sb3IFInJlZCLGg7zBlgsPHwUEYm9sZARudWxsxh8OHwYEYm9sZAR0cnVlAoO8wZYLAQIBHwIDAhUB"
+          ],
+          "stateV2": "AAMAAxlog/iCrRZfBsP4gq0WAB+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFl8Zg/iCrRYfg/iCrRYfg/iCrRYfg/iCrRYfg/iCrRYfg/iCrRYdBgxKAEQGAwEGAwJCXAIEAwEGBEwCEgMBXBQQAwETCAxKEFYGAQcCTAwCAQIMVh4BAiHGAcQARgDGBMQAxgUGAIQGhgBGAMYCxQDGAUYAxgLEAMbPAasBY29sb3Jjb2xvciF1bmRlcmxpbmV1bmRlcmxpbmVsaW5raXRhbGljYm9sZGNvbG9yw6nwn5iAbGlua2l0YWxpY2JvbGRjb2xvcmJvbGRib2xkcmljaGJvbGRIZWxsbyB3b3JsZGJvbGRpdGFsaWNpdGFsaWNsaW5rYm9sZGxpbmtib2xkdW5kZXJsaW5ldW5kZXJsaW5lc2l6ZWNvbG9y5Litc2l6ZWNvbG9yRQABSQAEBgQFAwQGBAVEAgECQQEDAgRGAEQCSQAEBQEEBQEBAAACEAB3A3JlZH54fnYBBGhyZWZ3DWh0dHBzOi8veC5vcmd+fn5+eHh3A3JlZH54FwB4fnh+dgEEaHJlZncTaHR0cHM6Ly9leGFtcGxlLmNvbX52AgVpbWFnZXcFeC5wbmcFd2lkdGh9pAF+eHh+fQ5+fncDcmVkAoO8wZYLAwAAAQACCR8CAgIPAQ==",
+          "localUpdatesV2": [
+            "AAIAAgeD+IKtFl8CAgYMAggMAcYNCmNvbG9yY29sb3JFAAAAAAECAHcDcmVkfgA=",
+            "AAAHg/iCrRZfAAEIAQoBxAMBIQEAAAABAQIA",
+            "AAIAAgyD+IKtFl8Ag/iCrRYBCAIaVgNGAMYVEnVuZGVybGluZXVuZGVybGluZUkAAAAAAQIDeH4A",
+            "AAMAAwc+w/iCrRYAH4P4gq0WH4P4gq0WH4P4gq0WH4P4gq0WH4P4gq0WH4P4gq0WH4P4gq0WH4P4gq0WH4P4gq0WXwEIBAYDAQYDAkIECgEHAgXGA8QAxkA0bGlua2l0YWxpY2JvbGRjb2xvcsOp8J+YgGxpbmtpdGFsaWNib2xkY29sb3Jib2xkYm9sZAQGBAUDBAYEBUQAAAAAAQsFdgEEaHJlZncNaHR0cHM6Ly94Lm9yZ35+fn54eHcDcmVkfngCg7zBlgsBAgAfAgMBEAA="
+          ],
+          "merged": "ARCDvMGWCwDGHwMfBAVjb2xvcgUicmVkIsYfCR8KBWNvbG9yBG51bGzEHwQfBQEhRh8NCXVuZGVybGluZQR0cnVlxh8Eg7zBlgsCCXVuZGVybGluZQRudWxsxoO8wZYLAh8FBGxpbmsYeyJocmVmIjoiaHR0cHM6Ly94Lm9yZyJ9xoO8wZYLBR8FBml0YWxpYwRudWxsxoO8wZYLBh8FBGJvbGQEbnVsbMaDvMGWCwcfBQVjb2xvcgRudWxsxIO8wZYLCB8FBsOp8J+YgMaDvMGWCwsfBQRsaW5rBG51bGzGg7zBlgsMHwUGaXRhbGljBHRydWXGg7zBlgsNHwUEYm9sZAR0cnVlxoO8wZYLDh8FBWNvbG9yBSJyZWQixoO8wZYLDx8FBGJvbGQEbnVsbMYfDh8GBGJvbGQEdHJ1ZQKDvMGWCwECAR8CAwIVAQ==",
+          "mergedV2": "AAMAAwtFg/iCrRZfBsP4gq0WAB+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFh+D+IKtFl8BDAYMSgBEBgMBBgMCQgkIDEoQVgYBBwILxgHEAEYAxgTEAMZiUWNvbG9yY29sb3IhdW5kZXJsaW5ldW5kZXJsaW5lbGlua2l0YWxpY2JvbGRjb2xvcsOp8J+YgGxpbmtpdGFsaWNib2xkY29sb3Jib2xkYm9sZEUAAUkABAYEBQMEBgQFRAAAAAABEAB3A3JlZH54fnYBBGhyZWZ3DWh0dHBzOi8veC5vcmd+fn5+eHh3A3JlZH54AoO8wZYLAQIAHwIDARAA",
+          "diffs": [
+            {
+              "againstReplica": 0,
+              "stateVector": "AoO8wZYLEh8b",
+              "v1": "AAKDvMGWCwMAAQIBBQofAgIDFAI=",
+              "v2": "AAAAAAAAAQAAAAAAAoO8wZYLAwAAAQACCR8CAgIPAQ=="
+            }
           ],
           "texts": {
             "rich": "Ho中 world"

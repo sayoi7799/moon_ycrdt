@@ -87,6 +87,7 @@ async function connect (room) {
 /** Stops the server and waits until it is gone. */
 function stopServer (child) {
   return new Promise(resolve => {
+    if (child.exitCode !== null || child.signalCode !== null) return resolve()
     child.once('exit', resolve)
     child.kill()
   })
@@ -165,7 +166,8 @@ try {
   console.error(err)
   exitCode = 1
 } finally {
-  serverProcess?.kill()
-  rmSync(dataDir, { recursive: true, force: true })
+  // the server may still be writing a room file: wait until it is gone
+  if (serverProcess) await stopServer(serverProcess)
+  rmSync(dataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 })
 }
 process.exit(exitCode)

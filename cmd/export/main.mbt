@@ -40,6 +40,8 @@ priv struct Script {
   clients : Array[UInt32]
   docs : Array[@doc.Doc]
   logs : Array[Array[Bytes]]
+  /// the same local updates in format v2
+  logs_v2 : Array[Array[Bytes]]
   ops : Array[Json]
   texts : Array[String]
   maps : Array[String]
@@ -56,10 +58,12 @@ fn Script::new(
 ) -> Script {
   let docs = clients.map(id => @doc.Doc::new(id))
   let logs : Array[Array[Bytes]] = docs.map(_ => [])
+  let logs_v2 : Array[Array[Bytes]] = docs.map(_ => [])
   for i, d in docs {
     d.on_update((u, is_local) => if is_local { logs[i].push(u) })
+    d.on_update_v2((u, is_local) => if is_local { logs_v2[i].push(u) })
   }
-  { name, clients, docs, logs, ops: [], texts, maps, arrays, }
+  { name, clients, docs, logs, logs_v2, ops: [], texts, maps, arrays, }
 }
 
 ///|
@@ -252,6 +256,43 @@ fn Script::report(self : Script) -> Json {
       "state": b64(d.encode_state_as_update()),
       "stateVector": b64(d.encode_state_vector()),
       "localUpdates": Json::array(self.logs[i].map(b64)),
+      "stateV2": b64(d.encode_state_as_update_v2()),
+      "localUpdatesV2": Json::array(self.logs_v2[i].map(b64)),
+      // merged and diffed without a document
+      "merged": b64(
+        @update.merge_updates(self.logs[i]) catch {
+          e => abort(e.to_string())
+        },
+      ),
+      "mergedV2": b64(
+        @update.merge_updates_v2(self.logs_v2[i]) catch {
+          e => abort(e.to_string())
+        },
+      ),
+      "diffs": Json::array(
+        self.docs
+        .mapi((j, other) => (j, other))
+        .filter(p => p.0 != i)
+        .map(p => {
+          let sv = p.1.encode_state_vector()
+          let state = d.encode_state_as_update()
+          let state_v2 = d.encode_state_as_update_v2()
+          {
+            "againstReplica": Json::number(p.0.to_double()),
+            "stateVector": b64(sv),
+            "v1": b64(
+              @update.diff_update(state, sv) catch {
+                e => abort(e.to_string())
+              },
+            ),
+            "v2": b64(
+              @update.diff_update_v2(state_v2, sv) catch {
+                e => abort(e.to_string())
+              },
+            ),
+          }
+        }),
+      ),
       "texts": Json::object(texts),
       "deltas": Json::object(deltas),
       "maps": Json::object(maps),

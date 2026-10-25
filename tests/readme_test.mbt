@@ -96,3 +96,31 @@ test "README: rich text" {
   let parsed = @types.delta_from_json(@json.parse(readme_rich_delta))
   assert_eq(parsed, delta)
 }
+
+///|
+test "README: update format v2 and updates without a document" {
+  let alice = @doc.Doc::new(1)
+  let updates : Array[Bytes] = []
+  alice.on_update((update, is_local) => if is_local { updates.push(update) })
+  let text = @types.Text::new(alice, "doc")
+  text.insert(0, "Hello")
+  text.insert(5, " world")
+  text.delete(0, 1)
+
+  // the whole state in format v2, like Y.encodeStateAsUpdateV2
+  let v2 = alice.encode_state_as_update_v2()
+  let bob = @doc.Doc::new(2)
+  bob.apply_update_v2(v2)
+  assert_eq(@types.Text::new(bob, "doc").to_string(), "ello world")
+
+  // work on updates as bytes: no document is needed
+  let merged = @update.merge_updates(updates)
+  let sv = @update.encode_state_vector_from_update(merged)
+  let missing = @update.diff_update(merged, bob.encode_state_vector())
+  let carol = @doc.Doc::new(3)
+  carol.apply_update(merged)
+  assert_eq(@types.Text::new(carol, "doc").to_string(), "ello world")
+  assert_eq(sv, carol.encode_state_vector())
+  // bob has every struct already: only the delete set is left
+  assert_eq(@update.decode_update(missing).clients.length(), 0)
+}

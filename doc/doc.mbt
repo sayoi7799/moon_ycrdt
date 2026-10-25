@@ -23,6 +23,7 @@ pub struct Doc {
   /// Types with a change inside them in this transaction (`transaction.changed`).
   priv txn_changed : Array[YType]
   priv listeners : Array[(Bytes, Bool) -> Unit]
+  priv listeners_v2 : Array[(Bytes, Bool) -> Unit]
 }
 
 ///|
@@ -41,6 +42,7 @@ pub fn Doc::new(client_id : UInt32) -> Doc {
     txn_ds: @update.DeleteSet::new(),
     txn_changed: [],
     listeners: [],
+    listeners_v2: [],
   }
 }
 
@@ -108,7 +110,21 @@ pub fn Doc::apply_update(
   self : Doc,
   data : Bytes,
 ) -> Unit raise @lib0.DecodeError {
-  let update = @update.decode_update(data)
+  self.apply_decoded_update(@update.decode_update(data))
+}
+
+///|
+/// Applies an update of format v2 (`Y.applyUpdateV2`); everything else works as
+/// for `apply_update`.
+pub fn Doc::apply_update_v2(
+  self : Doc,
+  data : Bytes,
+) -> Unit raise @lib0.DecodeError {
+  self.apply_decoded_update(@update.decode_update_v2(data))
+}
+
+///|
+fn Doc::apply_decoded_update(self : Doc, update : @update.Update) -> Unit {
   // queue = previously pending structs + new structs, per client by clock
   let queue = self.pending_structs
   self.pending_structs = {}
@@ -257,6 +273,20 @@ pub fn Doc::encode_state_as_update(
   self : Doc,
   sv~ : Map[UInt32, Int32] = Map([]),
 ) -> Bytes {
+  self.state_as_update(sv).encode()
+}
+
+///|
+/// `Y.encodeStateAsUpdateV2`: the same content in update format v2.
+pub fn Doc::encode_state_as_update_v2(
+  self : Doc,
+  sv~ : Map[UInt32, Int32] = Map([]),
+) -> Bytes {
+  self.state_as_update(sv).encode_v2()
+}
+
+///|
+fn Doc::state_as_update(self : Doc, sv : Map[UInt32, Int32]) -> @update.Update {
   let ids = @hashset.HashSet([])
   for client, _ in self.clients {
     if self.get_state(client) > sv.get(client).unwrap_or(0) {
@@ -306,7 +336,14 @@ pub fn Doc::encode_state_as_update(
     }
   }
   ds.sort_and_merge()
-  @update.Update::new(out, ds).encode()
+  let update = @update.Update::new(out, ds)
+  // With pending data Yjs merges the encoded state with it, and merging reads
+  // every struct again: the bit "this map entry has a key" is gone afterwards
+  if self.has_pending() {
+    update.normalized()
+  } else {
+    update
+  }
 }
 
 ///|
@@ -362,9 +399,15 @@ pub fn Doc::on_update(self : Doc, f : (Bytes, Bool) -> Unit) -> Unit {
 }
 
 ///|
+/// Like `on_update`, with the update in format v2 (`doc.on("updateV2")`).
+pub fn Doc::on_update_v2(self : Doc, f : (Bytes, Bool) -> Unit) -> Unit {
+  self.listeners_v2.push(f)
+}
+
+///|
 fn Doc::end_transaction(self : Doc, is_local : Bool) -> Unit {
   self.cleanup()
-  if self.listeners.length() > 0 &&
+  if (self.listeners.length() > 0 || self.listeners_v2.length() > 0) &&
     (self.txn_before.length() > 0 || !self.txn_ds.is_empty()) {
     let clients = self.txn_before.keys().to_array()
     clients.sort_by((a, b) => b.compare(a))
@@ -373,9 +416,18 @@ fn Doc::end_transaction(self : Doc, is_local : Bool) -> Unit {
       structs: self.structs_from(client, self.txn_before.get(client).unwrap()),
     })
     self.txn_ds.sort_and_merge()
-    let update = @update.Update::new(out, self.txn_ds).encode()
-    for f in self.listeners {
-      f(update, is_local)
+    let update = @update.Update::new(out, self.txn_ds)
+    if self.listeners.length() > 0 {
+      let bytes = update.encode()
+      for f in self.listeners {
+        f(bytes, is_local)
+      }
+    }
+    if self.listeners_v2.length() > 0 {
+      let bytes = update.encode_v2()
+      for f in self.listeners_v2 {
+        f(bytes, is_local)
+      }
     }
   }
   self.txn_before.clear()
@@ -400,6 +452,28 @@ pub fn encode_state_as_update(
   match target_state_vector {
     Some(sv) => doc.encode_state_as_update(sv=@update.decode_state_vector(sv))
     None => doc.encode_state_as_update()
+  }
+}
+
+///|
+/// `Y.applyUpdateV2(doc, update)`.
+pub fn apply_update_v2(
+  doc : Doc,
+  update : Bytes,
+) -> Unit raise @lib0.DecodeError {
+  doc.apply_update_v2(update)
+}
+
+///|
+/// `Y.encodeStateAsUpdateV2(doc, encodedTargetStateVector?)`.
+pub fn encode_state_as_update_v2(
+  doc : Doc,
+  target_state_vector? : Bytes,
+) -> Bytes raise @lib0.DecodeError {
+  match target_state_vector {
+    Some(sv) =>
+      doc.encode_state_as_update_v2(sv=@update.decode_state_vector(sv))
+    None => doc.encode_state_as_update_v2()
   }
 }
 

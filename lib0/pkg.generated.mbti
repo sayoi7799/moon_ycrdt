@@ -97,6 +97,59 @@ pub fn Encoder::write_var_uint(Self, Int32) -> Unit
 pub fn Encoder::write_var_uint32(Self, UInt32) -> Unit
 pub fn Encoder::write_var_uint64(Self, UInt64) -> Unit
 
+pub struct IntDiffOptRleDecoder {
+  // private fields
+}
+pub fn IntDiffOptRleDecoder::new(Bytes) -> Self
+pub fn IntDiffOptRleDecoder::read(Self) -> Int32 raise DecodeError
+
+pub struct IntDiffOptRleEncoder {
+  // private fields
+}
+pub fn IntDiffOptRleEncoder::new() -> Self
+pub fn IntDiffOptRleEncoder::to_bytes(Self) -> Bytes
+pub fn IntDiffOptRleEncoder::write(Self, Int32) -> Unit
+
+pub struct RleDecoder {
+  // private fields
+}
+pub fn RleDecoder::new(Bytes) -> Self
+pub fn RleDecoder::read(Self) -> Int32 raise DecodeError
+
+pub struct RleEncoder {
+  // private fields
+}
+pub fn RleEncoder::new() -> Self
+pub fn RleEncoder::to_bytes(Self) -> Bytes
+pub fn RleEncoder::write(Self, Int32) -> Unit
+
+pub struct StringDecoder {
+  // private fields
+}
+pub fn StringDecoder::new(Bytes) -> Self raise DecodeError
+pub fn StringDecoder::read(Self) -> String raise DecodeError
+
+pub struct StringEncoder {
+  // private fields
+}
+pub fn StringEncoder::new() -> Self
+pub fn StringEncoder::to_bytes(Self) -> Bytes
+pub fn StringEncoder::write(Self, String) -> Unit
+
+pub struct UintOptRleDecoder {
+  // private fields
+}
+pub fn UintOptRleDecoder::from_decoder(Decoder) -> Self
+pub fn UintOptRleDecoder::new(Bytes) -> Self
+pub fn UintOptRleDecoder::read(Self) -> UInt32 raise DecodeError
+
+pub struct UintOptRleEncoder {
+  // private fields
+}
+pub fn UintOptRleEncoder::new() -> Self
+pub fn UintOptRleEncoder::to_bytes(Self) -> Bytes
+pub fn UintOptRleEncoder::write(Self, UInt32) -> Unit
+
 // Type aliases
 
 // Traits

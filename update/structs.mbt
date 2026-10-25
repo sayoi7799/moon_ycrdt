@@ -85,17 +85,18 @@ const REF_SKIP : Int32 = 10
 /// clock of the same item, as in `Item.write(encoder, offset)`.
 pub fn StructRef::write(
   self : StructRef,
-  e : @lib0.Encoder,
+  e : UpdateEncoder,
   offset : Int32,
 ) -> Unit {
   match self {
     GC(_, len) => {
-      e.write_u8(REF_GC)
-      e.write_var_uint(len - offset)
+      e.write_info(REF_GC)
+      e.write_len(len - offset)
     }
     Skip(_, len) => {
-      e.write_u8(REF_SKIP)
-      e.write_var_uint(len - offset)
+      // a skip's length is a plain varint in both formats
+      e.write_info(REF_SKIP)
+      e.rest.write_var_uint(len - offset)
     }
     Item(item) => {
       let origin = if offset > 0 {
@@ -107,28 +108,28 @@ pub fn StructRef::write(
         (if origin is Some(_) { BIT_ORIGIN } else { 0 }) |
         (if item.right_origin is Some(_) { BIT_RIGHT_ORIGIN } else { 0 }) |
         (if item.has_parent_sub { BIT_PARENT_SUB } else { 0 })
-      e.write_u8(info)
+      e.write_info(info)
       if origin is Some(o) {
-        write_id(e, o)
+        e.write_left_id(o)
       }
       if item.right_origin is Some(ro) {
-        write_id(e, ro)
+        e.write_right_id(ro)
       }
       if origin is None && item.right_origin is None {
         match item.parent {
           Some(Root(name)) => {
-            e.write_var_uint(1)
-            e.write_var_string(name)
+            e.write_parent_info(true)
+            e.write_string(name)
           }
           Some(Item(id)) => {
-            e.write_var_uint(0)
-            write_id(e, id)
+            e.write_parent_info(false)
+            e.write_left_id(id)
           }
           None => abort("item \{item.id} without origins needs a parent")
         }
         if item.has_parent_sub {
           match item.parent_sub {
-            Some(key) => e.write_var_string(key)
+            Some(key) => e.write_string(key)
             None => abort("item \{item.id} without origins needs its key")
           }
         }
@@ -140,21 +141,21 @@ pub fn StructRef::write(
 
 ///|
 pub fn read_struct(
-  d : @lib0.Decoder,
+  d : UpdateDecoder,
   id : ID,
 ) -> StructRef raise @lib0.DecodeError {
-  let info = d.read_u8()
+  let info = d.read_info()
   match info & BITS_CONTENT_REF {
-    REF_GC => GC(id, d.read_var_uint())
-    REF_SKIP => Skip(id, d.read_var_uint())
+    REF_GC => GC(id, d.read_len())
+    REF_SKIP => Skip(id, d.rest.read_var_uint())
     ref_number => {
       let origin = if (info & BIT_ORIGIN) != 0 {
-        Some(read_id(d))
+        Some(d.read_left_id())
       } else {
         None
       }
       let right_origin = if (info & BIT_RIGHT_ORIGIN) != 0 {
-        Some(read_id(d))
+        Some(d.read_right_id())
       } else {
         None
       }
@@ -163,14 +164,14 @@ pub fn read_struct(
       let mut parent_sub = None
       if origin is None && right_origin is None {
         parent = Some(
-          if d.read_var_uint() == 1 {
-            ParentRef::Root(d.read_var_string())
+          if d.read_parent_info() {
+            ParentRef::Root(d.read_string())
           } else {
-            ParentRef::Item(read_id(d))
+            ParentRef::Item(d.read_left_id())
           },
         )
         if has_parent_sub {
-          parent_sub = Some(d.read_var_string())
+          parent_sub = Some(d.read_string())
         }
       }
       let content = read_content(d, ref_number)
@@ -203,5 +204,26 @@ pub fn StructRef::slice(self : StructRef, offset : Int32) -> StructRef {
         origin: Some(ID::new(r.id.client, r.id.clock + offset - 1)),
         content: r.content.split(offset).1,
       })
+  }
+}
+
+///|
+/// The struct as Yjs sees it after reading it from an update. An item with an
+/// origin does not carry its map key on the wire, only a bit in the info byte
+/// that says "this is a map entry"; the reader forgets that (the key of the
+/// item is `null`, so the bit is not written again). Everything that reads
+/// structs and writes them again (merging and diffing updates, converting
+/// between formats, the state of a document that holds pending structs)
+/// therefore writes the bit cleared for every item with an origin. Items
+/// without origins keep their key and the bit.
+pub fn StructRef::normalized(self : StructRef) -> StructRef {
+  match self {
+    Item(r) =>
+      if r.origin is None && r.right_origin is None && r.parent_sub is Some(_) {
+        self
+      } else {
+        Item({ ..r, has_parent_sub: false, parent_sub: None, })
+      }
+    _ => self
   }
 }
