@@ -31,13 +31,22 @@ fn array_state(a : @types.YArray) -> String {
 ///|
 /// Replays `cases` and returns the number of steps. A step whose recorded
 /// state is empty is only checked through the bytes of its updates.
-fn run_array_cases(cases : Array[ArrayCase]) -> Int32 raise {
+fn run_array_cases(cases : Array[ArrayCase], v2~ : Bool = false) -> Int32 raise {
   let mut steps = 0
   for c in cases {
     let docs = c.clients.map(id => @doc.Doc::new(id))
     let logs : Array[Array[Bytes]] = docs.map(_ => [])
     for i, d in docs {
-      d.on_update((u, is_local) => if is_local { logs[i].push(u) })
+      let record = fn(u : Bytes, is_local : Bool) {
+        if is_local {
+          logs[i].push(u)
+        }
+      }
+      if v2 {
+        d.on_update_v2(record)
+      } else {
+        d.on_update(record)
+      }
     }
     let arrays = docs.map(d => @types.YArray::new(d, "a"))
     for k, op in c.ops {
@@ -58,7 +67,11 @@ fn run_array_cases(cases : Array[ArrayCase]) -> Int32 raise {
         }
         ASync(from, to, indices, state) => {
           for i in indices {
-            docs[to].apply_update(logs[from][i])
+            if v2 {
+              docs[to].apply_update_v2(logs[from][i])
+            } else {
+              docs[to].apply_update(logs[from][i])
+            }
           }
           (to, None, state)
         }
