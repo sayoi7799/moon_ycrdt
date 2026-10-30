@@ -55,7 +55,9 @@ MoonBit 程序只要能产出和消费同样的字节，就能直接接入。因
 
 ## 安装
 
-在自己的 MoonBit 项目里添加依赖（需要本模块已发布到 mooncakes.io）：
+需要 MoonBit 工具链 moonc 0.10.16 或更新（`moon version --all` 查看）。CI 每次安装最新版工具链，没有固定版本。
+
+在自己的 MoonBit 项目里添加依赖（模块已发布在 [mooncakes.io](https://mooncakes.io/docs/sayoi7799/moon_ycrdt)）：
 
 ```bash
 moon add sayoi7799/moon_ycrdt
